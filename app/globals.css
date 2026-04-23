@@ -1,12 +1,12 @@
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap");
+@import "tailwindcss";
+@config "../tailwind.config.ts";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@theme {
+  --background-image-dot-grid: radial-gradient(circle at center, #353535 1px, transparent 1px);
+}
 
-.bg-dot-grid {
-  background-image: radial-gradient(circle at center, #353535 1px, transparent 1px);
+@utility bg-dot-grid {
+  background-image: var(--background-image-dot-grid);
   background-size: 32px 32px;
 }
 
@@ -22,4 +22,5 @@
   word-wrap: normal;
   white-space: nowrap;
   direction: ltr;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }

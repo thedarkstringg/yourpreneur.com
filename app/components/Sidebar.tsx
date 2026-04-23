@@ -33,7 +33,7 @@ export default function Sidebar() {
               : "text-white/30 hover:text-white/60"
           }`}
         >
-          <span className="material-symbols-outlined text-sm">timeline</span>
+          <span className="material-symbols-outlined">timeline</span>
           Chronicle
         </Link>
         <Link

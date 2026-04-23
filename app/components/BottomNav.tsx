@@ -29,7 +29,7 @@ export default function BottomNav() {
             : "text-white/40 hover:text-white/80 transition-colors hover:bg-white/5"
         }`}
       >
-        <span className="material-symbols-outlined text-sm mb-1">query_stats</span>
+        <span className="material-symbols-outlined mb-1">query_stats</span>
         Patterns
       </Link>
       <Link

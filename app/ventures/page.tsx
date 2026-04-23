@@ -1,164 +1,257 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { useAppStore } from "@/lib/appStore";
+import { getMockUser, getMockVentures, getMockEvents } from "@/lib/mockData";
+import { calculateDaysActive, formatDateShort } from "@/lib/utils";
+import StatusBadge from "@/app/components/StatusBadge";
+import { VentureStatus } from "@/lib/types";
+import { useRouter } from "next/navigation";
 
-interface Milestone {
-  id: number;
-  date: string;
-  title: string;
-  description: string;
-  isPrimary: boolean;
-}
+const industries = ["All", "FinTech", "AI/ML", "SaaS", "Logistics", "Healthcare"];
+const statuses: (VentureStatus | "All")[] = ["All", "active", "pivot", "paused", "shutdown", "exited"];
 
-interface Venture {
-  id: string;
-  name: string;
-  category: string;
-  status: "Active" | "Paused" | "Exited" | "Pivot";
-  description: string;
-  inceptionDate: string;
-  pauseDate?: string;
-  milestones: Milestone[];
-}
+type SortBy = "recent" | "oldest" | "active" | "name";
 
-const venture: Venture = {
-  id: "aura-financial",
-  name: "Aura Financial",
-  category: "FinTech",
-  status: "Paused",
-  description:
-    "A decentralized protocol aimed at democratizing access to institutional-grade yield strategies. Developed over 18 months, securing initial seed funding before shifting regulatory landscapes required a strategic pause. The core architecture remains a viable asset for future pivot opportunities.",
-  inceptionDate: "2021.04",
-  pauseDate: "2023.01",
-  milestones: [
-    {
-      id: 1,
-      date: "2021.09",
-      title: "Seed Round Close",
-      description:
-        "Secured $2.4M from tier-one web3 native funds. Validated the initial whitepaper thesis.",
-      isPrimary: true,
-    },
-    {
-      id: 2,
-      date: "2022.03",
-      title: "V1 Testnet Launch",
-      description:
-        "Deployed initial smart contracts to Goerli. Gathered feedback from 500+ alpha testers.",
-      isPrimary: true,
-    },
-    {
-      id: 3,
-      date: "2023.01",
-      title: "Strategic Pause",
-      description:
-        "Decision made to halt development pending clearer SEC guidance on yield-bearing assets.",
-      isPrimary: false,
-    },
-  ],
-};
+export default function Ventures() {
+  const router = useRouter();
+  const { ventures, events, setUser, setVentures, setEvents, isLoading, setIsLoading } =
+    useAppStore();
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "Active":
-      return "bg-primary/10 border-primary text-primary";
-    case "Paused":
-      return "bg-error-container/20 border-error text-error";
-    case "Exited":
-      return "bg-surface-variant border-outline-variant text-on-surface-variant";
-    case "Pivot":
-      return "bg-surface-variant border-outline-variant text-on-surface-variant";
-    default:
-      return "bg-surface-container border-outline-variant text-on-surface";
+  const [sortBy, setSortBy] = useState<SortBy>("recent");
+  const [filterIndustry, setFilterIndustry] = useState("All");
+  const [filterStatus, setFilterStatus] = useState<VentureStatus | "All">("All");
+
+  // Load mock data on mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const mockUser = await getMockUser();
+        const mockVentures = await getMockVentures();
+        const mockEvents = await getMockEvents();
+
+        setUser(mockUser);
+        setVentures(mockVentures);
+        setEvents(mockEvents);
+      } catch (error) {
+        console.error("Error loading data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (ventures.length === 0) {
+      loadData();
+    } else {
+      setIsLoading(false);
+    }
+  }, [ventures.length, setUser, setVentures, setEvents, setIsLoading]);
+
+  // Filter ventures
+  let filtered = ventures;
+  if (filterIndustry !== "All") {
+    filtered = filtered.filter((v) => v.industry === filterIndustry);
   }
-};
+  if (filterStatus !== "All") {
+    filtered = filtered.filter((v) => v.status === filterStatus);
+  }
 
-export default function VentureProfile() {
+  // Sort ventures
+  let sorted = [...filtered];
+  switch (sortBy) {
+    case "recent":
+      sorted.sort(
+        (a, b) =>
+          new Date(b.started_date).getTime() - new Date(a.started_date).getTime()
+      );
+      break;
+    case "oldest":
+      sorted.sort(
+        (a, b) =>
+          new Date(a.started_date).getTime() - new Date(b.started_date).getTime()
+      );
+      break;
+    case "active":
+      sorted.sort((a, b) => {
+        const eventsA = events.filter((e) => e.venture_id === a.id).length;
+        const eventsB = events.filter((e) => e.venture_id === b.id).length;
+        return eventsB - eventsA;
+      });
+      break;
+    case "name":
+      sorted.sort((a, b) => a.name.localeCompare(b.name));
+      break;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <div className="w-12 h-12 rounded-full border-2 border-outline-variant border-t-primary animate-spin mx-auto mb-4"></div>
+          <p className="text-on-surface-variant text-sm">Loading ventures...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
-      {/* Venture Header */}
-      <header className="flex flex-col gap-6 mb-32">
-        <div className="flex gap-3 flex-wrap">
-          <span className="px-3 py-1 rounded border border-outline-variant font-label-caps text-label-caps text-on-surface bg-surface-container-high">
-            {venture.category}
-          </span>
-          <span
-            className={`px-3 py-1 rounded border font-label-caps text-label-caps ${getStatusColor(venture.status)}`}
-          >
-            {venture.status}
-          </span>
-        </div>
-
-        <h1 className="font-display-lg text-display-lg text-primary">
-          {venture.name}
-        </h1>
-
-        <p className="font-body-base text-body-base text-on-surface-variant max-w-2xl">
-          {venture.description}
+      {/* Header */}
+      <header className="mb-12">
+        <h1 className="text-4xl font-display-lg text-primary mb-2">All Ventures</h1>
+        <p className="text-sm text-on-surface-variant">
+          {sorted.length} venture{sorted.length !== 1 ? "s" : ""} total
         </p>
-
-        <div className="flex gap-4 mt-4 border-b border-outline-variant/30 pb-4 flex-wrap">
-          <div className="flex flex-col">
-            <span className="font-label-caps text-label-caps text-on-surface-variant mb-1">
-              Inception
-            </span>
-            <span className="font-mono-data text-mono-data text-on-surface">
-              {venture.inceptionDate}
-            </span>
-          </div>
-          {venture.pauseDate && (
-            <>
-              <div className="w-px h-8 bg-outline-variant/30"></div>
-              <div className="flex flex-col">
-                <span className="font-label-caps text-label-caps text-on-surface-variant mb-1">
-                  Pause Date
-                </span>
-                <span className="font-mono-data text-mono-data text-on-surface">
-                  {venture.pauseDate}
-                </span>
-              </div>
-            </>
-          )}
-        </div>
       </header>
 
-      {/* Milestones Gallery */}
-      <section className="flex flex-col gap-8">
-        <h2 className="font-label-caps text-label-caps text-on-surface border-b border-outline-variant/30 pb-2 uppercase tracking-widest">
-          Key Milestones
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {venture.milestones.map((milestone) => (
-            <div
-              key={milestone.id}
-              className="bg-[#0A0A0A] border border-outline-variant/30 rounded p-6 flex flex-col gap-4 relative overflow-hidden group hover:border-outline-variant/60 transition-colors duration-200"
+      {/* Controls */}
+      <div className="flex flex-col gap-6 mb-12 md:flex-row md:items-center md:justify-between">
+        {/* Sort */}
+        <div className="flex gap-2">
+          {(["recent", "oldest", "active", "name"] as SortBy[]).map((option) => (
+            <motion.button
+              key={option}
+              onClick={() => setSortBy(option)}
+              className={`px-3 py-1.5 text-xs font-label-caps rounded-lg transition-all ${
+                sortBy === option
+                  ? "bg-primary text-on-primary"
+                  : "border border-outline-variant text-on-surface-variant hover:text-primary"
+              }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <div
-                className={`absolute top-0 left-0 w-full h-[1px] ${
-                  milestone.isPrimary ? "bg-primary" : "bg-error"
-                }`}
-              ></div>
-
-              <span className="font-mono-data text-mono-data text-on-surface-variant">
-                {milestone.date}
-              </span>
-
-              <h3 className="font-headline-md text-headline-md text-on-surface">
-                {milestone.title}
-              </h3>
-
-              <p className="font-body-sm text-body-sm text-on-surface-variant flex-grow">
-                {milestone.description}
-              </p>
-
-              <button className="self-start text-primary font-label-caps text-label-caps border border-primary/30 px-4 py-2 rounded hover:bg-[#1A1A1A] hover:border-primary/60 transition-colors mt-2 uppercase tracking-widest text-xs">
-                View Entry
-              </button>
-            </div>
+              {option.charAt(0).toUpperCase() + option.slice(1)}
+            </motion.button>
           ))}
         </div>
-      </section>
+
+        {/* Filters */}
+        <div className="flex gap-4">
+          {/* Industry filter */}
+          <select
+            value={filterIndustry}
+            onChange={(e) => setFilterIndustry(e.target.value)}
+            className="px-3 py-1.5 text-xs font-mono-data bg-surface-container border border-outline-variant rounded-lg text-primary focus:outline-none focus:border-primary transition-colors"
+          >
+            {industries.map((ind) => (
+              <option key={ind} value={ind}>
+                {ind}
+              </option>
+            ))}
+          </select>
+
+          {/* Status filter */}
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value as VentureStatus | "All")}
+            className="px-3 py-1.5 text-xs font-mono-data bg-surface-container border border-outline-variant rounded-lg text-primary focus:outline-none focus:border-primary transition-colors"
+          >
+            {statuses.map((stat) => (
+              <option key={stat} value={stat}>
+                {stat === "All" ? "All Status" : stat.charAt(0).toUpperCase() + stat.slice(1)}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Ventures Table */}
+      {sorted.length > 0 ? (
+        <div className="overflow-x-auto border border-outline-variant rounded-xl">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-outline-variant bg-surface-container-high">
+                <th className="text-left px-6 py-4 text-xs font-label-caps text-on-surface-variant uppercase tracking-wider">
+                  Name
+                </th>
+                <th className="text-left px-6 py-4 text-xs font-label-caps text-on-surface-variant uppercase tracking-wider">
+                  Industry
+                </th>
+                <th className="text-left px-6 py-4 text-xs font-label-caps text-on-surface-variant uppercase tracking-wider">
+                  Started
+                </th>
+                <th className="text-left px-6 py-4 text-xs font-label-caps text-on-surface-variant uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="text-center px-6 py-4 text-xs font-label-caps text-on-surface-variant uppercase tracking-wider">
+                  Events
+                </th>
+                <th className="text-left px-6 py-4 text-xs font-label-caps text-on-surface-variant uppercase tracking-wider">
+                  Last Activity
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {sorted.map((venture, idx) => {
+                const ventureEvents = events.filter((e) => e.venture_id === venture.id);
+                const lastEvent = ventureEvents.sort(
+                  (a, b) =>
+                    new Date(b.event_date).getTime() -
+                    new Date(a.event_date).getTime()
+                )[0];
+
+                return (
+                  <motion.tr
+                    key={venture.id}
+                    onClick={() => router.push(`/ventures/${venture.id}`)}
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                    className="border-b border-outline-variant hover:bg-surface-container-high transition-colors cursor-pointer"
+                  >
+                    <td className="px-6 py-4">
+                      <span className="text-sm font-headline-md text-primary">
+                        {venture.name}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-xs text-on-surface-variant font-mono-data">
+                        {venture.industry}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-xs text-on-surface-variant font-mono-data">
+                        {formatDateShort(venture.started_date)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <StatusBadge status={venture.status} size="sm" />
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="text-sm font-headline-md text-primary">
+                        {ventureEvents.length}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-xs text-on-surface-variant font-mono-data">
+                        {lastEvent ? formatDateShort(lastEvent.event_date) : "—"}
+                      </span>
+                    </td>
+                  </motion.tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        /* Empty state */
+        <motion.div
+          className="flex flex-col items-center justify-center py-24 text-center"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="w-16 h-16 rounded-full bg-surface-container border border-outline-variant flex items-center justify-center mb-6">
+            <span className="text-2xl">🎯</span>
+          </div>
+          <h2 className="text-lg font-headline-md text-primary mb-2">
+            No ventures match your filters
+          </h2>
+          <p className="text-sm text-on-surface-variant mb-6">
+            Try adjusting your filters or create a new venture to get started.
+          </p>
+        </motion.div>
+      )}
     </>
   );
 }
