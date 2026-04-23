@@ -71,9 +71,12 @@ export default function Sidebar() {
         </Link>
       </div>
 
-      <button className="w-full py-3 bg-primary text-on-primary font-label-caps text-xs rounded hover:bg-white/90 transition-colors mt-8 uppercase tracking-widest">
+      <Link
+        href="/entries/new"
+        className="w-full py-3 bg-primary text-on-primary font-label-caps text-xs rounded hover:bg-white/90 transition-colors mt-8 uppercase tracking-widest text-center block"
+      >
         New Entry
-      </button>
+      </Link>
     </nav>
   );
 }
