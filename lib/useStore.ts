@@ -40,8 +40,10 @@ interface CanvasState {
   setVentures: (ventures: Venture[]) => void;
   addVenture: (venture: Venture) => void;
   updateVenture: (id: string, updates: Partial<Venture>) => void;
+  deleteVenture: (id: string) => void;
   setEvents: (events: VentureEvent[]) => void;
   addEvent: (event: VentureEvent) => void;
+  deleteEvent: (id: string) => void;
   setSelectedVenture: (id: string | null) => void;
   setZoom: (zoom: number) => void;
   setPan: (x: number, y: number) => void;
@@ -107,10 +109,20 @@ export const useStore = create<CanvasState>((set) => ({
         v.id === id ? { ...v, ...updates } : v
       ),
     })),
+  deleteVenture: (id) =>
+    set((state) => ({
+      ventures: state.ventures.filter((v) => v.id !== id),
+      selectedVentureId:
+        state.selectedVentureId === id ? null : state.selectedVentureId,
+    })),
   setEvents: (events) => set({ events }),
   addEvent: (event) =>
     set((state) => ({
       events: [...state.events, event],
+    })),
+  deleteEvent: (id) =>
+    set((state) => ({
+      events: state.events.filter((e) => e.id !== id),
     })),
   setSelectedVenture: (id) => set({ selectedVentureId: id }),
   setZoom: (zoom) => set({ zoomLevel: zoom }),

@@ -11,7 +11,7 @@ export default function ModifyPanel({
   ventureId: string | null;
   onClose: () => void;
 }) {
-  const { ventures, updateVenture } = useStore();
+  const { ventures, updateVenture, deleteVenture } = useStore();
   const venture = ventures.find((v) => v.id === ventureId);
   const [isAddingEvent, setIsAddingEvent] = useState(false);
 
@@ -29,6 +29,13 @@ export default function ModifyPanel({
   const handleSave = () => {
     updateVenture(venture.id, formData);
     onClose();
+  };
+
+  const handleDelete = () => {
+    if (window.confirm('Are you sure you want to delete this venture?')) {
+      deleteVenture(venture.id);
+      onClose();
+    }
   };
 
   return (
@@ -149,6 +156,12 @@ export default function ModifyPanel({
 
         {/* Footer */}
         <div className="border-t border-white/10 p-6 flex gap-3">
+          <button
+            onClick={handleDelete}
+            className="px-4 py-2 bg-red-500/10 border border-red-500/30 rounded text-red-400 text-sm font-mono hover:bg-red-500/15 transition-colors"
+          >
+            DELETE
+          </button>
           <button
             onClick={onClose}
             className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded text-white text-sm font-mono hover:bg-white/10 transition-colors"
