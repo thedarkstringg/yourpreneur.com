@@ -6,6 +6,7 @@ export default function Toolbar({
   onPreviewClick,
   onMoreClick,
   onHelpClick,
+  onListClick,
   isPreviewMode = false,
 }: {
   onModifyClick?: () => void;
@@ -13,6 +14,7 @@ export default function Toolbar({
   onPreviewClick?: () => void;
   onMoreClick?: () => void;
   onHelpClick?: () => void;
+  onListClick?: () => void;
   isPreviewMode?: boolean;
 }) {
   return (
@@ -62,6 +64,20 @@ export default function Toolbar({
             PREVIEW
           </span>
           <span className="text-xs">∨</span>
+        </div>
+
+        {/* Divider */}
+        <div className="w-px h-4 bg-white/10" />
+
+        {/* List */}
+        <div
+          onClick={onListClick}
+          className="flex items-center gap-1 px-3 py-1.5 hover:bg-white/5 rounded cursor-pointer transition-colors"
+        >
+          <span>☰</span>
+          <span className="text-xs font-mono tracking-widest text-white/75 hover:text-white">
+            LIST
+          </span>
         </div>
 
         {/* Divider */}

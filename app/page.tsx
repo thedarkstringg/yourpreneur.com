@@ -6,12 +6,14 @@ import Toolbar from './components/ui/Toolbar';
 import ModifyPanel from './components/ui/ModifyPanel';
 import NewVentureDialog from './components/ui/NewVentureDialog';
 import KeyboardHelp from './components/ui/KeyboardHelp';
+import VentureList from './components/ui/VentureList';
 import { useStore } from '@/lib/useStore';
 
 export default function Home() {
   const [isModifyPanelOpen, setIsModifyPanelOpen] = useState(false);
   const [isNewVentureOpen, setIsNewVentureOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [isListOpen, setIsListOpen] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const { selectedVentureId } = useStore();
 
@@ -31,6 +33,11 @@ export default function Home() {
     setIsPreviewMode(!isPreviewMode);
   };
 
+  // Handle venture selection from list
+  const handleSelectVenture = (id: string) => {
+    useStore.setState({ selectedVentureId: id });
+  };
+
   return (
     <>
       <PixiApp
@@ -38,12 +45,14 @@ export default function Home() {
         onNewVenture={handleNewVenture}
         onPreviewMode={handlePreviewMode}
         onHelpToggle={() => setIsHelpOpen(!isHelpOpen)}
+        onListToggle={() => setIsListOpen(!isListOpen)}
       />
       <Toolbar
         onModifyClick={() => selectedVentureId && setIsModifyPanelOpen(true)}
         onGenerateClick={handleNewVenture}
         onPreviewClick={handlePreviewMode}
         onHelpClick={() => setIsHelpOpen(!isHelpOpen)}
+        onListClick={() => setIsListOpen(!isListOpen)}
         isPreviewMode={isPreviewMode}
       />
       {!isPreviewMode && (
@@ -59,6 +68,11 @@ export default function Home() {
         </>
       )}
       <KeyboardHelp isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+      <VentureList
+        isOpen={isListOpen}
+        onClose={() => setIsListOpen(false)}
+        onSelectVenture={handleSelectVenture}
+      />
     </>
   );
 }
