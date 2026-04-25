@@ -7,6 +7,7 @@ export default function Toolbar({
   onMoreClick,
   onHelpClick,
   onListClick,
+  onSettingsClick,
   isPreviewMode = false,
 }: {
   onModifyClick?: () => void;
@@ -15,6 +16,7 @@ export default function Toolbar({
   onMoreClick?: () => void;
   onHelpClick?: () => void;
   onListClick?: () => void;
+  onSettingsClick?: () => void;
   isPreviewMode?: boolean;
 }) {
   return (
@@ -91,6 +93,20 @@ export default function Toolbar({
           <span className="text-xs">?</span>
           <span className="text-xs font-mono tracking-widest text-white/75 hover:text-white">
             HELP
+          </span>
+        </div>
+
+        {/* Divider */}
+        <div className="w-px h-4 bg-white/10" />
+
+        {/* Settings */}
+        <div
+          onClick={onSettingsClick}
+          className="flex items-center gap-1 px-3 py-1.5 hover:bg-white/5 rounded cursor-pointer transition-colors"
+        >
+          <span className="text-xs">⚙</span>
+          <span className="text-xs font-mono tracking-widest text-white/75 hover:text-white">
+            DATA
           </span>
         </div>
       </div>

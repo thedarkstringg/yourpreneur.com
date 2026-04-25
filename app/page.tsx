@@ -7,6 +7,7 @@ import ModifyPanel from './components/ui/ModifyPanel';
 import NewVentureDialog from './components/ui/NewVentureDialog';
 import KeyboardHelp from './components/ui/KeyboardHelp';
 import VentureList from './components/ui/VentureList';
+import DataManager from './components/ui/DataManager';
 import { useStore } from '@/lib/useStore';
 
 export default function Home() {
@@ -14,6 +15,7 @@ export default function Home() {
   const [isNewVentureOpen, setIsNewVentureOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isListOpen, setIsListOpen] = useState(false);
+  const [isDataManagerOpen, setIsDataManagerOpen] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const { selectedVentureId } = useStore();
 
@@ -53,6 +55,7 @@ export default function Home() {
         onPreviewClick={handlePreviewMode}
         onHelpClick={() => setIsHelpOpen(!isHelpOpen)}
         onListClick={() => setIsListOpen(!isListOpen)}
+        onSettingsClick={() => setIsDataManagerOpen(!isDataManagerOpen)}
         isPreviewMode={isPreviewMode}
       />
       {!isPreviewMode && (
@@ -73,6 +76,7 @@ export default function Home() {
         onClose={() => setIsListOpen(false)}
         onSelectVenture={handleSelectVenture}
       />
+      <DataManager isOpen={isDataManagerOpen} onClose={() => setIsDataManagerOpen(false)} />
     </>
   );
 }
