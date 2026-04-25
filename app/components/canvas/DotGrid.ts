@@ -2,8 +2,8 @@ import { Container, Graphics, TilingSprite, Texture } from 'pixi.js';
 
 export class DotGrid extends Container {
   private tilingSprite: TilingSprite | null = null;
-  private gridSize = 32; // pixels between dots
-  private dotRadius = 1.5; // radius of each dot
+  private gridSize = 12; // pixels between dots (tight spacing)
+  private dotRadius = 0.8; // radius of each dot
 
   constructor() {
     super();
