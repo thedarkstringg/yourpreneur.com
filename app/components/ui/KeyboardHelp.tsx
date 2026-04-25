@@ -14,6 +14,7 @@ export default function KeyboardHelp({
     { key: 'M', action: 'Modify selected venture (if selected)' },
     { key: 'P', action: 'Toggle preview mode' },
     { key: 'L', action: 'Toggle ventures list' },
+    { key: 'S', action: 'Show statistics' },
     { key: 'Double Click', action: 'Open modify panel for venture' },
     { key: 'Space + Drag', action: 'Pan the canvas' },
     { key: 'Scroll', action: 'Zoom in/out' },

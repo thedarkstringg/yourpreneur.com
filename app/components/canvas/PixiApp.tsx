@@ -26,12 +26,14 @@ export default function PixiApp({
   onPreviewMode,
   onHelpToggle,
   onListToggle,
+  onStatsToggle,
 }: {
   onNodeDoubleClick?: (ventureId: string) => void;
   onNewVenture?: () => void;
   onPreviewMode?: () => void;
   onHelpToggle?: () => void;
   onListToggle?: () => void;
+  onStatsToggle?: () => void;
 } = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<Application | null>(null);
@@ -197,6 +199,12 @@ export default function PixiApp({
           onListToggle?.();
         }
 
+        // S = statistics
+        if (e.key.toLowerCase() === 's') {
+          e.preventDefault();
+          onStatsToggle?.();
+        }
+
         // ? = help
         if (e.key === '?') {
           e.preventDefault();
@@ -218,7 +226,7 @@ export default function PixiApp({
     };
 
     initCanvas();
-  }, [ventures, setZoom, setPan, setSelectedVenture, onNodeDoubleClick, onNewVenture, onPreviewMode, onHelpToggle, onListToggle]);
+  }, [ventures, setZoom, setPan, setSelectedVenture, onNodeDoubleClick, onNewVenture, onPreviewMode, onHelpToggle, onListToggle, onStatsToggle]);
 
   return (
     <div
