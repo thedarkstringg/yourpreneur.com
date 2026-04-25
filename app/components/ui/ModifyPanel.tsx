@@ -130,20 +130,42 @@ export default function ModifyPanel({
             />
           </div>
 
-          {/* Ended Date */}
+          {/* Parent Venture */}
           <div>
             <label className="block text-xs font-mono text-white/60 mb-2">
-              ENDED DATE (Optional)
+              PARENT VENTURE (Optional)
             </label>
-            <input
-              type="date"
-              value={formData.endedDate || ''}
-              onChange={(e) => handleChange('endedDate', e.target.value)}
+            <select
+              value={formData.parentId || ''}
+              onChange={(e) => handleChange('parentId', e.target.value || undefined)}
               className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-white/30"
-            />
+            >
+              <option value="">None</option>
+              {ventures
+                .filter((v) => v.id !== venture.id)
+                .map((v) => (
+                  <option key={v.id} value={v.id}>
+                    {v.name}
+                  </option>
+                ))}
+            </select>
           </div>
 
-          {/* Add Event Button */}
+          {/* Branch Label */}
+          {formData.parentId && (
+            <div>
+              <label className="block text-xs font-mono text-white/60 mb-2">
+                BRANCH LABEL
+              </label>
+              <input
+                type="text"
+                value={formData.branchLabel || ''}
+                onChange={(e) => handleChange('branchLabel', e.target.value)}
+                placeholder="e.g., Spinoff, Pivot"
+                className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-white/30"
+              />
+            </div>
+          )}
           <div className="border-t border-white/10 pt-6">
             <button
               onClick={() => setIsAddingEvent(true)}

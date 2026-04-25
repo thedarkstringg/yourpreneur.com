@@ -15,6 +15,7 @@ export default function VentureList({
   const { ventures, selectedVentureId } = useStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<'name' | 'date' | 'status'>('name');
 
   const filtered = ventures.filter((v) => {
     const matchesSearch = v.name
@@ -22,6 +23,20 @@ export default function VentureList({
       .includes(searchTerm.toLowerCase());
     const matchesStatus = !filterStatus || v.status === filterStatus;
     return matchesSearch && matchesStatus;
+  });
+
+  const sorted = [...filtered].sort((a, b) => {
+    if (sortBy === 'name') {
+      return a.name.localeCompare(b.name);
+    } else if (sortBy === 'date') {
+      return (
+        new Date(b.startedDate).getTime() -
+        new Date(a.startedDate).getTime()
+      );
+    } else if (sortBy === 'status') {
+      return a.status.localeCompare(b.status);
+    }
+    return 0;
   });
 
   const statusColors: Record<string, string> = {
@@ -88,14 +103,34 @@ export default function VentureList({
         </div>
       </div>
 
+      {/* Sort */}
+      <div className="px-4 py-3 border-b border-white/10">
+        <p className="text-xs font-mono text-white/60 mb-2">SORT BY</p>
+        <div className="flex gap-2">
+          {['name', 'date', 'status'].map((sort) => (
+            <button
+              key={sort}
+              onClick={() => setSortBy(sort as any)}
+              className={`px-2 py-1 rounded text-xs font-mono transition-colors ${
+                sortBy === sort
+                  ? 'bg-white/20 text-white border border-white/40'
+                  : 'bg-white/5 text-white/60 border border-white/10 hover:bg-white/10'
+              }`}
+            >
+              {sort.slice(0, 3).toUpperCase()}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Ventures List */}
       <div className="flex-1 overflow-y-auto p-4 space-y-2">
-        {filtered.length === 0 ? (
+        {sorted.length === 0 ? (
           <div className="flex items-center justify-center h-32 text-white/40 text-sm">
             No ventures found
           </div>
         ) : (
-          filtered.map((venture) => (
+          sorted.map((venture) => (
             <div
               key={venture.id}
               onClick={() => {
@@ -138,7 +173,7 @@ export default function VentureList({
       {/* Stats Footer */}
       <div className="border-t border-white/10 p-4 text-xs text-white/60 space-y-1">
         <p>Total: {ventures.length}</p>
-        <p>Showing: {filtered.length}</p>
+        <p>Showing: {sorted.length}</p>
       </div>
     </div>
   );
