@@ -186,15 +186,18 @@ export default function PixiApp({
         viewport.resize(window.innerWidth, window.innerHeight);
       };
 
-      // Keyboard shortcuts
+      // Keyboard shortcuts (Alt + key)
       const handleKeyDown = (e: KeyboardEvent) => {
-        // N = new venture
+        // Only trigger shortcuts with Alt key
+        if (!e.altKey) return;
+
+        // Alt+N = new venture
         if (e.key.toLowerCase() === 'n') {
           e.preventDefault();
           onNewVenture?.();
         }
 
-        // M = modify selected venture
+        // Alt+M = modify selected venture
         if (e.key.toLowerCase() === 'm') {
           e.preventDefault();
           const selected = useStore.getState().selectedVentureId;
@@ -203,26 +206,26 @@ export default function PixiApp({
           }
         }
 
-        // P = preview mode
+        // Alt+P = preview mode
         if (e.key.toLowerCase() === 'p') {
           e.preventDefault();
           onPreviewMode?.();
         }
 
-        // L = ventures list
+        // Alt+L = ventures list
         if (e.key.toLowerCase() === 'l') {
           e.preventDefault();
           onListToggle?.();
         }
 
-        // S = statistics
+        // Alt+S = statistics
         if (e.key.toLowerCase() === 's') {
           e.preventDefault();
           onStatsToggle?.();
         }
 
-        // ? = help
-        if (e.key === '?') {
+        // Alt+H = help
+        if (e.key.toLowerCase() === 'h') {
           e.preventDefault();
           onHelpToggle?.();
         }
