@@ -5,76 +5,107 @@ interface NodePosition {
   y: number;
   width: number;
   height: number;
+  stemHeight?: number; // Height of the vertical stem from timeline to card
 }
 
 interface LayoutResult {
   positions: Map<string, NodePosition>;
-  trunkX: number;
-  yearPositions: Map<number, number>;
+  timelineY: number;
+  yearPositions: Map<number, number>; // X position for each year
 }
 
-const YEAR_HEIGHT = 900; // pixels per year (was 600, now 1.5x)
-const NODE_WIDTH = 300; // was 200
-const NODE_HEIGHT = 120; // was 80
-const HORIZONTAL_SPACING = 270; // was 180
-const TRUNK_X = 400; // x position of the main trunk
+const MONTH_WIDTH = 120; // pixels per month
+const NODE_WIDTH = 180;
+const NODE_HEIGHT = 110;
+const TIMELINE_Y = 400; // 40% from top (approximate)
+const STEM_HEIGHT_BASE = 28; // base stem length
+const STEM_OVERLAP_OFFSET = 100; // additional offset per overlap level
+
+// Reference date for all calculations
+const REFERENCE_DATE = new Date('2024-01-01');
 
 export function calculateLayout(ventures: Venture[]): LayoutResult {
   const positions = new Map<string, NodePosition>();
   const yearPositions = new Map<number, number>();
 
-  // Find year range
-  const dates = ventures.map((v) => new Date(v.startedDate));
-  const minYear = Math.min(...dates.map((d) => d.getFullYear()));
-  const maxYear = Math.max(...dates.map((d) => d.getFullYear()));
+  // Calculate X position (months since reference date)
+  function dateToX(dateStr: string): number {
+    const date = new Date(dateStr);
+    const months =
+      (date.getFullYear() - REFERENCE_DATE.getFullYear()) * 12 +
+      (date.getMonth() - REFERENCE_DATE.getMonth());
+    const dayOfMonth = date.getDate();
+    const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+    const dayProgress = dayOfMonth / daysInMonth;
 
-  // Calculate year label positions
-  let currentY = 0;
-  for (let year = minYear; year <= maxYear; year++) {
-    yearPositions.set(year, currentY);
-    currentY += YEAR_HEIGHT;
+    return months * MONTH_WIDTH + dayProgress * MONTH_WIDTH;
   }
 
-  // Separate root ventures from branches
+  // Build year positions map
+  const allYears = new Set<number>();
+  ventures.forEach((v) => {
+    allYears.add(new Date(v.startedDate).getFullYear());
+  });
+
+  Array.from(allYears)
+    .sort()
+    .forEach((year) => {
+      const xPos = dateToX(`${year}-01-01`);
+      yearPositions.set(year, xPos);
+    });
+
+  // Separate root and branch ventures
   const rootVentures = ventures.filter((v) => !v.parentId);
   const branches = ventures.filter((v) => v.parentId);
 
-  // Position root ventures (alternating left/right)
-  let leftX = TRUNK_X - HORIZONTAL_SPACING - NODE_WIDTH;
-  let rightX = TRUNK_X + HORIZONTAL_SPACING;
+  // Position root ventures
+  const rootPositions = new Map<string, { x: number; stemLevel: number }>();
 
-  rootVentures.forEach((venture, index) => {
-    const date = new Date(venture.startedDate);
-    const year = date.getFullYear();
-    const dayOfYear = Math.floor(
-      (date.getTime() - new Date(year, 0, 0).getTime()) /
-        (1000 * 60 * 60 * 24)
-    );
-    const yearProgress = dayOfYear / 365;
+  rootVentures.forEach((venture) => {
+    const x = dateToX(venture.startedDate);
 
-    const yearY = yearPositions.get(year) || 0;
-    const y = yearY + yearProgress * YEAR_HEIGHT - NODE_HEIGHT / 2;
+    // Detect overlaps with other ventures at similar X positions
+    let stemLevel = 0;
+    let overlap = true;
+    while (overlap) {
+      overlap = false;
+      const currentStemHeight = STEM_HEIGHT_BASE + stemLevel * STEM_OVERLAP_OFFSET;
+      const currentY = TIMELINE_Y + currentStemHeight + NODE_HEIGHT;
+      const currentCardBottom = currentY + NODE_HEIGHT;
 
-    if (index % 2 === 0) {
-      // Left side (even indices)
-      positions.set(venture.id, {
-        x: leftX,
-        y,
-        width: NODE_WIDTH,
-        height: NODE_HEIGHT,
+      // Check if this position overlaps with any other positioned venture
+      rootPositions.forEach((pos) => {
+        const otherStemHeight = STEM_HEIGHT_BASE + pos.stemLevel * STEM_OVERLAP_OFFSET;
+        const otherY = TIMELINE_Y + otherStemHeight + NODE_HEIGHT;
+        const otherCardBottom = otherY + NODE_HEIGHT;
+
+        // Cards overlap if X ranges overlap and Y ranges overlap
+        const xOverlap = Math.abs(x - pos.x) < NODE_WIDTH + 20; // 20px tolerance
+        const yOverlap = !(currentCardBottom < otherY || currentY > otherCardBottom);
+
+        if (xOverlap && yOverlap) {
+          overlap = true;
+        }
       });
-    } else {
-      // Right side (odd indices)
-      positions.set(venture.id, {
-        x: rightX,
-        y,
-        width: NODE_WIDTH,
-        height: NODE_HEIGHT,
-      });
+
+      if (overlap) stemLevel++;
     }
+
+    const stemHeight = STEM_HEIGHT_BASE + stemLevel * STEM_OVERLAP_OFFSET;
+    const y = TIMELINE_Y + stemHeight + NODE_HEIGHT;
+
+    positions.set(venture.id, {
+      x,
+      y: y - NODE_HEIGHT, // Top of card
+      width: NODE_WIDTH,
+      height: NODE_HEIGHT,
+      stemHeight,
+    });
+
+    rootPositions.set(venture.id, { x, stemLevel });
   });
 
-  // Position branches off their parent
+  // Position branch ventures
   branches.forEach((branch) => {
     const parent = ventures.find((v) => v.id === branch.parentId);
     if (!parent) return;
@@ -82,29 +113,52 @@ export function calculateLayout(ventures: Venture[]): LayoutResult {
     const parentPos = positions.get(parent.id);
     if (!parentPos) return;
 
-    // Place branch to the right of parent, slightly offset
-    const date = new Date(branch.startedDate);
-    const year = date.getFullYear();
-    const dayOfYear = Math.floor(
-      (date.getTime() - new Date(year, 0, 0).getTime()) /
-        (1000 * 60 * 60 * 24)
-    );
-    const yearProgress = dayOfYear / 365;
+    // Position to the right and below parent
+    const x = parentPos.x + NODE_WIDTH + 60; // 60px to the right
 
-    const yearY = yearPositions.get(year) || 0;
-    const y = yearY + yearProgress * YEAR_HEIGHT - NODE_HEIGHT / 2;
+    // Position below parent with some vertical offset
+    let stemLevel = 0;
+    let overlap = true;
+    while (overlap) {
+      overlap = false;
+      const currentStemHeight = STEM_HEIGHT_BASE + stemLevel * STEM_OVERLAP_OFFSET;
+      const currentY = TIMELINE_Y + currentStemHeight + NODE_HEIGHT;
+      const currentCardBottom = currentY + NODE_HEIGHT;
+
+      // Check overlap with all positioned ventures
+      positions.forEach((pos) => {
+        if (pos.stemHeight === undefined) return;
+
+        const otherStemHeight = pos.stemHeight;
+        const otherY = pos.y;
+        const otherCardBottom = otherY + NODE_HEIGHT;
+
+        const xOverlap = Math.abs(x - pos.x) < NODE_WIDTH + 20;
+        const yOverlap = !(currentCardBottom < otherY || currentY > otherCardBottom);
+
+        if (xOverlap && yOverlap) {
+          overlap = true;
+        }
+      });
+
+      if (overlap) stemLevel++;
+    }
+
+    const stemHeight = STEM_HEIGHT_BASE + stemLevel * STEM_OVERLAP_OFFSET;
+    const y = TIMELINE_Y + stemHeight + NODE_HEIGHT;
 
     positions.set(branch.id, {
-      x: parentPos.x + NODE_WIDTH + 120,
-      y,
+      x,
+      y: y - NODE_HEIGHT, // Top of card
       width: NODE_WIDTH,
       height: NODE_HEIGHT,
+      stemHeight,
     });
   });
 
   return {
     positions,
-    trunkX: TRUNK_X,
+    timelineY: TIMELINE_Y,
     yearPositions,
   };
 }

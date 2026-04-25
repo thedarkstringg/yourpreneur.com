@@ -13,8 +13,8 @@ export class VentureNode extends Container {
     this.venture = venture;
     this.x = x;
     this.y = y;
-    this.width = 300;
-    this.height = 120;
+    this.width = 180;
+    this.height = 110;
 
     this.interactive = true;
     this.cursor = 'pointer';
@@ -59,112 +59,76 @@ export class VentureNode extends Container {
 
   private createCard(): Graphics {
     const card = new Graphics();
-    const radius = 12;
+    const radius = 8;
 
     card.fill({
-      color: 0x161212,
+      color: 0x141111,
       alpha: 1,
     });
     card.stroke({
       color: 0xffffff,
-      width: 1.5,
-      alpha: 0.08,
+      width: 1,
+      alpha: 0.09,
     });
 
-    card.roundRect(0, 0, 300, 120, radius);
+    card.roundRect(0, 0, 180, 110, radius);
 
     return card;
   }
 
   private drawContent() {
-    // Logo placeholder
-    const logoBg = new Graphics();
-    logoBg.fill({ color: 0x2a2420 });
-    logoBg.roundRect(16, 16, 56, 56, 8);
-    this.addChild(logoBg);
-
-    // First letter
-    const firstLetter = this.venture.name[0].toUpperCase();
-    const letterStyle = new TextStyle({
-      fontFamily: "'Cormorant Garamond', serif",
-      fontSize: 32,
-      fontWeight: '700',
+    // Industry tag - top left
+    const industryStyle = new TextStyle({
+      fontFamily: "'Space Mono', monospace",
+      fontSize: 9,
       fill: 0xffffff,
     });
-    const letterText = new Text(firstLetter, letterStyle);
-    letterText.x = 16 + 28;
-    letterText.y = 16 + 28;
-    letterText.alpha = 0.8;
-    letterText.anchor.set(0.5, 0.5);
-    this.addChild(letterText);
+    const industryText = new Text(this.venture.industry.toUpperCase(), industryStyle);
+    industryText.x = 12;
+    industryText.y = 10;
+    industryText.alpha = 0.35;
+    this.addChild(industryText);
 
-    // Venture name
+    // Venture name - center
     const nameStyle = new TextStyle({
       fontFamily: "'Cormorant Garamond', serif",
-      fontSize: 20,
+      fontSize: 22,
       fontWeight: '600',
       fill: 0xffffff,
       wordWrap: true,
-      wordWrapWidth: 200,
+      wordWrapWidth: 156,
+      align: 'center',
     });
     const nameText = new Text(this.venture.name, nameStyle);
-    nameText.x = 88;
-    nameText.y = 14;
+    nameText.x = 90;
+    nameText.y = 45;
+    nameText.anchor.set(0.5, 0.5);
+    nameText.alpha = 0.85;
     this.addChild(nameText);
 
-    // Date
-    const dateStyle = new TextStyle({
-      fontFamily: "'Space Mono', monospace",
-      fontSize: 13,
-      fill: 0xffffff,
-    });
-    const dateText = new Text(
-      new Date(this.venture.startedDate).toLocaleDateString('en-US', {
-        month: 'short',
-        year: 'numeric',
-      }),
-      dateStyle
-    );
-    dateText.x = 88;
-    dateText.y = 44;
-    dateText.alpha = 0.5;
-    this.addChild(dateText);
-
-    // Industry
-    const industryStyle = new TextStyle({
-      fontFamily: "'Space Mono', monospace",
-      fontSize: 11,
-      fill: 0xffffff,
-    });
-    const industryText = new Text(this.venture.industry, industryStyle);
-    industryText.x = 88;
-    industryText.y = 62;
-    industryText.alpha = 0.4;
-    this.addChild(industryText);
-
-    // Status badge
+    // Status badge - bottom left
+    const badgeWidth = 50;
+    const badgeHeight = 20;
     const statusBg = new Graphics();
     statusBg.stroke({
       color: this.getStatusColor(),
-      width: 1.2,
-      alpha: 0.8,
+      width: 1,
+      alpha: 0.7,
     });
-    statusBg.roundRect(88, 80, 70, 18, 6);
+    statusBg.roundRect(12, 85, badgeWidth, badgeHeight, 4);
     this.addChild(statusBg);
 
     const statusStyle = new TextStyle({
       fontFamily: "'Space Mono', monospace",
-      fontSize: 10,
+      fontSize: 8,
       fill: this.getStatusColor(),
+      fontWeight: '500',
     });
-    const statusText = new Text(
-      this.venture.status.toUpperCase(),
-      statusStyle
-    );
-    statusText.x = 123;
-    statusText.y = 80;
-    statusText.alpha = 0.9;
-    statusText.anchor.set(0.5, 0);
+    const statusText = new Text(this.venture.status.toUpperCase(), statusStyle);
+    statusText.x = 12 + badgeWidth / 2;
+    statusText.y = 85 + badgeHeight / 2;
+    statusText.anchor.set(0.5, 0.5);
+    statusText.alpha = 0.8;
     this.addChild(statusText);
   }
 
@@ -190,21 +154,20 @@ export class VentureNode extends Container {
     if (hovered) {
       this.card.stroke({
         color: 0xffffff,
-        width: 1.5,
+        width: 1,
         alpha: 0.2,
       });
     } else {
       this.card.stroke({
         color: 0xffffff,
-        width: 1.5,
-        alpha: 0.08,
+        width: 1,
+        alpha: 0.09,
       });
     }
   }
 
   setSelected(selected: boolean) {
     this.isSelected = selected;
-    // Visual feedback on selection
     if (selected) {
       this.scale.set(1.02);
     } else {

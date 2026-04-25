@@ -1,50 +1,63 @@
-import { Container, Graphics } from 'pixi.js';
+import { Container, Graphics, TilingSprite, Texture } from 'pixi.js';
 
 export class DotGrid extends Container {
-  private graphics: Graphics;
+  private tilingSprite: TilingSprite | null = null;
+  private gridSize = 32; // pixels between dots
+  private dotRadius = 1.5; // radius of each dot
 
-  constructor(width: number = 10000, height: number = 10000) {
+  constructor() {
     super();
-
-    this.graphics = new Graphics();
-    this.drawGrid(width, height);
-    this.addChild(this.graphics);
+    this.createGrid();
   }
 
-  private drawGrid(width: number, height: number) {
-    this.graphics.stroke({
-      color: 0xffffff,
-      width: 0.5,
-      alpha: 0.15,
+  private createGrid() {
+    // Create a canvas to draw the dot texture
+    const canvas = document.createElement('canvas');
+    const size = this.gridSize;
+    canvas.width = size;
+    canvas.height = size;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Draw a single dot in the center
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, this.dotRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Create texture from canvas
+    const texture = Texture.from(canvas);
+
+    // Create tiling sprite
+    this.tilingSprite = new TilingSprite({
+      texture,
+      width: 20000,
+      height: 20000,
     });
 
-    const dotSpacing = 50; // pixels between dots
-
-    // Draw vertical lines
-    for (let x = 0; x <= width; x += dotSpacing) {
-      this.graphics.moveTo(x, 0);
-      this.graphics.lineTo(x, height);
-    }
-
-    // Draw horizontal lines
-    for (let y = 0; y <= height; y += dotSpacing) {
-      this.graphics.moveTo(0, y);
-      this.graphics.lineTo(width, y);
-    }
+    this.tilingSprite.position.set(-10000, -10000);
+    this.addChild(this.tilingSprite);
   }
 
   updateForZoom(zoomLevel: number) {
-    // Adjust grid opacity based on zoom
-    if (zoomLevel < 0.5) {
-      this.graphics.alpha = 0.08;
-    } else if (zoomLevel > 2) {
-      this.graphics.alpha = 0.2;
-    } else {
-      this.graphics.alpha = 0.15;
+    // Grid opacity adapts to zoom level
+    if (this.tilingSprite) {
+      if (zoomLevel < 0.5) {
+        this.tilingSprite.alpha = 0.08;
+      } else if (zoomLevel > 2) {
+        this.tilingSprite.alpha = 0.2;
+      } else {
+        this.tilingSprite.alpha = 0.12;
+      }
     }
   }
 
-  updateTilePosition(_panX: number, _panY: number) {
-    // Grid doesn't need position updates in this simplified version
+  updateTilePosition(panX: number, panY: number) {
+    // Update tile position to follow pan transform
+    if (this.tilingSprite) {
+      this.tilingSprite.tilePosition.x = -panX;
+      this.tilingSprite.tilePosition.y = -panY;
+    }
   }
 }

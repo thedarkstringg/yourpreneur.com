@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { Application, Container } from 'pixi.js';
+import { Application, Container, Graphics, Text, TextStyle } from 'pixi.js';
 import { Viewport } from 'pixi-viewport';
 import { DotGrid } from './DotGrid';
-import { TimelineTrunk } from './TimelineTrunk';
+import { HorizontalTimeline } from './HorizontalTimeline';
 import { VentureNode } from './VentureNode';
 import { BranchLine } from './BranchLine';
 import { EventDot } from './EventDot';
@@ -92,8 +92,8 @@ export default function PixiApp({
 
       const layout = calculateLayout(ventures);
 
-      const trunk = new TimelineTrunk(layout.trunkX, layout.yearPositions);
-      rootContainer.addChild(trunk);
+      const timeline = new HorizontalTimeline(layout.timelineY, layout.yearPositions);
+      rootContainer.addChild(timeline);
 
       // Add branch lines
       const branchContainer = new Container();
@@ -105,14 +105,13 @@ export default function PixiApp({
           const childPos = layout.positions.get(venture.id);
           if (parentPos && childPos) {
             const branch = new BranchLine({
-              fromX: parentPos.x + parentPos.width,
+              fromX: parentPos.x,
               fromY: parentPos.y,
               fromHeight: parentPos.height,
               toX: childPos.x,
               toY: childPos.y,
               toHeight: childPos.height,
               label: venture.branchLabel,
-              isBranch: true,
             });
             branchContainer.addChild(branch);
           }
@@ -120,9 +119,49 @@ export default function PixiApp({
       });
 
       const nodeMap = new Map();
+      const dateLabelsContainer = new Container();
+      const stemsContainer = new Container();
+      rootContainer.addChild(stemsContainer);
+      rootContainer.addChild(dateLabelsContainer);
+
       layout.positions.forEach((pos, ventureId) => {
         const venture = ventures.find((v) => v.id === ventureId);
         if (venture) {
+          // Add date label above the timeline
+          const dateStr = new Date(venture.startedDate);
+          const dateLabel = dateStr.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+          }).toUpperCase();
+
+          const dateStyle = new TextStyle({
+            fontFamily: "'Space Mono', monospace",
+            fontSize: 11,
+            fill: 0xffffff,
+          });
+          const dateText = new Text(dateLabel, dateStyle);
+          dateText.x = pos.x + 90; // Center of card (180 / 2)
+          dateText.y = layout.timelineY - 30; // 14px above the line, accounting for text size
+          dateText.anchor.set(0.5, 0);
+          dateText.alpha = 0.5;
+          dateLabelsContainer.addChild(dateText);
+
+          // Add stem (vertical line from timeline to card)
+          if (pos.stemHeight !== undefined) {
+            const stem = new Graphics();
+            stem.lineStyle(1, 0xffffff, 0.15);
+            stem.moveTo(pos.x + 90, layout.timelineY);
+            stem.lineTo(pos.x + 90, layout.timelineY + pos.stemHeight);
+            stemsContainer.addChild(stem);
+
+            // Add dot on timeline
+            const dot = new Graphics();
+            dot.stroke({ color: 0xffffff, width: 1, alpha: 0.7 });
+            dot.circle(pos.x + 90, layout.timelineY, 4);
+            stemsContainer.addChild(dot);
+          }
+
+          // Add venture card
           const node = new VentureNode(venture, pos.x, pos.y);
           rootContainer.addChild(node);
           nodeMap.set(ventureId, node);
@@ -135,22 +174,25 @@ export default function PixiApp({
       rootContainer.addChild(eventContainer);
 
       events.forEach((event) => {
-        const venturePos = layout.positions.get(event.ventureId);
-        if (venturePos) {
-          // Position event dot to the right of the venture node, proportional to event date
+        const venture = ventures.find((v) => v.id === event.ventureId);
+        if (venture) {
+          // Position event dot on the horizontal timeline based on event date
+          // Use simple calculation: months since reference date * 120px
+          const REFERENCE_DATE = new Date('2024-01-01');
           const eventDate = new Date(event.eventDate);
-          const ventureStartDate = new Date(
-            ventures.find((v) => v.id === event.ventureId)?.startedDate || ''
-          );
 
-          const daysElapsed =
-            (eventDate.getTime() - ventureStartDate.getTime()) /
-            (1000 * 60 * 60 * 24);
-          const eventOffsetX = Math.min(daysElapsed * 0.2, 150); // spread out events
+          const months =
+            (eventDate.getFullYear() - REFERENCE_DATE.getFullYear()) * 12 +
+            (eventDate.getMonth() - REFERENCE_DATE.getMonth());
+          const dayOfMonth = eventDate.getDate();
+          const daysInMonth = new Date(eventDate.getFullYear(), eventDate.getMonth() + 1, 0).getDate();
+          const dayProgress = dayOfMonth / daysInMonth;
+
+          const eventX = months * 120 + dayProgress * 120;
 
           const dot = new EventDot({
-            x: venturePos.x + venturePos.width + eventOffsetX,
-            y: venturePos.y + venturePos.height / 2,
+            x: eventX,
+            y: layout.timelineY + 15,
             type: event.type,
           });
           eventContainer.addChild(dot);
