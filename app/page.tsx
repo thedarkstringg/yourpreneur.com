@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import PixiApp from './components/canvas/PixiApp';
 import Toolbar from './components/ui/Toolbar';
 import ModifyPanel from './components/ui/ModifyPanel';
@@ -22,25 +22,25 @@ export default function Home() {
   const { selectedVentureId } = useStore();
 
   // Open modify panel when M is pressed or Modify button clicked
-  const handleOpenModifyPanel = (ventureId: string) => {
+  const handleOpenModifyPanel = useCallback((ventureId: string) => {
     useStore.setState({ selectedVentureId: ventureId });
     setIsModifyPanelOpen(true);
-  };
+  }, []);
 
   // Handle new venture (open dialog)
-  const handleNewVenture = () => {
+  const handleNewVenture = useCallback(() => {
     setIsNewVentureOpen(true);
-  };
+  }, []);
 
   // Handle preview mode toggle
-  const handlePreviewMode = () => {
-    setIsPreviewMode(!isPreviewMode);
-  };
+  const handlePreviewMode = useCallback(() => {
+    setIsPreviewMode((prev) => !prev);
+  }, []);
 
   // Handle venture selection from list
-  const handleSelectVenture = (id: string) => {
+  const handleSelectVenture = useCallback((id: string) => {
     useStore.setState({ selectedVentureId: id });
-  };
+  }, []);
 
   return (
     <>

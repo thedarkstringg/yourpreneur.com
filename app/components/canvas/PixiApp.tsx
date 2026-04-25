@@ -46,6 +46,20 @@ export default function PixiApp({
     const initCanvas = async () => {
       await loadFonts();
 
+      // Clean up old canvas if it exists
+      if (containerRef.current) {
+        const oldCanvas = containerRef.current.querySelector('canvas');
+        if (oldCanvas) {
+          oldCanvas.remove();
+        }
+      }
+
+      // Destroy old app if it exists
+      if (appRef.current) {
+        appRef.current.destroy();
+        appRef.current = null;
+      }
+
       const app = new Application();
       await app.init({
         width: window.innerWidth,
@@ -54,7 +68,9 @@ export default function PixiApp({
         antialias: true,
       });
 
-      containerRef.current!.appendChild(app.canvas as HTMLCanvasElement);
+      if (containerRef.current) {
+        containerRef.current.appendChild(app.canvas as HTMLCanvasElement);
+      }
       appRef.current = app;
 
       const rootContainer = new Container();
@@ -221,12 +237,22 @@ export default function PixiApp({
 
       return () => {
         window.removeEventListener('resize', handleResize);
-        app.destroy();
+        window.removeEventListener('keydown', handleKeyDown);
+        if (appRef.current) {
+          appRef.current.destroy();
+          appRef.current = null;
+        }
+        if (containerRef.current) {
+          const canvas = containerRef.current.querySelector('canvas');
+          if (canvas) {
+            canvas.remove();
+          }
+        }
       };
     };
 
     initCanvas();
-  }, [ventures, setZoom, setPan, setSelectedVenture, onNodeDoubleClick, onNewVenture, onPreviewMode, onHelpToggle, onListToggle, onStatsToggle]);
+  }, [ventures]);
 
   return (
     <div
