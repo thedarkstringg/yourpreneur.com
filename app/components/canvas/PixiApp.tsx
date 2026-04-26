@@ -492,6 +492,34 @@ export default function PixiApp({
       // Keyboard shortcuts (Alt + key)
       const handleKeyDown = (e: KeyboardEvent) => {
         // Only trigger shortcuts with Alt key
+        if (!e.altKey && !e.key.startsWith('Arrow')) return;
+
+        // Arrow keys for venture navigation
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+          e.preventDefault();
+          const currentVentureId = useStore.getState().selectedVentureId;
+          const ventureIds = ventures.map(v => v.id);
+
+          if (currentVentureId) {
+            const currentIndex = ventureIds.indexOf(currentVentureId);
+            const nextIndex = e.key === 'ArrowRight'
+              ? (currentIndex + 1) % ventureIds.length
+              : (currentIndex - 1 + ventureIds.length) % ventureIds.length;
+
+            const nextVentureId = ventureIds[nextIndex];
+            const layout = calculateLayout(ventures);
+            const position = layout.positions.get(nextVentureId);
+
+            if (position) {
+              useStore.setState({ selectedVentureId: nextVentureId });
+              const onNavigateToTarget = useStore.getState().onNavigateToTarget;
+              onNavigateToTarget?.(position.x + 110, position.y + 60);
+            }
+          }
+          return;
+        }
+
+        // Require Alt key for other shortcuts
         if (!e.altKey) return;
 
         // Alt+N = new venture
