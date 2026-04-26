@@ -14,6 +14,7 @@ export default function ModifyPanel({
   const { ventures, updateVenture, deleteVenture } = useStore();
   const venture = ventures.find((v) => v.id === ventureId);
   const [isAddingEvent, setIsAddingEvent] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
 
   const [formData, setFormData] = useState<Partial<Venture>>(venture || {});
 
@@ -28,25 +29,58 @@ export default function ModifyPanel({
 
   const handleSave = () => {
     updateVenture(venture.id, formData);
-    onClose();
+    handleCloseAnimated();
   };
 
   const handleDelete = () => {
     if (window.confirm('Are you sure you want to delete this venture?')) {
       deleteVenture(venture.id);
-      onClose();
+      handleCloseAnimated();
     }
+  };
+
+  const handleCloseAnimated = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+    }, 250);
   };
 
   return (
     <>
-      <div className="modify-panel">
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          right: 0,
+          width: '400px',
+          height: '100vh',
+          background: '#0e0b0b',
+          borderLeft: '1px solid rgba(255,255,255,0.08)',
+          fontFamily: "'Space Grotesk', sans-serif",
+          zIndex: 100,
+          display: 'flex',
+          flexDirection: 'column',
+          overflowY: 'auto',
+          animation: isClosing ? 'panelSlideOut 250ms cubic-bezier(0.4, 0, 0.2, 1)' : 'panelSlideIn 300ms cubic-bezier(0.4, 0, 0.2, 1)',
+        }}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/10 pb-6">
-          <h2 className="font-display">Modify Venture</h2>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '24px' }}>
+          <h2 style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '26px', color: 'rgba(255,255,255,0.9)', margin: 0 }}>Modify Venture</h2>
           <button
-            onClick={onClose}
-            className="text-white/60 hover:text-white transition-colors pt-8 pr-8"
+            onClick={handleCloseAnimated}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'rgba(255,255,255,0.5)',
+              cursor: 'pointer',
+              fontSize: '18px',
+              padding: '8px',
+              transition: 'color 150ms',
+            }}
+            onMouseOver={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.8)')}
+            onMouseOut={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.5)')}
           >
             ✕
           </button>
