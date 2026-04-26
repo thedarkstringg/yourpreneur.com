@@ -286,6 +286,14 @@ export default function PixiApp({
         }
       });
 
+      // Track all animation frames for cleanup
+      const animationFrameIds: number[] = [];
+
+      const trackAnimationFrame = (callback: () => void) => {
+        const id = requestAnimationFrame(callback);
+        animationFrameIds.push(id);
+      };
+
       // Animate date labels fade-in with stagger (t=500ms, 20ms stagger)
       const dateLabelsStart = Date.now();
       const dateLabelsDelay = 500;
@@ -306,10 +314,9 @@ export default function PixiApp({
         });
 
         if (elapsed < dateLabelsDelay + dateLabels.length * dateLabelsStagger + 400) {
-          requestAnimationFrame(dateLabelsAnimate);
+          trackAnimationFrame(dateLabelsAnimate);
         }
       };
-      dateLabelsAnimate();
 
       // Create stems and venture nodes
       const nodeMap = new Map();
@@ -347,15 +354,16 @@ export default function PixiApp({
         }
       });
 
-      // Start load sequence animations
-      timeline.startLoadAnimation();
-      branchContainer.children.forEach((branch) => {
-        if (branch instanceof BranchLine) {
-          branch.startLoadAnimation((branch as any).branchIndex || 0);
-        }
-      });
-
-      // Render event dots
+      // Start load sequence animations (defer to next tick to avoid initialization issues)
+      const animationTimeoutId = setTimeout(() => {
+        timeline.startLoadAnimation();
+        branchContainer.children.forEach((branch) => {
+          if (branch instanceof BranchLine) {
+            branch.startLoadAnimation((branch as any).branchIndex || 0);
+          }
+        });
+        trackAnimationFrame(dateLabelsAnimate);
+      }, 0);
       const events = useStore.getState().events;
       const eventContainer = new Container();
       rootContainer.addChild(eventContainer);
@@ -633,6 +641,12 @@ export default function PixiApp({
       });
 
       return () => {
+        // Clear animation timeout
+        clearTimeout(animationTimeoutId);
+
+        // Cancel all animation frames
+        animationFrameIds.forEach(id => cancelAnimationFrame(id));
+
         // Remove global listeners
         window.removeEventListener('resize', handleResize);
         window.removeEventListener('keydown', handleKeyDown);
