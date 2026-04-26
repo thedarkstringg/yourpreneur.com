@@ -9,6 +9,7 @@ export class HorizontalTimeline extends Container {
   private yearLabels: Text[] = [];
   private ticks: Graphics[] = [];
   private yearLabelMap: Map<number, Text> = new Map();
+  private boundHandleYearFlash: (event: Event) => void;
 
   constructor(timelineY: number, yearPositions: Map<number, number>) {
     super();
@@ -49,8 +50,10 @@ export class HorizontalTimeline extends Container {
 
     this.zIndex = 1;
 
+    // Create bound handler for cleanup
+    this.boundHandleYearFlash = this.handleYearFlash.bind(this);
     // Listen for year watermark flash event
-    window.addEventListener('flash-year-watermark', this.handleYearFlash.bind(this));
+    window.addEventListener('flash-year-watermark', this.boundHandleYearFlash);
   }
 
   private handleYearFlash(event: Event) {
@@ -62,6 +65,10 @@ export class HorizontalTimeline extends Container {
         this.flashYearLabel(label);
       }
     }
+  }
+
+  destroy() {
+    window.removeEventListener('flash-year-watermark', this.boundHandleYearFlash);
   }
 
   private flashYearLabel(label: Text) {

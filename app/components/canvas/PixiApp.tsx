@@ -641,6 +641,9 @@ export default function PixiApp({
         window.removeEventListener('pointerup', onPointerUp);
         window.removeEventListener('pixi-logo-click', handleLogoClick);
 
+        // Cleanup timeline listeners
+        timeline.destroy();
+
         // Toolbar listeners
         const toolbarElCleanup = document.getElementById('toolbar');
         if (toolbarElCleanup) {
