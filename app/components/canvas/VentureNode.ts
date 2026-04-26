@@ -304,12 +304,25 @@ export class VentureNode extends Container {
     this.scale.set(0.92);
     this.alpha = 0;
     const start = Date.now();
-    const dur = 350;
+    // Base timing: t=750ms for first card, staggered 80ms after each dot
+    // Dot falls at t=600ms with 120ms stagger, so card at 600+120+80 = 800ms base
+    const staggerIndex = Math.floor(Math.random() * 4); // simulate stagger
+    const staggerDelay = 600 + staggerIndex * 120 + staggerIndex * 80; // dots then cards
+    const dur = 280;
+
     const animate = () => {
-      const t = Math.min(1, (Date.now() - start) / dur);
-      const e = 1 - Math.pow(1 - t, 3);
-      this.scale.set(0.92 + 0.08 * e);
-      this.alpha = e;
+      const elapsed = Date.now() - start;
+      const delay = staggerDelay;
+
+      if (elapsed < delay) {
+        requestAnimationFrame(animate);
+        return;
+      }
+
+      const t = Math.min(1, (elapsed - delay) / dur);
+      const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic
+      this.scale.set(0.92 + 0.08 * eased);
+      this.alpha = eased;
       if (t < 1) requestAnimationFrame(animate);
     };
     animate();

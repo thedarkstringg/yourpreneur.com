@@ -190,6 +190,13 @@ export default function PixiApp({
             });
             const ventureCount = yearVentures.length;
             addToast('info', `Viewing ${year + 2022} · ${ventureCount} venture${ventureCount !== 1 ? 's' : ''}`);
+
+            // Flash year watermark
+            window.dispatchEvent(
+              new CustomEvent('flash-year-watermark', {
+                detail: { year: year + 2022 },
+              })
+            );
           }
         );
       };
