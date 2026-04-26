@@ -304,19 +304,6 @@ export default function LeftPanel({
           </div>
         </>
       )}
-
-      <style>{`
-        @keyframes slideInLeft {
-          from {
-            transform: translateX(-240px);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-      `}</style>
     </div>
   );
 }

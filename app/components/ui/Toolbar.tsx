@@ -99,7 +99,7 @@ export default function Toolbar({
           left: '50%',
           transform: 'translateX(-50%)',
           zIndex: 200,
-          animation: 'slideUp 400ms cubic-bezier(0.34, 1.56, 0.64, 1) 1400ms both',
+          animation: 'toolbarSlideUp 400ms cubic-bezier(0.34, 1.56, 0.64, 1) 1400ms both',
         }}
       >
         <div
@@ -189,18 +189,6 @@ export default function Toolbar({
         </div>
       </div>
 
-      <style>{`
-        @keyframes slideUp {
-          from {
-            transform: translateX(-50%) translateY(60px);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-          }
-        }
-      `}</style>
     </>
   );
 }

@@ -208,19 +208,6 @@ export default function TopBar({
           <User size={14} strokeWidth={1.5} />
         </div>
       </div>
-
-      <style>{`
-        @keyframes slideDown {
-          from {
-            transform: translateY(-48px);
-            opacity: 0;
-          }
-          to {
-            transform: translateY(0);
-            opacity: 1;
-          }
-        }
-      `}</style>
     </div>
   );
 }
