@@ -94,7 +94,7 @@ export class VentureNode extends Container {
     const logoBg = new Graphics();
     logoBg.roundRect(logoX, logoY, logoSize, logoSize, 8);
     logoBg.fill({ color: 0x000000, alpha: 0.06 });
-    logoBg.stroke({ width: 1, color: 0xffffff, alpha: 0.1 });
+    logoBg.stroke({ width: 1, color: 0xffffff, alpha: this.isHovered ? 0.2 : 0.1 });
     this.contentContainer.addChild(logoBg);
 
     // Logo text (first letter of venture name)
@@ -112,6 +112,23 @@ export class VentureNode extends Container {
       logoText.x = logoX + logoSize / 2;
       logoText.y = logoY + logoSize / 2;
       this.contentContainer.addChild(logoText);
+    }
+
+    // Logo hover indicator (small icon hint on hover)
+    if (this.isHovered) {
+      const hintStyle = new TextStyle({
+        fontFamily: 'Montserrat',
+        fontSize: 10,
+        fill: 'rgba(255,255,255,0.4)',
+        align: 'center',
+      });
+      const hint = new Text({ text: '◎', style: hintStyle });
+      hint.resolution = window.devicePixelRatio * 4;
+      hint.anchor.set(0.5, 0.5);
+      hint.x = logoX + logoSize / 2;
+      hint.y = logoY + logoSize / 2;
+      hint.alpha = 0.6;
+      this.contentContainer.addChild(hint);
     }
 
     // Industry tag: Space Mono, 9px, rgba(255,255,255,0.32), uppercase, letterSpacing: 2
@@ -326,6 +343,37 @@ export class VentureNode extends Container {
       this.drawCard();
       this.drawContent();
       if (t < 1) requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    // Attention animation on selection
+    if (selected) {
+      this.attentionAnimation();
+    }
+  }
+
+  private attentionAnimation() {
+    const startScale = this.scale.x;
+    const startTime = Date.now();
+    const duration = 400;
+
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+
+      // Easing: easeInOutSine
+      const eased = -(Math.cos(Math.PI * progress) - 1) / 2;
+      // Scale: 1.0 → 1.03 → 1.0
+      const scale = 1.0 + 0.03 * Math.sin(progress * Math.PI);
+
+      this.scale.set(scale);
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        this.scale.set(1.0);
+      }
     };
 
     animate();

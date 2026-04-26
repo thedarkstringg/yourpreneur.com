@@ -149,6 +149,13 @@ export default function PixiApp({
                 const date = new Date(venture.startedDate);
                 const dateStr = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
                 addToast('info', `${venture.name} · ${dateStr}`);
+
+                // Trigger dot pulse for any events in this venture
+                const events = useStore.getState().events.filter(e => e.ventureId === venture.id);
+                if (events.length > 0) {
+                  // Dispatch event to pulse dots - handled in eventContainer render
+                  window.dispatchEvent(new CustomEvent('pulse-venture-dots', { detail: { ventureId } }));
+                }
                 break;
               }
             }

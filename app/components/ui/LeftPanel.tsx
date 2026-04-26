@@ -173,10 +173,12 @@ export default function LeftPanel({
                   cursor: 'pointer',
                   transition: 'all 150ms',
                   marginBottom: '4px',
-                  background: selectedVentureId === venture.id ? 'rgba(255,255,255,0.04)' : 'transparent',
+                  background: selectedVentureId === venture.id ? 'rgba(255,255,255,0.08)' : 'transparent',
+                  borderLeft: selectedVentureId === venture.id ? '2px solid rgba(255,255,255,0.6)' : '2px solid transparent',
+                  paddingLeft: '6px',
                 }}
                 onMouseOver={(e) => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
                 }}
                 onMouseOut={(e) => {
                   if (selectedVentureId !== venture.id) {
@@ -184,14 +186,28 @@ export default function LeftPanel({
                   }
                 }}
               >
-                <div
-                  style={{
-                    width: '5px',
-                    height: '5px',
-                    borderRadius: '50%',
-                    background: 'rgba(255,255,255,0.4)',
-                  }}
-                />
+                {/* Logo or dot */}
+                {venture.logoUrl ? (
+                  <img
+                    src={venture.logoUrl}
+                    alt={venture.name}
+                    style={{
+                      width: '18px',
+                      height: '18px',
+                      borderRadius: '3px',
+                      objectFit: 'cover',
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: '5px',
+                      height: '5px',
+                      borderRadius: '50%',
+                      background: 'rgba(255,255,255,0.4)',
+                    }}
+                  />
+                )}
                 <div
                   style={{
                     flex: 1,

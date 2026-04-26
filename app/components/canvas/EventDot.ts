@@ -69,12 +69,12 @@ export class EventDot extends Container {
 
   private startPulseAnimation() {
     if (!this.pulseRing) return;
-    
+
     const animate = () => {
       if (!this.pulseRing) return;
       const start = Date.now();
       const dur = 2000;
-      
+
       const step = () => {
         if (!this.pulseRing) return;
         const t = ((Date.now() - start) % dur) / dur;
@@ -86,6 +86,28 @@ export class EventDot extends Container {
       step();
     };
     animate();
+  }
+
+  public triggerPulse() {
+    if (!this.pulseRing) {
+      this.pulseRing = new Graphics();
+      this.pulseRing.circle(0, 0, this.baseRadius);
+      this.pulseRing.stroke({ width: 1, color: this.moodColor, alpha: 0.4 });
+      this.addChild(this.pulseRing);
+    }
+
+    const start = Date.now();
+    const dur = 500;
+
+    const step = () => {
+      if (!this.pulseRing) return;
+      const t = ((Date.now() - start) % dur) / dur;
+      this.pulseRing.clear();
+      this.pulseRing.circle(0, 0, this.baseRadius + t * 24);
+      this.pulseRing.stroke({ width: 1, color: this.moodColor, alpha: 0.4 * (1 - t) });
+      requestAnimationFrame(step);
+    };
+    step();
   }
 
   private handlePointerOver() {
@@ -139,9 +161,10 @@ export class EventDot extends Container {
 
     animate();
 
-    window.dispatchEvent(new CustomEvent('event-dot-hover', { 
-      detail: { hover: false } 
+    window.dispatchEvent(new CustomEvent('event-dot-hover', {
+      detail: { hover: false }
     }));
   }
 }
+
 
