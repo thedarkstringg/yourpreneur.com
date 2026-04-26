@@ -329,4 +329,52 @@ html::before {
   }
 }
 
+/* Event panel slide animation */
+@keyframes slideInPanel {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Micro-interactions */
+button {
+  transition: all 120ms ease-out;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+input, textarea, select {
+  transition: border 180ms ease, background 180ms ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: rgba(255,255,255,0.22) !important;
+  background-color: rgba(255,255,255,0.05) !important;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.2);
+}
+
 
