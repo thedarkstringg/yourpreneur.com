@@ -335,8 +335,23 @@ export class VentureNode extends Container {
       this.card.roundRect(0, 0, this.widthPx, this.currentHeight, 10);
       this.card.fill({ color: 0x161111, alpha: 1 });
       this.card.stroke({ width: 1, color: 0xffffff, alpha: 0.22 });
+
+      // Add subtle glow effect on hover
+      const glowGraphics = new Graphics();
+      glowGraphics.roundRect(0, 0, this.widthPx, this.currentHeight, 10);
+      glowGraphics.stroke({ width: 1, color: 0xffffff, alpha: 0.08 });
+      glowGraphics.x = -1;
+      glowGraphics.y = -1;
+      this.addChildAt(glowGraphics, 0);
+
+      // Redraw content to show hover state
+      this.drawContent();
     } else {
       this.drawCard();
+      // Remove glow effect
+      while (this.children.length > 2) {
+        this.removeChildAt(0);
+      }
     }
   }
 
@@ -363,6 +378,12 @@ export class VentureNode extends Container {
     // Attention animation on selection
     if (selected) {
       this.attentionAnimation();
+
+      // Add selection glow
+      const glow = new Graphics();
+      glow.roundRect(0, 0, this.widthPx, this.currentHeight, 10);
+      glow.stroke({ width: 2, color: 0xffffff, alpha: 0.15 });
+      this.addChildAt(glow, 1);
     }
   }
 

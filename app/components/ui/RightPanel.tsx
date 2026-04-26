@@ -13,6 +13,7 @@ export default function RightPanel({
       (v.events || []).map((e: any) => ({
         ...e,
         ventureName: v.name,
+        logoUrl: v.logoUrl,
       }))
     )
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -139,39 +140,70 @@ export default function RightPanel({
                 borderBottom: '1px solid rgba(255,255,255,0.04)',
                 cursor: 'pointer',
                 transition: 'background 150ms',
+                display: 'flex',
+                gap: '8px',
+                alignItems: 'flex-start',
               }}
               onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.03)')}
               onMouseOut={(e) => (e.currentTarget.style.background = 'transparent')}
             >
-              <div
-                style={{
-                  fontSize: '8px',
-                  color: 'rgba(255,255,255,0.35)',
-                  marginBottom: '2px',
-                }}
-              >
-                {event.ventureName}
-              </div>
-              <div
-                style={{
-                  fontFamily: "'Montserrat', sans-serif",
-                  fontSize: '13px',
-                  color: 'rgba(255,255,255,0.65)',
-                  marginBottom: '2px',
-                  textOverflow: 'ellipsis',
-                  overflow: 'hidden',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {event.title}
-              </div>
-              <div
-                style={{
-                  fontSize: '7px',
-                  color: 'rgba(255,255,255,0.2)',
-                }}
-              >
-                {new Date(event.date).toLocaleDateString()}
+              {/* Logo */}
+              {event.logoUrl ? (
+                <img
+                  src={event.logoUrl}
+                  alt={event.ventureName}
+                  style={{
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '3px',
+                    objectFit: 'cover',
+                    flexShrink: 0,
+                    marginTop: '2px',
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: '4px',
+                    height: '4px',
+                    borderRadius: '50%',
+                    background: 'rgba(255,255,255,0.3)',
+                    flexShrink: 0,
+                    marginTop: '6px',
+                  }}
+                />
+              )}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: '8px',
+                    color: 'rgba(255,255,255,0.35)',
+                    marginBottom: '2px',
+                  }}
+                >
+                  {event.ventureName}
+                </div>
+                <div
+                  style={{
+                    fontFamily: "'Montserrat', sans-serif",
+                    fontSize: '13px',
+                    color: 'rgba(255,255,255,0.65)',
+                    marginBottom: '2px',
+                    textOverflow: 'ellipsis',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {event.title}
+                </div>
+                <div
+                  style={{
+                    fontSize: '7px',
+                    color: 'rgba(255,255,255,0.2)',
+                  }}
+                >
+                  {new Date(event.date).toLocaleDateString()}
+                </div>
               </div>
             </div>
           ))

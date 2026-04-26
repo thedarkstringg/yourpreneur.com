@@ -225,6 +225,15 @@ export default function PixiApp({
       const branchContainer = new Container();
       rootContainer.addChild(branchContainer);
 
+      // Setup date labels and stems containers
+      const dateLabelsContainer = new Container();
+      const stemsContainer = new Container();
+      rootContainer.addChild(stemsContainer);
+      rootContainer.addChild(dateLabelsContainer);
+
+      const dateLabels: Text[] = [];
+
+      let branchIndex = 0;
       ventures.forEach((venture) => {
         if (venture.parentId) {
           const parentPos = layout.positions.get(venture.parentId);
@@ -242,16 +251,13 @@ export default function PixiApp({
               label: venture.branchLabel,
             });
             branchContainer.addChild(branch);
+            // Store branch reference for animation
+            (branch as any).branchIndex = branchIndex++;
           }
         }
       });
 
-      const nodeMap = new Map();
-      const dateLabelsContainer = new Container();
-      const stemsContainer = new Container();
-      rootContainer.addChild(stemsContainer);
-      rootContainer.addChild(dateLabelsContainer);
-
+      // Create date labels
       layout.positions.forEach((pos, ventureId) => {
         const venture = ventures.find((v) => v.id === ventureId);
         if (venture) {
@@ -273,10 +279,43 @@ export default function PixiApp({
           dateText.x = pos.x + 110; // Center of card (220/2)
           dateText.y = layout.timelineY - 18; // 18px above the line per spec
           dateText.anchor.set(0.5, 0);
-          dateText.alpha = 0.45;
+          dateText.alpha = 0; // Start hidden for animation
           dateLabelsContainer.addChild(dateText);
           textObjectsRef.current.push(dateText);
+          dateLabels.push(dateText);
+        }
+      });
 
+      // Animate date labels fade-in with stagger (t=500ms, 20ms stagger)
+      const dateLabelsStart = Date.now();
+      const dateLabelsDelay = 500;
+      const dateLabelsStagger = 20;
+
+      const dateLabelsAnimate = () => {
+        const elapsed = Date.now() - dateLabelsStart;
+
+        dateLabels.forEach((label, idx) => {
+          const labelDelay = dateLabelsDelay + idx * dateLabelsStagger;
+          const labelElapsed = elapsed - labelDelay;
+
+          if (labelElapsed > 0) {
+            const t = Math.min(1, labelElapsed / 400);
+            const eased = 1 - Math.pow(1 - t, 3);
+            label.alpha = 0.45 * eased;
+          }
+        });
+
+        if (elapsed < dateLabelsDelay + dateLabels.length * dateLabelsStagger + 400) {
+          requestAnimationFrame(dateLabelsAnimate);
+        }
+      };
+      dateLabelsAnimate();
+
+      // Create stems and venture nodes
+      const nodeMap = new Map();
+      layout.positions.forEach((pos, ventureId) => {
+        const venture = ventures.find((v) => v.id === ventureId);
+        if (venture) {
           // Add stem (vertical line from timeline to card)
           if (pos.stemHeight !== undefined) {
             const stem = new Graphics();
@@ -287,10 +326,10 @@ export default function PixiApp({
             stemsContainer.addChild(stem);
 
             // Add dot on timeline (use EventDot for hover/animation)
-            const timelineDot = new EventDot({ 
-              x: centerX, 
-              y: layout.timelineY, 
-              event: { ...venture, id: `v-dot-${venture.id}`, ventureId: venture.id, type: 'milestone', title: 'Venture Started', eventDate: venture.startedDate } as any 
+            const timelineDot = new EventDot({
+              x: centerX,
+              y: layout.timelineY,
+              event: { ...venture, id: `v-dot-${venture.id}`, ventureId: venture.id, type: 'milestone', title: 'Venture Started', eventDate: venture.startedDate } as any
             });
             stemsContainer.addChild(timelineDot);
           }
@@ -299,12 +338,20 @@ export default function PixiApp({
           const node = new VentureNode(venture, pos.x, pos.y);
           rootContainer.addChild(node);
           nodeMap.set(ventureId, node);
-          
+
           // Collect text objects from VentureNode
           // This is a bit hacky, maybe VentureNode should expose them
           (node as any).contentContainer.children.forEach((child: any) => {
              if (child instanceof Text) textObjectsRef.current.push(child);
           });
+        }
+      });
+
+      // Start load sequence animations
+      timeline.startLoadAnimation();
+      branchContainer.children.forEach((branch) => {
+        if (branch instanceof BranchLine) {
+          branch.startLoadAnimation((branch as any).branchIndex || 0);
         }
       });
 
