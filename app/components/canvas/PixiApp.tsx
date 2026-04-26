@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Application, Container, Graphics, Text, TextStyle } from 'pixi.js';
 import { Viewport } from 'pixi-viewport';
 import { DotGrid } from './DotGrid2';
@@ -13,6 +13,7 @@ import { useStore } from '@/lib/useStore';
 import { calculateLayout } from '@/lib/layoutAlgorithm';
 import { easingFunctions, animateTo } from '@/lib/easingFunctions';
 import { useToasts } from '../ui/Toast';
+import LogoUploadOverlay from '../ui/LogoUploadOverlay';
 
 async function loadFonts() {
   try {
@@ -27,14 +28,12 @@ async function loadFonts() {
 export default function PixiApp({
   onNodeDoubleClick,
   onNewVenture,
-  onPreviewMode,
   onHelpToggle,
   onListToggle,
   onStatsToggle,
 }: {
   onNodeDoubleClick?: (ventureId: string) => void;
   onNewVenture?: () => void;
-  onPreviewMode?: () => void;
   onHelpToggle?: () => void;
   onListToggle?: () => void;
   onStatsToggle?: () => void;
@@ -42,6 +41,7 @@ export default function PixiApp({
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<Application | null>(null);
   const textObjectsRef = useRef<Text[]>([]);
+  const [logoUploadVentureId, setLogoUploadVentureId] = useState<string | null>(null);
 
   const { ventures, setZoom, setPan, setSelectedVenture } = useStore();
   const { addToast } = useToasts();
@@ -509,12 +509,6 @@ export default function PixiApp({
           }
         }
 
-        // Alt+P = preview mode
-        if (e.key.toLowerCase() === 'p') {
-          e.preventDefault();
-          onPreviewMode?.();
-        }
-
         // Alt+L = ventures list
         if (e.key.toLowerCase() === 'l') {
           e.preventDefault();
@@ -537,6 +531,13 @@ export default function PixiApp({
       window.addEventListener('resize', handleResize);
       window.addEventListener('keydown', handleKeyDown);
 
+      // Handle logo click events
+      const handleLogoClick = (e: Event) => {
+        const event = e as CustomEvent;
+        setLogoUploadVentureId(event.detail?.ventureId);
+      };
+      window.addEventListener('pixi-logo-click', handleLogoClick);
+
       app.ticker.add(() => {
         // render loop
         dotGrid.tick?.();
@@ -549,6 +550,7 @@ export default function PixiApp({
         window.removeEventListener('mousemove', onMouseMoveClient);
         window.removeEventListener('pixi-card-hover', onPixiCardHover as EventListener);
         window.removeEventListener('pointerup', onPointerUp);
+        window.removeEventListener('pixi-logo-click', handleLogoClick);
 
         // Toolbar listeners
         const toolbarElCleanup = document.getElementById('toolbar');
@@ -584,17 +586,25 @@ export default function PixiApp({
   }, [ventures]);
 
   return (
-    <div
-      ref={containerRef}
-      style={{
-        position: 'fixed',
-        top: '48px',
-        left: '240px',
-        right: '200px',
-        bottom: '80px',
-        overflow: 'hidden',
-        background: 'transparent',
-      }}
-    />
+    <>
+      <div
+        ref={containerRef}
+        style={{
+          position: 'fixed',
+          top: '48px',
+          left: '240px',
+          right: '200px',
+          bottom: '80px',
+          overflow: 'hidden',
+          background: 'transparent',
+        }}
+      />
+      {logoUploadVentureId && (
+        <LogoUploadOverlay
+          ventureId={logoUploadVentureId}
+          onClose={() => setLogoUploadVentureId(null)}
+        />
+      )}
+    </>
   );
 }

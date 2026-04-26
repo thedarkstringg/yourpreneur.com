@@ -18,7 +18,7 @@ export class VentureNode extends Container {
     this.venture = venture;
     this.x = x;
     this.y = y;
-    // this.width and this.height are calculated from children in PixiJS, 
+    // this.width and this.height are calculated from children in PixiJS,
     // we don't need to set them manually usually if using Graphics
 
     this.interactive = true;
@@ -40,6 +40,27 @@ export class VentureNode extends Container {
     this.on('pointerout', () => {
       window.dispatchEvent(new CustomEvent('pixi-card-hover', { detail: { hover: false } }));
       this.setHovered(false);
+    });
+
+    // Emit click event for logo area
+    this.on('pointerdown', (event) => {
+      const logoSize = 36;
+      const logoMargin = 12;
+      const logoX = this.widthPx - logoSize - logoMargin;
+      const logoY = logoMargin;
+
+      if (
+        event.global.x >= this.x + logoX &&
+        event.global.x <= this.x + logoX + logoSize &&
+        event.global.y >= this.y + logoY &&
+        event.global.y <= this.y + logoY + logoSize
+      ) {
+        window.dispatchEvent(
+          new CustomEvent('pixi-logo-click', {
+            detail: { ventureId: this.venture.id },
+          })
+        );
+      }
     });
 
     this.spawnAnimation();
