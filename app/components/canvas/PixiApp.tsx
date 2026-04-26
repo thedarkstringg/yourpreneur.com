@@ -12,6 +12,7 @@ import { InteractionManager } from './InteractionManager';
 import { useStore } from '@/lib/useStore';
 import { calculateLayout } from '@/lib/layoutAlgorithm';
 import { easingFunctions, animateTo } from '@/lib/easingFunctions';
+import { useToasts } from '../ui/Toast';
 
 async function loadFonts() {
   try {
@@ -43,6 +44,7 @@ export default function PixiApp({
   const textObjectsRef = useRef<Text[]>([]);
 
   const { ventures, setZoom, setPan, setSelectedVenture } = useStore();
+  const { addToast } = useToasts();
 
   const updateTextResolution = (zoomScale: number) => {
     const baseRes = window.devicePixelRatio || 2;
@@ -139,6 +141,17 @@ export default function PixiApp({
           },
           () => {
             navigationCancelRef.current = null;
+            // Show toast with venture name and date
+            // Find which venture is being navigated to based on world position
+            for (const [ventureId, position] of (layout as any).positions) {
+              const venture = ventures.find(v => v.id === ventureId);
+              if (venture && Math.abs(position.x - worldX) < 50 && Math.abs(position.y - worldY) < 50) {
+                const date = new Date(venture.startedDate);
+                const dateStr = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                addToast('info', `${venture.name} · ${dateStr}`);
+                break;
+              }
+            }
           }
         );
       };
@@ -163,6 +176,13 @@ export default function PixiApp({
           },
           () => {
             navigationCancelRef.current = null;
+            // Show toast with year and venture count
+            const yearVentures = ventures.filter(v => {
+              const vYear = new Date(v.startedDate).getFullYear();
+              return vYear === (year + 2022);
+            });
+            const ventureCount = yearVentures.length;
+            addToast('info', `Viewing ${year + 2022} · ${ventureCount} venture${ventureCount !== 1 ? 's' : ''}`);
           }
         );
       };

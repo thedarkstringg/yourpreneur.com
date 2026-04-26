@@ -63,6 +63,36 @@ export class VentureNode extends Container {
   private drawContent() {
     this.contentContainer.removeChildren();
 
+    // Logo placeholder (top-right)
+    const logoSize = 36;
+    const logoMargin = 12;
+    const logoX = this.widthPx - logoSize - logoMargin;
+    const logoY = logoMargin;
+
+    // Logo background
+    const logoBg = new Graphics();
+    logoBg.roundRect(logoX, logoY, logoSize, logoSize, 8);
+    logoBg.fill({ color: 0x000000, alpha: 0.06 });
+    logoBg.stroke({ width: 1, color: 0xffffff, alpha: 0.1 });
+    this.contentContainer.addChild(logoBg);
+
+    // Logo text (first letter of venture name)
+    if (this.venture.name) {
+      const logoTextStyle = new TextStyle({
+        fontFamily: 'Montserrat',
+        fontSize: 16,
+        fontWeight: '500',
+        fill: 'rgba(255,255,255,0.5)',
+        align: 'center',
+      });
+      const logoText = new Text({ text: this.venture.name.charAt(0).toUpperCase(), style: logoTextStyle });
+      logoText.resolution = window.devicePixelRatio * 4;
+      logoText.anchor.set(0.5, 0.5);
+      logoText.x = logoX + logoSize / 2;
+      logoText.y = logoY + logoSize / 2;
+      this.contentContainer.addChild(logoText);
+    }
+
     // Industry tag: Space Mono, 9px, rgba(255,255,255,0.32), uppercase, letterSpacing: 2
     const industryStyle = new TextStyle({
       fontFamily: 'Space Mono',
