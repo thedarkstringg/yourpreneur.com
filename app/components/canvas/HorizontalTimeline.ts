@@ -6,31 +6,34 @@ export class HorizontalTimeline extends Graphics {
   constructor(timelineY: number, yearPositions: Map<number, number>) {
     super();
 
-    // Draw horizontal timeline
-    this.lineStyle(1, 0xffffff, 0.2);
-    this.moveTo(-10000, timelineY);
-    this.lineTo(10000, timelineY);
+    // Draw horizontal timeline across wide world bounds
+    this.moveTo(-20000, timelineY);
+    this.lineTo(20000, timelineY);
+    this.stroke({ width: 1, color: 0xffffff, alpha: 0.2 });
 
-    // Draw year markers and labels
-    const fontStyle = new TextStyle({
-      fontFamily: 'Cormorant Garamond, serif',
-      fontSize: 28,
+    // Year watermark
+    const yearStyle = new TextStyle({
+      fontFamily: 'Cormorant Garamond',
+      fontSize: 96,
       fill: 0xffffff,
-      fontWeight: 'bold',
+      fontWeight: '300',
     });
 
     yearPositions.forEach((xPos, year) => {
-      // Draw tick mark above timeline
-      this.lineStyle(1, 0xffffff, 0.2);
-      this.moveTo(xPos, timelineY - 15);
-      this.lineTo(xPos, timelineY);
+      // Tick mark
+      const tick = new Graphics();
+      tick.moveTo(xPos, timelineY - 5);
+      tick.lineTo(xPos, timelineY + 5);
+      tick.stroke({ width: 1, color: 0xffffff, alpha: 0.35 });
+      this.addChild(tick);
 
-      // Add year label
-      const yearLabel = new Text(year.toString(), fontStyle);
-      yearLabel.anchor.set(0.5, 0);
+      // Year watermark (baseline sits on the timeline)
+      const yearLabel = new Text({ text: year.toString(), style: yearStyle });
+      yearLabel.resolution = window.devicePixelRatio * 4;
+      yearLabel.anchor.set(0.5, 1);
       yearLabel.x = xPos;
-      yearLabel.y = timelineY - 40;
-      yearLabel.alpha = 0.15;
+      yearLabel.y = timelineY;
+      yearLabel.alpha = 0.035;
       this.addChild(yearLabel);
     });
 

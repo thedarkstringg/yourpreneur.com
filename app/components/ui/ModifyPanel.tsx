@@ -40,74 +40,64 @@ export default function ModifyPanel({
 
   return (
     <>
-      <div className="fixed right-0 top-0 h-screen w-[440px] bg-zinc-950 border-l border-white/10 shadow-2xl z-40 flex flex-col">
+      <div className="modify-panel">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-white/10">
-          <h2 className="text-lg font-semibold text-white">Modify Venture</h2>
+        <div className="flex items-center justify-between border-b border-white/10 pb-6">
+          <h2 className="font-display">Modify Venture</h2>
           <button
             onClick={onClose}
-            className="text-white/60 hover:text-white transition-colors"
+            className="text-white/60 hover:text-white transition-colors pt-8 pr-8"
           >
             ✕
           </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto px-7 pb-6">
           {/* Name */}
           <div>
-            <label className="block text-xs font-mono text-white/60 mb-2">
-              NAME
-            </label>
+            <label>NAME</label>
             <input
               type="text"
+              placeholder="Venture Name"
               value={formData.name || ''}
               onChange={(e) => handleChange('name', e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-white/30"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-mono text-white/60 mb-2">
-              DESCRIPTION
-            </label>
+            <label>DESCRIPTION</label>
             <textarea
+              placeholder="Brief overview..."
               value={formData.description || ''}
               onChange={(e) => handleChange('description', e.target.value)}
               rows={4}
-              className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-white/30 resize-none"
             />
           </div>
 
           {/* Industry */}
           <div>
-            <label className="block text-xs font-mono text-white/60 mb-2">
-              INDUSTRY
-            </label>
+            <label>INDUSTRY</label>
             <input
               type="text"
+              placeholder="e.g. FINTECH, SAAS"
               value={formData.industry || ''}
               onChange={(e) => handleChange('industry', e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-white/30"
             />
           </div>
 
           {/* Status */}
           <div>
-            <label className="block text-xs font-mono text-white/60 mb-2">
-              STATUS
-            </label>
+            <label>STATUS</label>
             <div className="grid grid-cols-2 gap-2">
               {['active', 'pivot', 'paused', 'shutdown', 'exited'].map(
                 (status) => (
                   <button
                     key={status}
                     onClick={() => handleChange('status', status)}
-                    className={`px-3 py-1.5 rounded text-xs font-mono transition-colors ${
-                      formData.status === status
-                        ? 'bg-white/20 text-white border border-white/40'
-                        : 'bg-white/5 text-white/60 border border-white/10 hover:bg-white/10'
+                    className={`status-pill ${
+                      formData.status === status ? 'selected' : ''
                     }`}
                   >
                     {status.toUpperCase()}
@@ -119,26 +109,20 @@ export default function ModifyPanel({
 
           {/* Started Date */}
           <div>
-            <label className="block text-xs font-mono text-white/60 mb-2">
-              STARTED DATE
-            </label>
+            <label>STARTED DATE</label>
             <input
               type="date"
               value={formData.startedDate || ''}
               onChange={(e) => handleChange('startedDate', e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-white/30"
             />
           </div>
 
           {/* Parent Venture */}
           <div>
-            <label className="block text-xs font-mono text-white/60 mb-2">
-              PARENT VENTURE (Optional)
-            </label>
+            <label>PARENT VENTURE</label>
             <select
               value={formData.parentId || ''}
               onChange={(e) => handleChange('parentId', e.target.value || undefined)}
-              className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-white/30"
             >
               <option value="">None</option>
               {ventures
@@ -154,22 +138,19 @@ export default function ModifyPanel({
           {/* Branch Label */}
           {formData.parentId && (
             <div>
-              <label className="block text-xs font-mono text-white/60 mb-2">
-                BRANCH LABEL
-              </label>
+              <label>BRANCH LABEL</label>
               <input
                 type="text"
                 value={formData.branchLabel || ''}
                 onChange={(e) => handleChange('branchLabel', e.target.value)}
                 placeholder="e.g., Spinoff, Pivot"
-                className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-white/30"
               />
             </div>
           )}
-          <div className="border-t border-white/10 pt-6">
+          <div className="mt-8">
             <button
               onClick={() => setIsAddingEvent(true)}
-              className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded text-white text-sm font-mono hover:bg-white/15 transition-colors"
+              className="w-full btn-cancel"
             >
               + ADD EVENT
             </button>
@@ -177,25 +158,27 @@ export default function ModifyPanel({
         </div>
 
         {/* Footer */}
-        <div className="border-t border-white/10 p-6 flex gap-3">
+        <div className="modify-footer">
           <button
             onClick={handleDelete}
-            className="px-4 py-2 bg-red-500/10 border border-red-500/30 rounded text-red-400 text-sm font-mono hover:bg-red-500/15 transition-colors"
+            className="btn-delete"
           >
             DELETE
           </button>
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded text-white text-sm font-mono hover:bg-white/10 transition-colors"
-          >
-            CANCEL
-          </button>
-          <button
-            onClick={handleSave}
-            className="flex-1 px-4 py-2 bg-white/20 border border-white/30 rounded text-white text-sm font-mono hover:bg-white/30 transition-colors"
-          >
-            SAVE
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              className="btn-cancel"
+            >
+              CANCEL
+            </button>
+            <button
+              onClick={handleSave}
+              className="btn-save"
+            >
+              SAVE
+            </button>
+          </div>
         </div>
       </div>
 

@@ -15,11 +15,11 @@ interface LayoutResult {
 }
 
 const MONTH_WIDTH = 120; // pixels per month
-const NODE_WIDTH = 180;
-const NODE_HEIGHT = 110;
-const TIMELINE_Y = 400; // 40% from top (approximate)
-const STEM_HEIGHT_BASE = 28; // base stem length
-const STEM_OVERLAP_OFFSET = 100; // additional offset per overlap level
+const NODE_WIDTH = 220;
+const NODE_HEIGHT = 120;
+const TIMELINE_Y = Math.floor(typeof window !== 'undefined' ? window.innerHeight * 0.42 : 400); 
+const STEM_HEIGHT_BASE = 36; // base stem length (per spec)
+const STEM_OVERLAP_OFFSET = 120; // increased offset for larger cards
 
 // Reference date for all calculations
 const REFERENCE_DATE = new Date('2024-01-01');

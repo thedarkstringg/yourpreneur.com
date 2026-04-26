@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 @config "../tailwind.config.ts";
 
@@ -6,11 +6,187 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'Space Grotesk', sans-serif; /* default for all UI */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  font-family: 'Space Mono', monospace;
+  background: radial-gradient(ellipse at 65% 35%, #181010 0%, #0c0909 40%, #080606 100%);
+  cursor: none; /* custom cursor per spec */
 }
+
+/* Vignette overlay */
+html::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 35%, rgba(5,3,3,0.75) 100%);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.font-display {
+  font-family: 'Montserrat', sans-serif;
+}
+
+#custom-cursor {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.7);
+  transform: translate(-50%, -50%);
+  transition: width 200ms, height 200ms, background 200ms, box-shadow 200ms;
+}
+
+#custom-cursor.ring::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+/* Modify Panel — complete style reset */
+
+.modify-panel {
+  position: fixed;
+  top: 0; right: 0;
+  width: 400px; height: 100vh;
+  background: #0e0b0b;
+  border-left: 1px solid rgba(255,255,255,0.08);
+  font-family: 'Space Grotesk', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-y: auto;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+.modify-panel h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 26px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.9);
+  letter-spacing: -0.01em;
+  padding: 28px 28px 0;
+  margin: 0;
+}
+
+.modify-panel label {
+  display: block;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 8px;
+  color: rgba(255,255,255,0.22);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  margin-bottom: 8px;
+  margin-top: 22px;
+}
+
+.modify-panel input,
+.modify-panel textarea,
+.modify-panel select {
+  width: 100%;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  padding: 11px 14px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  color: rgba(255,255,255,0.8);
+  outline: none;
+  transition: border-color 180ms ease, background 180ms ease;
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+}
+
+.modify-panel input::placeholder,
+.modify-panel textarea::placeholder {
+  color: rgba(255,255,255,0.18);
+}
+
+.modify-panel input:focus,
+.modify-panel textarea:focus {
+  border-color: rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.05);
+}
+
+/* Status pills */
+.status-pill {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-radius: 999px;
+  padding: 7px 16px;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.4);
+  background: transparent;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.status-pill.selected {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.9);
+}
+
+/* Footer */
+.modify-footer {
+  position: sticky;
+  bottom: 0;
+  background: #0e0b0b;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 20px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.btn-delete {
+  font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.3); background: none; border: none; cursor: pointer;
+  transition: color 150ms;
+}
+.btn-delete:hover { color: rgba(255,255,255,0.8); }
+
+.btn-cancel {
+  font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.4); background: none;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 999px; padding: 8px 18px; cursor: pointer;
+  transition: all 150ms;
+}
+.btn-cancel:hover { border-color: rgba(255,255,255,0.28); color: rgba(255,255,255,0.7); }
+
+.btn-save {
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+  color: #0c0a0a; background: rgba(255,255,255,0.92);
+  border: none; border-radius: 999px; padding: 9px 22px; cursor: pointer;
+  transition: opacity 150ms;
+}
+.btn-save:hover { opacity: 0.85; }
+
+/* Toolbar Font Fix */
+.toolbar-item {
+  font-family: 'Space Mono', monospace !important;
+  font-size: 11px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  -webkit-font-smoothing: antialiased;
+}
+

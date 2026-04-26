@@ -1,11 +1,16 @@
 import { Container, Graphics, Text, TextStyle } from 'pixi.js';
-import { Venture } from '@/lib/useStore';
+import { Venture, useStore } from '@/lib/useStore';
 
 export class VentureNode extends Container {
   private venture: Venture;
   private card: Graphics;
+  public contentContainer: Container; // Changed to public for PixiApp to access text objects
   private isHovered: boolean = false;
   private isSelected: boolean = false;
+  private widthPx = 220;
+  private heightPx = 120;
+  private expandedHeight = 280;
+  private currentHeight = 120;
 
   constructor(venture: Venture, x: number, y: number) {
     super();
@@ -13,166 +18,266 @@ export class VentureNode extends Container {
     this.venture = venture;
     this.x = x;
     this.y = y;
-    this.width = 180;
-    this.height = 110;
+    // this.width and this.height are calculated from children in PixiJS, 
+    // we don't need to set them manually usually if using Graphics
 
     this.interactive = true;
     this.cursor = 'pointer';
 
-    this.card = this.createCard();
-    this.addChild(this.card);
+    this.card = new Graphics();
+    this.contentContainer = new Container();
 
+    this.addChild(this.card);
+    this.addChild(this.contentContainer);
+
+    this.drawCard();
     this.drawContent();
 
-    // Spawn animation
+    this.on('pointerover', () => {
+      window.dispatchEvent(new CustomEvent('pixi-card-hover', { detail: { hover: true } }));
+      this.setHovered(true);
+    });
+    this.on('pointerout', () => {
+      window.dispatchEvent(new CustomEvent('pixi-card-hover', { detail: { hover: false } }));
+      this.setHovered(false);
+    });
+
     this.spawnAnimation();
   }
 
-  private spawnAnimation() {
-    // Start small and fade in
-    this.scale.set(0.85);
-    this.alpha = 0;
+  private drawCard() {
+    // draw background with border and rounded corners
+    this.card.clear();
+    const r = 10;
+    
+    this.card.roundRect(0, 0, this.widthPx, this.currentHeight, r);
+    this.card.fill({ color: 0x161111, alpha: 1 });
+    this.card.stroke({ width: 1, color: 0xffffff, alpha: 0.08 });
 
-    let progress = 0;
-    const duration = 0.3; // seconds
-    const startTime = Date.now();
-
-    const animate = () => {
-      progress = (Date.now() - startTime) / (duration * 1000);
-
-      if (progress >= 1) {
-        this.scale.set(1);
-        this.alpha = 1;
-        return;
-      }
-
-      // Easing function: ease-out cubic
-      const easeProgress = 1 - Math.pow(1 - progress, 3);
-      this.scale.set(0.85 + easeProgress * 0.15);
-      this.alpha = easeProgress;
-
-      requestAnimationFrame(animate);
-    };
-
-    animate();
-  }
-
-  private createCard(): Graphics {
-    const card = new Graphics();
-    const radius = 8;
-
-    card.fill({
-      color: 0x141111,
-      alpha: 1,
-    });
-    card.stroke({
-      color: 0xffffff,
-      width: 1,
-      alpha: 0.09,
-    });
-
-    card.roundRect(0, 0, 180, 110, radius);
-
-    return card;
+    // top inner highlight line at y=1
+    this.card.moveTo(1, 1);
+    this.card.lineTo(this.widthPx - 1, 1);
+    this.card.stroke({ width: 1, color: 0xffffff, alpha: 0.05 });
   }
 
   private drawContent() {
-    // Industry tag - top left
+    this.contentContainer.removeChildren();
+
+    // Industry tag: Space Mono, 9px, rgba(255,255,255,0.32), uppercase, letterSpacing: 2
     const industryStyle = new TextStyle({
-      fontFamily: "'Space Mono', monospace",
+      fontFamily: 'Space Mono',
       fontSize: 9,
-      fill: 0xffffff,
+      fill: 'rgba(255,255,255,0.32)',
+      letterSpacing: 2,
     });
-    const industryText = new Text(this.venture.industry.toUpperCase(), industryStyle);
-    industryText.x = 12;
-    industryText.y = 10;
-    industryText.alpha = 0.35;
-    this.addChild(industryText);
+    const industry = new Text({ text: (this.venture.industry || '').toUpperCase(), style: industryStyle });
+    industry.resolution = window.devicePixelRatio * 4;
+    industry.x = 24;
+    industry.y = 18;
+    this.contentContainer.addChild(industry);
 
-    // Venture name - center
+    // Venture name: Cormorant Garamond, 26px, font-weight 500, rgba(255,255,255,0.9)
     const nameStyle = new TextStyle({
-      fontFamily: "'Cormorant Garamond', serif",
-      fontSize: 22,
-      fontWeight: '600',
-      fill: 0xffffff,
-      wordWrap: true,
-      wordWrapWidth: 156,
-      align: 'center',
-    });
-    const nameText = new Text(this.venture.name, nameStyle);
-    nameText.x = 90;
-    nameText.y = 45;
-    nameText.anchor.set(0.5, 0.5);
-    nameText.alpha = 0.85;
-    this.addChild(nameText);
-
-    // Status badge - bottom left
-    const badgeWidth = 50;
-    const badgeHeight = 20;
-    const statusBg = new Graphics();
-    statusBg.stroke({
-      color: this.getStatusColor(),
-      width: 1,
-      alpha: 0.7,
-    });
-    statusBg.roundRect(12, 85, badgeWidth, badgeHeight, 4);
-    this.addChild(statusBg);
-
-    const statusStyle = new TextStyle({
-      fontFamily: "'Space Mono', monospace",
-      fontSize: 8,
-      fill: this.getStatusColor(),
+      fontFamily: 'Cormorant Garamond',
+      fontSize: 26,
       fontWeight: '500',
+      fill: 'rgba(255,255,255,0.9)',
     });
-    const statusText = new Text(this.venture.status.toUpperCase(), statusStyle);
-    statusText.x = 12 + badgeWidth / 2;
-    statusText.y = 85 + badgeHeight / 2;
-    statusText.anchor.set(0.5, 0.5);
-    statusText.alpha = 0.8;
-    this.addChild(statusText);
-  }
+    const name = new Text({ text: this.venture.name, style: nameStyle });
+    name.resolution = window.devicePixelRatio * 6;
+    name.x = 24;
+    name.y = 40;
+    this.contentContainer.addChild(name);
 
-  private getStatusColor(): number {
+    // Status badge: Space Mono, 9px, outlined pill
+    const statusTextStyle = new TextStyle({
+      fontFamily: 'Space Mono',
+      fontSize: 9,
+      fill: 'rgba(255,255,255,0.9)',
+    });
+
+    const statusStr = (this.venture.status || '').toUpperCase();
+    const statusText = new Text({ text: (this.venture.status === 'exited' ? '✦ ' : '') + statusStr, style: statusTextStyle });
+    statusText.resolution = window.devicePixelRatio * 4;
+    
+    const paddingX = 12;
+    const paddingY = 6;
+    const measured = statusText.width + paddingX * 2;
+
+    const pill = new Graphics();
+    // Determine colors per status
+    let borderColor = 0xffffff;
+    let borderAlpha = 0.1;
+    let textAlpha = 0.4;
+    
     switch (this.venture.status) {
       case 'active':
-        return 0xffffff;
+        borderColor = 0xffffff;
+        borderAlpha = 0.25;
+        textAlpha = 0.9;
+        break;
       case 'pivot':
-        return 0xfbbf24;
+        borderColor = 0xc9a96e;
+        borderAlpha = 0.45;
+        textAlpha = 1;
+        break;
       case 'paused':
-        return 0x9ca3af;
+        borderColor = 0xffffff;
+        borderAlpha = 0.1;
+        textAlpha = 0.3;
+        break;
       case 'shutdown':
-        return 0x6b7280;
+        borderColor = 0xffffff;
+        borderAlpha = 0.06;
+        textAlpha = 0.2;
+        break;
       case 'exited':
-        return 0xc9a96e;
-      default:
-        return 0xffffff;
+        borderColor = 0xc9a96e;
+        borderAlpha = 1;
+        textAlpha = 1;
+        break;
     }
+    
+    statusText.style.fill = `rgba(255,255,255,${textAlpha})`;
+    
+    const pillX = 24;
+    const pillY = this.heightPx - 18 - statusText.height - paddingY;
+    pill.roundRect(pillX, pillY, measured, paddingY * 2 + statusText.height, 999);
+    pill.stroke({ width: 1, color: borderColor, alpha: borderAlpha });
+
+    statusText.x = pillX + paddingX;
+    statusText.y = pillY + paddingY;
+
+    this.contentContainer.addChild(pill);
+    this.contentContainer.addChild(statusText);
+
+    // If expanded, draw divider and events
+    if (this.isSelected) {
+      // Divider
+      const divider = new Graphics();
+      divider.moveTo(12, 120 - 10);
+      divider.lineTo(this.widthPx - 12, 120 - 10);
+      divider.stroke({ width: 1, color: 0xffffff, alpha: 0.06 });
+      this.contentContainer.addChild(divider);
+
+      // Events from store
+      const events = useStore.getState().events.filter((e) => e.ventureId === this.venture.id);
+      let startY = 125;
+      events.slice(0, 4).forEach((ev, idx) => {
+        const rowY = startY + idx * 32;
+        
+        const rowStyle = new TextStyle({ 
+          fontFamily: 'Space Mono', 
+          fontSize: 9, 
+          fill: 'rgba(255,255,255,0.5)' 
+        });
+
+        // Type symbol
+        const symbol = new Text({ text: this.getSymbolForType(ev.type), style: rowStyle });
+        symbol.resolution = window.devicePixelRatio * 4;
+        symbol.x = 24;
+        symbol.y = rowY + 6;
+        this.contentContainer.addChild(symbol);
+
+        // Title
+        const title = new Text({ text: ev.title.length > 20 ? ev.title.slice(0, 20) + '…' : ev.title, style: rowStyle });
+        title.resolution = window.devicePixelRatio * 4;
+        title.x = 48;
+        title.y = rowY + 6;
+        this.contentContainer.addChild(title);
+
+        // Date
+        const dateStr = new Date(ev.eventDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
+        const date = new Text({ text: dateStr, style: rowStyle });
+        date.resolution = window.devicePixelRatio * 4;
+        date.style.fill = 'rgba(255,255,255,0.22)';
+        date.x = this.widthPx - 70;
+        date.y = rowY + 6;
+        this.contentContainer.addChild(date);
+      });
+
+      // + ADD EVENT row
+      const addStyle = new TextStyle({
+        fontFamily: 'Space Mono',
+        fontSize: 9,
+        fill: 'rgba(255,255,255,0.28)',
+      });
+      const add = new Text({ text: '+ ADD EVENT', style: addStyle });
+      add.resolution = window.devicePixelRatio * 4;
+      add.x = 24;
+      add.y = startY + Math.min(4, events.length) * 32 + 8;
+      add.interactive = true;
+      add.on('pointerover', () => (add.style.fill = 'rgba(255,255,255,0.8)'));
+      add.on('pointerout', () => (add.style.fill = 'rgba(255,255,255,0.28)'));
+      this.contentContainer.addChild(add);
+    }
+  }
+
+  private getSymbolForType(type: string) {
+    switch (type) {
+      case 'milestone':
+        return '◆';
+      case 'launch':
+        return '▲';
+      case 'funding':
+        return '$';
+      case 'setback':
+        return '↓';
+      case 'pivot':
+        return '⟳';
+      case 'exit':
+        return '✦';
+      default:
+        return '•';
+    }
+  }
+
+  private spawnAnimation() {
+    this.scale.set(0.92);
+    this.alpha = 0;
+    const start = Date.now();
+    const dur = 350;
+    const animate = () => {
+      const t = Math.min(1, (Date.now() - start) / dur);
+      const e = 1 - Math.pow(1 - t, 3);
+      this.scale.set(0.92 + 0.08 * e);
+      this.alpha = e;
+      if (t < 1) requestAnimationFrame(animate);
+    };
+    animate();
   }
 
   setHovered(hovered: boolean) {
     this.isHovered = hovered;
     if (hovered) {
-      this.card.stroke({
-        color: 0xffffff,
-        width: 1,
-        alpha: 0.2,
-      });
+      this.card.clear();
+      this.card.roundRect(0, 0, this.widthPx, this.currentHeight, 10);
+      this.card.fill({ color: 0x161111, alpha: 1 });
+      this.card.stroke({ width: 1, color: 0xffffff, alpha: 0.22 });
     } else {
-      this.card.stroke({
-        color: 0xffffff,
-        width: 1,
-        alpha: 0.09,
-      });
+      this.drawCard();
     }
   }
 
   setSelected(selected: boolean) {
+    if (selected === this.isSelected) return;
     this.isSelected = selected;
-    if (selected) {
-      this.scale.set(1.02);
-    } else {
-      this.scale.set(1);
-    }
+
+    const from = this.currentHeight;
+    const to = selected ? this.expandedHeight : this.heightPx;
+    const start = Date.now();
+    const dur = 260;
+
+    const animate = () => {
+      const t = Math.min(1, (Date.now() - start) / dur);
+      const eased = 1 - Math.pow(1 - t, 3);
+      this.currentHeight = from + (to - from) * eased;
+      this.drawCard();
+      this.drawContent();
+      if (t < 1) requestAnimationFrame(animate);
+    };
+
+    animate();
   }
 
   getVenture(): Venture {

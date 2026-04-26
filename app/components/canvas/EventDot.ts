@@ -1,51 +1,147 @@
-import { Container, Graphics, Circle } from 'pixi.js';
+import { Container, Graphics } from 'pixi.js';
+import { VentureEvent } from '@/lib/useStore';
 
 interface EventDotOptions {
   x: number;
   y: number;
-  type: 'milestone' | 'launch' | 'funding' | 'team' | 'pivot' | 'setback' | 'exit' | 'other';
+  event: VentureEvent;
 }
 
+const MOOD_COLORS: Record<string, number> = {
+  energized: 0x64dc96, // soft green
+  focused: 0xffffff,   // white
+  uncertain: 0xdcb450, // amber
+  lost: 0x9696b4,      // slate
+  proud: 0xb48cff,     // soft purple
+  regretful: 0xc86450, // muted red
+  burned_out: 0x787878, // gray
+};
+
+const IMPACT_SIZES: Record<string, number> = {
+  low: 4,
+  medium: 5,
+  high: 7,
+  critical: 9,
+};
+
 export class EventDot extends Container {
+  private baseRadius: number;
+  private dot: Graphics;
+  private ring: Graphics;
+  private pulseRing?: Graphics;
+  private event: VentureEvent;
+  private moodColor: number;
+
   constructor(options: EventDotOptions) {
     super();
 
+    this.event = options.event;
     this.x = options.x;
     this.y = options.y;
 
-    const color = this.getColorForType(options.type);
-    const dot = new Graphics();
-    dot.circle(0, 0, 5);
-    dot.fill({ color });
+    this.baseRadius = IMPACT_SIZES[this.event.impact || 'low'] || 5;
+    this.moodColor = MOOD_COLORS[this.event.mood || ''] || 0xffffff;
 
-    // Add outline
-    dot.stroke({
-      color: 0xffffff,
-      width: 1,
-      alpha: 0.3,
-    });
+    this.dot = new Graphics();
+    this.dot.circle(0, 0, this.baseRadius);
+    this.dot.fill({ color: this.moodColor, alpha: this.event.mood ? 0.7 : 0.5 });
+    this.addChild(this.dot);
 
-    this.addChild(dot);
+    // subtle outer ring for hover glow (drawn but alpha 0)
+    this.ring = new Graphics();
+    this.ring.circle(0, 0, this.baseRadius + 6);
+    this.ring.stroke({ width: 1, color: this.moodColor, alpha: 0.16 });
+    this.ring.alpha = 0;
+    this.addChild(this.ring);
+
+    if (this.event.impact === 'critical') {
+      this.pulseRing = new Graphics();
+      this.pulseRing.circle(0, 0, this.baseRadius);
+      this.pulseRing.stroke({ width: 1, color: this.moodColor, alpha: 0.4 });
+      this.addChild(this.pulseRing);
+      this.startPulseAnimation();
+    }
+
+    this.interactive = true;
+    this.on('pointerover', this.handlePointerOver.bind(this));
+    this.on('pointerout', this.handlePointerOut.bind(this));
   }
 
-  private getColorForType(type: string): number {
-    switch (type) {
-      case 'launch':
-        return 0x00ff00; // green
-      case 'funding':
-        return 0x0099ff; // blue
-      case 'pivot':
-        return 0xffaa00; // orange
-      case 'milestone':
-        return 0xff00ff; // magenta
-      case 'team':
-        return 0x00ffff; // cyan
-      case 'setback':
-        return 0xff3333; // red
-      case 'exit':
-        return 0xccaa00; // gold
-      default:
-        return 0xcccccc; // gray
-    }
+  private startPulseAnimation() {
+    if (!this.pulseRing) return;
+    
+    const animate = () => {
+      if (!this.pulseRing) return;
+      const start = Date.now();
+      const dur = 2000;
+      
+      const step = () => {
+        if (!this.pulseRing) return;
+        const t = ((Date.now() - start) % dur) / dur;
+        this.pulseRing.clear();
+        this.pulseRing.circle(0, 0, this.baseRadius + t * 15);
+        this.pulseRing.stroke({ width: 1, color: this.moodColor, alpha: 0.4 * (1 - t) });
+        requestAnimationFrame(step);
+      };
+      step();
+    };
+    animate();
+  }
+
+  private handlePointerOver() {
+    // enlarge smoothly
+    const start = Date.now();
+    const dur = 180;
+    const from = this.baseRadius;
+    const to = this.baseRadius + 2;
+
+    const animate = () => {
+      const t = Math.min(1, (Date.now() - start) / dur);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const r = from + (to - from) * eased;
+      this.dot.clear();
+      this.dot.circle(0, 0, r);
+      this.dot.fill({ color: this.moodColor, alpha: this.event.mood ? 0.95 : 0.85 });
+      this.ring.alpha = 0.25 * eased;
+      if (t < 1) requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    // Tooltip trigger would be handled in InteractionManager 
+    // but we can dispatch event
+    window.dispatchEvent(new CustomEvent('event-dot-hover', { 
+      detail: { 
+        hover: true, 
+        event: this.event,
+        x: this.worldTransform.tx,
+        y: this.worldTransform.ty
+      } 
+    }));
+  }
+
+  private handlePointerOut() {
+    const start = Date.now();
+    const dur = 160;
+    const from = this.baseRadius + 2;
+    const to = this.baseRadius;
+
+    const animate = () => {
+      const t = Math.min(1, (Date.now() - start) / dur);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const r = from + (to - from) * eased;
+      this.dot.clear();
+      this.dot.circle(0, 0, r);
+      this.dot.fill({ color: this.moodColor, alpha: this.event.mood ? 0.7 : 0.5 });
+      this.ring.alpha = 0.25 * (1 - eased);
+      if (t < 1) requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    window.dispatchEvent(new CustomEvent('event-dot-hover', { 
+      detail: { hover: false } 
+    }));
   }
 }
+

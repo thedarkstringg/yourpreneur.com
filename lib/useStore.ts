@@ -18,11 +18,19 @@ export interface Venture {
 export interface VentureEvent {
   id: string;
   ventureId: string;
-  type: 'milestone' | 'launch' | 'funding' | 'team' | 'pivot' | 'setback' | 'exit' | 'other';
+  type: 'milestone' | 'launch' | 'funding' | 'team' | 'pivot' | 'setback' | 'exit' | 'decision' | 'lesson' | 'feeling' | 'other';
   title: string;
   notes?: string;
   eventDate: string;
   linkUrl?: string;
+
+  // NEW FIELDS
+  mood?: 'energized' | 'uncertain' | 'burned_out' | 'focused' | 'lost' | 'proud' | 'regretful';
+  impact?: 'low' | 'medium' | 'high' | 'critical';
+  wasPlanned?: boolean;
+  triggerType?: 'internal' | 'external' | 'market' | 'team' | 'personal';
+  lessonLearned?: string;
+  counterfactual?: string;
 }
 
 interface CanvasState {
@@ -36,6 +44,10 @@ interface CanvasState {
   panX: number;
   panY: number;
 
+  // Navigation callbacks
+  onNavigateToTarget?: (worldX: number, worldY: number, scale?: number) => void;
+  onNavigateToYear?: (year: number) => void;
+
   // Actions
   setVentures: (ventures: Venture[]) => void;
   addVenture: (venture: Venture) => void;
@@ -48,6 +60,10 @@ interface CanvasState {
   setZoom: (zoom: number) => void;
   setPan: (x: number, y: number) => void;
   resetView: () => void;
+  setCanvasNavigationCallbacks: (
+    onNavigateToTarget?: (worldX: number, worldY: number, scale?: number) => void,
+    onNavigateToYear?: (year: number) => void
+  ) => void;
 }
 
 const SEED_DATA: Venture[] = [
@@ -128,4 +144,6 @@ export const useStore = create<CanvasState>((set) => ({
   setZoom: (zoom) => set({ zoomLevel: zoom }),
   setPan: (x, y) => set({ panX: x, panY: y }),
   resetView: () => set({ zoomLevel: 1, panX: 0, panY: 0 }),
+  setCanvasNavigationCallbacks: (onNavigateToTarget, onNavigateToYear) =>
+    set({ onNavigateToTarget, onNavigateToYear }),
 }));

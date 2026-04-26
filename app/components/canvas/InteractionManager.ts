@@ -1,4 +1,4 @@
-import { Application, Container } from 'pixi.js';
+import { Application, Container, Point } from 'pixi.js';
 import { Viewport } from 'pixi-viewport';
 import { VentureNode } from './VentureNode';
 
@@ -70,17 +70,17 @@ export class InteractionManager {
       // Check if click is on a node
       let clickedNode = false;
       for (const node of this.ventureNodes.values()) {
-        const bounds = node.getBounds();
-        const worldBounds = this.viewport.toWorld({
-          x: canvasX,
-          y: canvasY,
-        } as any);
+        const localBounds = node.getBounds();
+        // convert node world position to compare with worldBounds
+        const nodeWorldX = node.x;
+        const nodeWorldY = node.y;
+        const worldBounds = this.viewport.toWorld(new Point(canvasX, canvasY));
 
         if (
-          worldBounds.x >= bounds.x &&
-          worldBounds.x <= bounds.x + bounds.width &&
-          worldBounds.y >= bounds.y &&
-          worldBounds.y <= bounds.y + bounds.height
+          worldBounds.x >= nodeWorldX &&
+          worldBounds.x <= nodeWorldX + 220 && // card width
+          worldBounds.y >= nodeWorldY &&
+          worldBounds.y <= nodeWorldY + (node as any).currentHeight // card height
         ) {
           clickedNode = true;
           break;
