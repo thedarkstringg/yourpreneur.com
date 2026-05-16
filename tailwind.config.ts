@@ -71,19 +71,21 @@ const config: Config = {
         "container-max": "800px",
       },
       fontFamily: {
+        sans: ["Inter", "Plus Jakarta Sans", "Montserrat", "sans-serif"],
+        mono: ["Inter", "sans-serif"],
         "body-sm": ["Inter"],
-        "mono-data": ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace"],
-        "display-lg": ["Space Grotesk"],
+        "mono-data": ["Inter"],
+        "display-lg": ["Plus Jakarta Sans"],
         "body-base": ["Inter"],
-        "headline-md": ["Space Grotesk"],
+        "headline-md": ["Plus Jakarta Sans"],
         "label-caps": ["Inter"],
       },
       fontSize: {
         "body-sm": ["14px", { lineHeight: "1.5", letterSpacing: "0em", fontWeight: "400" }],
         "mono-data": ["13px", { lineHeight: "1", letterSpacing: "0em", fontWeight: "400" }],
-        "display-lg": ["48px", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "600" }],
+        "display-lg": ["48px", { lineHeight: "1.1", letterSpacing: "0em", fontWeight: "600" }],
         "body-base": ["16px", { lineHeight: "1.6", letterSpacing: "0em", fontWeight: "400" }],
-        "headline-md": ["24px", { lineHeight: "1.3", letterSpacing: "-0.01em", fontWeight: "500" }],
+        "headline-md": ["24px", { lineHeight: "1.3", letterSpacing: "0em", fontWeight: "500" }],
         "label-caps": ["12px", { lineHeight: "1", letterSpacing: "0.1em", fontWeight: "600" }],
       },
       backgroundImage: {
@@ -95,3 +97,4 @@ const config: Config = {
 };
 
 export default config;
+

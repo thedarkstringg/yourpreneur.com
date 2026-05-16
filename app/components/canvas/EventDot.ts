@@ -31,6 +31,7 @@ export class EventDot extends Container {
   private pulseRing?: Graphics;
   private event: VentureEvent;
   private moodColor: number;
+  private animationFrames: number[] = [];
 
   constructor(options: EventDotOptions) {
     super();
@@ -71,17 +72,18 @@ export class EventDot extends Container {
     if (!this.pulseRing) return;
 
     const animate = () => {
-      if (!this.pulseRing) return;
+      if (this.destroyed || !this.pulseRing) return;
       const start = Date.now();
-      const dur = 2000;
+      const dur = 3500;
 
       const step = () => {
-        if (!this.pulseRing) return;
+        if (this.destroyed || !this.pulseRing) return;
         const t = ((Date.now() - start) % dur) / dur;
-        this.pulseRing.clear();
-        this.pulseRing.circle(0, 0, this.baseRadius + t * 15);
-        this.pulseRing.stroke({ width: 1, color: this.moodColor, alpha: 0.4 * (1 - t) });
-        requestAnimationFrame(step);
+        this.pulseRing!.clear();
+        this.pulseRing!.circle(0, 0, this.baseRadius + t * 25);
+        this.pulseRing!.stroke({ width: 1, color: this.moodColor, alpha: 0.4 * (1 - t) });
+        const rafId = requestAnimationFrame(step);
+        this.animationFrames.push(rafId);
       };
       step();
     };
@@ -97,15 +99,16 @@ export class EventDot extends Container {
     }
 
     const start = Date.now();
-    const dur = 500;
+    const dur = 800;
 
     const step = () => {
-      if (!this.pulseRing) return;
+      if (this.destroyed || !this.pulseRing) return;
       const t = ((Date.now() - start) % dur) / dur;
-      this.pulseRing.clear();
-      this.pulseRing.circle(0, 0, this.baseRadius + t * 24);
-      this.pulseRing.stroke({ width: 1, color: this.moodColor, alpha: 0.4 * (1 - t) });
-      requestAnimationFrame(step);
+      this.pulseRing!.clear();
+      this.pulseRing!.circle(0, 0, this.baseRadius + t * 35);
+      this.pulseRing!.stroke({ width: 1, color: this.moodColor, alpha: 0.4 * (1 - t) });
+      const rafId = requestAnimationFrame(step);
+      this.animationFrames.push(rafId);
     };
     step();
   }
@@ -118,6 +121,7 @@ export class EventDot extends Container {
     const to = this.baseRadius + 2;
 
     const animate = () => {
+      if (this.destroyed) return;
       const t = Math.min(1, (Date.now() - start) / dur);
       const eased = 1 - Math.pow(1 - t, 3);
       const r = from + (to - from) * eased;
@@ -125,20 +129,23 @@ export class EventDot extends Container {
       this.dot.circle(0, 0, r);
       this.dot.fill({ color: this.moodColor, alpha: this.event.mood ? 0.95 : 0.85 });
       this.ring.alpha = 0.25 * eased;
-      if (t < 1) requestAnimationFrame(animate);
+      if (t < 1) {
+        const rafId = requestAnimationFrame(animate);
+        this.animationFrames.push(rafId);
+      }
     };
 
     animate();
 
-    // Tooltip trigger would be handled in InteractionManager 
+    // Tooltip trigger would be handled in InteractionManager
     // but we can dispatch event
-    window.dispatchEvent(new CustomEvent('event-dot-hover', { 
-      detail: { 
-        hover: true, 
+    window.dispatchEvent(new CustomEvent('event-dot-hover', {
+      detail: {
+        hover: true,
         event: this.event,
         x: this.worldTransform.tx,
         y: this.worldTransform.ty
-      } 
+      }
     }));
   }
 
@@ -149,6 +156,7 @@ export class EventDot extends Container {
     const to = this.baseRadius;
 
     const animate = () => {
+      if (this.destroyed) return;
       const t = Math.min(1, (Date.now() - start) / dur);
       const eased = 1 - Math.pow(1 - t, 3);
       const r = from + (to - from) * eased;
@@ -156,7 +164,10 @@ export class EventDot extends Container {
       this.dot.circle(0, 0, r);
       this.dot.fill({ color: this.moodColor, alpha: this.event.mood ? 0.7 : 0.5 });
       this.ring.alpha = 0.25 * (1 - eased);
-      if (t < 1) requestAnimationFrame(animate);
+      if (t < 1) {
+        const rafId = requestAnimationFrame(animate);
+        this.animationFrames.push(rafId);
+      }
     };
 
     animate();
@@ -164,6 +175,12 @@ export class EventDot extends Container {
     window.dispatchEvent(new CustomEvent('event-dot-hover', {
       detail: { hover: false }
     }));
+  }
+
+  destroy(options?: boolean | object): void {
+    this.animationFrames.forEach(rafId => cancelAnimationFrame(rafId));
+    this.animationFrames = [];
+    super.destroy(options);
   }
 }
 

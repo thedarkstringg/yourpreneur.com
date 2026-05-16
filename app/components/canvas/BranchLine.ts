@@ -17,6 +17,7 @@ export class BranchLine extends Container {
   private labelText?: Text;
   private options: BranchLineOptions;
   private pill?: Graphics;
+  private animationFrames: number[] = [];
 
   constructor(options: BranchLineOptions) {
     super();
@@ -62,6 +63,7 @@ export class BranchLine extends Container {
   }
 
   private drawBranchLine(progress: number) {
+    if (this.destroyed || !this.line) return;
     const { fromX, fromY, fromHeight, toX, toY, fromWidth, toWidth } = this.options;
     const points = this.getBezierPoints(fromX, fromY, fromHeight, toX, toY, fromWidth, toWidth);
 
@@ -99,7 +101,7 @@ export class BranchLine extends Container {
     const labelY = (startY + endY) / 2;
 
     const labelStyle = new TextStyle({
-      fontFamily: "'Space Mono', monospace",
+      fontFamily: "'Inter', monospace",
       fontSize: 8,
       fill: 0xffffff,
       fontWeight: '500',
@@ -138,9 +140,11 @@ export class BranchLine extends Container {
     const lineDuration = 450;
 
     const lineAnimate = () => {
+      if (this.destroyed) return;
       const elapsed = Date.now() - lineStart;
       if (elapsed < lineDelay) {
-        requestAnimationFrame(lineAnimate);
+        const rafId = requestAnimationFrame(lineAnimate);
+        this.animationFrames.push(rafId);
         return;
       }
 
@@ -148,7 +152,10 @@ export class BranchLine extends Container {
       const eased = easeInOutCubic(t);
       this.drawBranchLine(eased);
 
-      if (t < 1) requestAnimationFrame(lineAnimate);
+      if (t < 1) {
+        const rafId = requestAnimationFrame(lineAnimate);
+        this.animationFrames.push(rafId);
+      }
     };
     lineAnimate();
 
@@ -159,9 +166,11 @@ export class BranchLine extends Container {
       const labelDuration = 300;
 
       const labelAnimate = () => {
+        if (this.destroyed) return;
         const elapsed = Date.now() - labelStart;
         if (elapsed < labelDelay) {
-          requestAnimationFrame(labelAnimate);
+          const rafId = requestAnimationFrame(labelAnimate);
+          this.animationFrames.push(rafId);
           return;
         }
 
@@ -170,9 +179,19 @@ export class BranchLine extends Container {
         this.labelText!.alpha = 0.3 * eased;
         this.pill!.alpha = eased;
 
-        if (t < 1) requestAnimationFrame(labelAnimate);
+        if (t < 1) {
+          const rafId = requestAnimationFrame(labelAnimate);
+          this.animationFrames.push(rafId);
+        }
       };
       labelAnimate();
     }
   }
+
+  destroy(options?: boolean | object): void {
+    this.animationFrames.forEach(rafId => cancelAnimationFrame(rafId));
+    this.animationFrames = [];
+    super.destroy(options);
+  }
 }
+

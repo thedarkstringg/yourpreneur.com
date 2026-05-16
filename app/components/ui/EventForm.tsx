@@ -44,7 +44,7 @@ export default function EventForm({
 
   if (!ventureId) return null;
 
-  const handleChange = (key: keyof VentureEvent, value: any) => {
+  const handleChange = (key: keyof VentureEvent, value: VentureEvent[keyof VentureEvent]) => {
     setFormData((prev) => ({
       ...prev,
       [key]: value,
@@ -60,7 +60,7 @@ export default function EventForm({
     const newEvent: VentureEvent = {
       id: `event-${Date.now()}`,
       ventureId,
-      type: (formData.type as any) || 'milestone',
+      type: (formData.type as VentureEvent['type']) || 'milestone',
       title: formData.title || '',
       notes: formData.notes || '',
       eventDate: formData.eventDate || '',
@@ -240,7 +240,7 @@ export default function EventForm({
             </div>
             <div>
               <label className="block text-[8px] tracking-[0.18em] text-white/20 mb-2">
-                WHAT YOU'D DO DIFFERENTLY
+                WHAT YOU&apos;D DO DIFFERENTLY
               </label>
               <textarea
                 value={formData.counterfactual || ''}

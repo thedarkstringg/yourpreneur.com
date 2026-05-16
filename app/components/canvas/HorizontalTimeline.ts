@@ -4,6 +4,7 @@ import { Container, Graphics, Text, TextStyle } from 'pixi.js';
 
 export class HorizontalTimeline extends Container {
   private timelineGraphics: Graphics;
+  private monthGraphics: Graphics;
   private timelineY: number;
   private yearPositions: Map<number, number>;
   private yearLabels: Text[] = [];
@@ -16,11 +17,14 @@ export class HorizontalTimeline extends Container {
     this.timelineY = timelineY;
     this.yearPositions = yearPositions;
     this.timelineGraphics = new Graphics();
+    this.monthGraphics = new Graphics();
+    this.addChild(this.monthGraphics);
     this.addChild(this.timelineGraphics);
+    this.drawMonthAxis();
 
     // Setup year labels and ticks (hidden initially)
     const yearStyle = new TextStyle({
-      fontFamily: 'Cormorant Garamond',
+      fontFamily: 'Plus Jakarta Sans',
       fontSize: 96,
       fill: 0xffffff,
       fontWeight: '300',
@@ -54,6 +58,40 @@ export class HorizontalTimeline extends Container {
     this.boundHandleYearFlash = this.handleYearFlash.bind(this);
     // Listen for year watermark flash event
     window.addEventListener('flash-year-watermark', this.boundHandleYearFlash);
+  }
+
+  private drawMonthAxis() {
+    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    const monthStyle = new TextStyle({
+      fontFamily: 'Inter',
+      fontSize: 8,
+      fill: 0xffffff,
+      letterSpacing: 1,
+    });
+
+    this.monthGraphics.moveTo(-3600, this.timelineY);
+    this.monthGraphics.lineTo(5400, this.timelineY);
+    this.monthGraphics.stroke({ width: 1.5, color: 0xffffff, alpha: 0.2 });
+
+    for (let year = 2022; year <= 2026; year++) {
+      for (let month = 0; month < 12; month++) {
+        const x = (year - 2024) * 1440 + month * 120;
+        const isQuarter = month % 3 === 0;
+        this.monthGraphics.moveTo(x, this.timelineY - (isQuarter ? 12 : 7));
+        this.monthGraphics.lineTo(x, this.timelineY + (isQuarter ? 12 : 7));
+        this.monthGraphics.stroke({ width: isQuarter ? 1.2 : 1, color: 0xffffff, alpha: isQuarter ? 0.2 : 0.09 });
+
+        if (isQuarter) {
+          const label = new Text({ text: months[month], style: monthStyle });
+          label.resolution = window.devicePixelRatio * 4;
+          label.anchor.set(0.5, 0);
+          label.x = x;
+          label.y = this.timelineY + 18;
+          label.alpha = 0.46;
+          this.addChild(label);
+        }
+      }
+    }
   }
 
   private handleYearFlash(event: Event) {
@@ -165,3 +203,4 @@ export class HorizontalTimeline extends Container {
     ticksAnimate();
   }
 }
+

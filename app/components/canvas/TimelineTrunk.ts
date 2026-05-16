@@ -46,7 +46,7 @@ export class TimelineTrunk extends Container {
   private drawYearLabels(trunkX: number) {
     this.yearPositions.forEach((yearPos) => {
       const style = new TextStyle({
-        fontFamily: "'Cormorant Garamond', serif",
+        fontFamily: "'Plus Jakarta Sans', serif",
         fontSize: 48,
         fontWeight: '700',
         fill: 0xffffff,
@@ -63,3 +63,4 @@ export class TimelineTrunk extends Container {
     });
   }
 }
+

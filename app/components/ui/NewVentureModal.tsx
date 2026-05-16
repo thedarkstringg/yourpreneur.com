@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { X, Plus } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { X, Plus, Upload } from 'lucide-react';
 import { useToasts } from './Toast';
 
 interface NewVentureModalProps {
@@ -13,6 +13,7 @@ interface NewVentureModalProps {
     industry?: string;
     startDate: string;
     status: string;
+    logoUrl?: string;
   }) => void;
 }
 
@@ -22,8 +23,10 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
   const [industry, setIndustry] = useState('');
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
   const [status, setStatus] = useState('active');
+  const [logoUrl, setLogoUrl] = useState('');
   const [errors, setErrors] = useState<{ name?: string; startDate?: string }>({});
   const [isShaking, setIsShaking] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
   const { addToast } = useToasts();
 
   const industries = ['Fintech', 'AgriTech', 'SaaS', 'EdTech', 'HealthTech', 'CleanTech', 'AI/ML', 'Logistics', 'E-commerce', 'Web3', 'Hardware', 'Consumer', 'B2B', 'Other'];
@@ -49,6 +52,7 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
       industry: industry || undefined,
       startDate,
       status,
+      logoUrl: logoUrl || undefined,
     });
 
     // Reset form
@@ -57,9 +61,25 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
     setIndustry('');
     setStartDate(new Date().toISOString().split('T')[0]);
     setStatus('active');
+    setLogoUrl('');
     setErrors({});
 
     addToast('success', `${name} added to ${new Date(startDate).getFullYear()}`);
+  };
+
+  const handleLogoFile = (file?: File) => {
+    if (!file) return;
+    if (!['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'].includes(file.type)) {
+      addToast('error', 'Please upload PNG, JPG, SVG, or WebP');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      addToast('error', 'Logo must be smaller than 2MB');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => setLogoUrl(String(event.target?.result || ''));
+    reader.readAsDataURL(file);
   };
 
   if (!isOpen) return null;
@@ -147,6 +167,60 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
 
         {/* Form Fields */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div>
+            <label
+              style={{
+                display: 'block',
+                fontSize: '9px',
+                color: 'rgba(255,255,255,0.25)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.18em',
+                marginBottom: '8px',
+              }}
+            >
+              Venture Logo
+            </label>
+            <input
+              ref={logoInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/svg+xml,image/webp"
+              style={{ display: 'none' }}
+              onChange={(event) => handleLogoFile(event.target.files?.[0])}
+            />
+            <button
+              onClick={() => logoInputRef.current?.click()}
+              style={{
+                width: '100%',
+                minHeight: '58px',
+                border: '1px dashed rgba(255,255,255,0.16)',
+                borderRadius: '10px',
+                background: 'rgba(255,255,255,0.025)',
+                color: 'rgba(255,255,255,0.58)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                cursor: 'pointer',
+              }}
+            >
+              {logoUrl ? (
+                <span
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '9px',
+                    backgroundImage: `url(${logoUrl})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                />
+              ) : (
+                <Upload size={15} />
+              )}
+              {logoUrl ? 'Logo ready' : 'Upload logo'}
+            </button>
+          </div>
+
           {/* Venture Name */}
           <div>
             <label
@@ -181,7 +255,7 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
                   border: errors.name ? '1px solid rgba(255,255,255,0.4)' : '1px solid rgba(255,255,255,0.08)',
                   borderRadius: '6px',
                   padding: '11px 14px',
-                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   fontSize: '13px',
                   color: 'rgba(255,255,255,0.8)',
                   outline: 'none',
@@ -240,7 +314,7 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
                 border: '1px solid rgba(255,255,255,0.08)',
                 borderRadius: '6px',
                 padding: '11px 14px',
-                fontFamily: "'Space Grotesk', sans-serif",
+                fontFamily: "'Inter', sans-serif",
                 fontSize: '13px',
                 color: 'rgba(255,255,255,0.8)',
                 outline: 'none',
@@ -281,7 +355,7 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
                 border: '1px solid rgba(255,255,255,0.08)',
                 borderRadius: '6px',
                 padding: '11px 14px',
-                fontFamily: "'Space Grotesk', sans-serif",
+                fontFamily: "'Inter', sans-serif",
                 fontSize: '13px',
                 color: 'rgba(255,255,255,0.8)',
                 outline: 'none',
@@ -333,7 +407,7 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
                 border: errors.startDate ? '1px solid rgba(255,255,255,0.4)' : '1px solid rgba(255,255,255,0.08)',
                 borderRadius: '6px',
                 padding: '11px 14px',
-                fontFamily: "'Space Grotesk', sans-serif",
+                fontFamily: "'Inter', sans-serif",
                 fontSize: '13px',
                 color: 'rgba(255,255,255,0.8)',
                 outline: 'none',
@@ -374,7 +448,7 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
               Status
             </label>
             <div style={{ display: 'flex', gap: '8px' }}>
-              {['Active', 'Pivot', 'Paused'].map((s) => (
+              {['Active', 'Stealth', 'Graveyard', 'Pivot', 'Paused', 'Archived'].map((s) => (
                 <button
                   key={s}
                   onClick={() => setStatus(s.toLowerCase())}
@@ -383,7 +457,7 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
                     border: status === s.toLowerCase() ? '1px solid rgba(255,255,255,0.3)' : '1px solid rgba(255,255,255,0.1)',
                     borderRadius: '999px',
                     padding: '7px 14px',
-                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontFamily: "'Inter', sans-serif",
                     fontSize: '10px',
                     fontWeight: 500,
                     color: status === s.toLowerCase() ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)',
@@ -419,7 +493,7 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
               border: '1px solid rgba(255,255,255,0.12)',
               borderRadius: '999px',
               padding: '9px 20px',
-              fontFamily: "'Space Grotesk', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: '11px',
               fontWeight: 500,
               color: 'rgba(255,255,255,0.5)',
@@ -445,7 +519,7 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
               border: 'none',
               borderRadius: '999px',
               padding: '10px 24px',
-              fontFamily: "'Space Grotesk', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: '11px',
               fontWeight: 600,
               color: '#080808',
@@ -491,3 +565,4 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
     </>
   );
 }
+

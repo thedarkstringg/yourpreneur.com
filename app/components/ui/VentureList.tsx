@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useStore } from '@/lib/useStore';
+import { calculateLayout } from '@/lib/layoutAlgorithm';
 
 export default function VentureList({
   isOpen,
@@ -12,10 +13,11 @@ export default function VentureList({
   onClose: () => void;
   onSelectVenture: (id: string) => void;
 }) {
-  const { ventures, selectedVentureId } = useStore();
+  const { ventures, selectedVentureId, onNavigateToTarget } = useStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'name' | 'date' | 'status'>('name');
+  const sortOptions: Array<'name' | 'date' | 'status'> = ['name', 'date', 'status'];
 
   const filtered = ventures.filter((v) => {
     const matchesSearch = v.name
@@ -45,6 +47,9 @@ export default function VentureList({
     paused: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
     shutdown: 'bg-red-500/20 text-red-400 border-red-500/30',
     exited: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+    archived: 'bg-zinc-500/20 text-zinc-300 border-zinc-500/30',
+    acquired: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+    failed: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
   };
 
   if (!isOpen) return null;
@@ -87,7 +92,7 @@ export default function VentureList({
           >
             ALL
           </button>
-          {['active', 'pivot', 'paused', 'shutdown', 'exited'].map((status) => (
+          {['active', 'pivot', 'paused', 'archived', 'acquired', 'failed', 'shutdown', 'exited'].map((status) => (
             <button
               key={status}
               onClick={() => setFilterStatus(status)}
@@ -107,10 +112,10 @@ export default function VentureList({
       <div className="px-4 py-3 border-b border-white/10">
         <p className="text-xs font-mono text-white/60 mb-2">SORT BY</p>
         <div className="flex gap-2">
-          {['name', 'date', 'status'].map((sort) => (
+          {sortOptions.map((sort) => (
             <button
               key={sort}
-              onClick={() => setSortBy(sort as any)}
+              onClick={() => setSortBy(sort)}
               className={`px-2 py-1 rounded text-xs font-mono transition-colors ${
                 sortBy === sort
                   ? 'bg-white/20 text-white border border-white/40'
@@ -135,6 +140,11 @@ export default function VentureList({
               key={venture.id}
               onClick={() => {
                 onSelectVenture(venture.id);
+                const layout = calculateLayout(ventures);
+                const position = layout.positions.get(venture.id);
+                if (position) {
+                  onNavigateToTarget?.(position.x + 110, position.y + 60, 1);
+                }
                 onClose();
               }}
               className={`p-3 rounded border cursor-pointer transition-colors ${

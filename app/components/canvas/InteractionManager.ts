@@ -13,6 +13,7 @@ export class InteractionManager {
   private selectedNodeId: string | null = null;
   private onNodeClick: (nodeId: string) => void = () => {};
   private onNodeDoubleClick: (nodeId: string) => void = () => {};
+  private onNodeMove: (nodeId: string, x: number, y: number) => void = () => {};
   private onZoomChange: (zoom: number) => void = () => {};
   private onPanChange: (x: number, y: number) => void = () => {};
   private lastClickTime: number = 0;
@@ -80,7 +81,7 @@ export class InteractionManager {
           worldBounds.x >= nodeWorldX &&
           worldBounds.x <= nodeWorldX + 220 && // card width
           worldBounds.y >= nodeWorldY &&
-          worldBounds.y <= nodeWorldY + (node as any).currentHeight // card height
+          worldBounds.y <= nodeWorldY + node.getCardHeight() // card height
         ) {
           clickedNode = true;
           break;
@@ -105,7 +106,12 @@ export class InteractionManager {
       node.setHovered(false);
     });
 
-    node.on('pointerdown', () => {
+    node.on('pointerdown', (event) => {
+      if (node.handlePointerAction(event.global.x, event.global.y)) {
+        return;
+      }
+      event.stopPropagation();
+
       const now = Date.now();
       const isDoubleClick =
         venture.id === this.lastClickNodeId &&
@@ -120,6 +126,35 @@ export class InteractionManager {
 
       this.lastClickTime = now;
       this.lastClickNodeId = venture.id;
+
+      const startX = event.global.x;
+      const startY = event.global.y;
+      const originX = node.x;
+      const originY = node.y;
+      let moved = false;
+
+      const onMove = (moveEvent: PointerEvent) => {
+        if (!this.app?.canvas) return;
+        const rect = this.app.canvas.getBoundingClientRect();
+        const nextX = originX + (moveEvent.clientX - rect.left - startX) / this.viewport.scale.x;
+        const nextY = originY + (moveEvent.clientY - rect.top - startY) / this.viewport.scale.y;
+        if (Math.hypot(nextX - originX, nextY - originY) > 4) moved = true;
+        if (moved) {
+          node.x = nextX;
+          node.y = nextY;
+        }
+      };
+
+      const onUp = () => {
+        window.removeEventListener('pointermove', onMove);
+        window.removeEventListener('pointerup', onUp);
+        if (moved) {
+          this.onNodeMove(venture.id, node.x, node.y);
+        }
+      };
+
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onUp);
     });
   }
 
@@ -148,6 +183,10 @@ export class InteractionManager {
 
   onNodeDoubleClickHandler(callback: (nodeId: string) => void) {
     this.onNodeDoubleClick = callback;
+  }
+
+  onNodeMoveHandler(callback: (nodeId: string, x: number, y: number) => void) {
+    this.onNodeMove = callback;
   }
 
   onZoomChangeHandler(callback: (zoom: number) => void) {

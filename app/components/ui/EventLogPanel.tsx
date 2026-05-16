@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Plus, Flag, Rocket, DollarSign, Users, RefreshCw, AlertTriangle, LogOut, GitBranch, BookOpen, Heart, Circle, ChevronDown, Upload } from 'lucide-react';
+import { X, Plus, Flag, Rocket, DollarSign, Users, RefreshCw, AlertTriangle, LogOut, GitBranch, BookOpen, Heart, Circle } from 'lucide-react';
 import { useToasts } from './Toast';
+import { Venture } from '@/lib/useStore';
 
 interface EventLogPanelProps {
   isOpen: boolean;
@@ -19,7 +20,7 @@ interface EventLogPanelProps {
     whatYouddoDifferently?: string;
     linkUrl?: string;
   }) => void;
-  ventures?: any[];
+  ventures?: Venture[];
   selectedVentureId?: string | null;
 }
 
@@ -35,6 +36,7 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
   const [lessonLearned, setLessonLearned] = useState('');
   const [whatYouddoDifferently, setWhatYouddoDifferently] = useState('');
   const [linkUrl, setLinkUrl] = useState('');
+  const [now] = useState(() => Date.now());
   const [errors, setErrors] = useState<{ ventureId?: string; date?: string; type?: string; title?: string }>({});
   const { addToast } = useToasts();
 
@@ -102,9 +104,9 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
   const getRelativeDate = () => {
     const today = new Date().toISOString().split('T')[0];
     if (date === today) return 'Today';
-    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    const yesterday = new Date(now - 86400000).toISOString().split('T')[0];
     if (date === yesterday) return 'Yesterday';
-    const days = Math.floor((new Date().getTime() - new Date(date).getTime()) / 86400000);
+    const days = Math.floor((now - new Date(date).getTime()) / 86400000);
     if (days > 0 && days < 7) return `${days} days ago`;
     return '';
   };
@@ -208,7 +210,7 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
                   border: errors.ventureId ? '1px solid rgba(255,255,255,0.4)' : '1px solid rgba(255,255,255,0.08)',
                   borderRadius: '6px',
                   padding: '11px 14px',
-                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   fontSize: '13px',
                   color: 'rgba(255,255,255,0.8)',
                   outline: 'none',
@@ -242,7 +244,7 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
                   border: '1px solid rgba(255,255,255,0.08)',
                   borderRadius: '6px',
                   padding: '11px 14px',
-                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   fontSize: '13px',
                   color: 'rgba(255,255,255,0.8)',
                   outline: 'none',
@@ -282,7 +284,7 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
                         background: eventType === et.id ? 'rgba(255,255,255,0.1)' : 'transparent',
                         cursor: 'pointer',
                         transition: 'all 150ms',
-                        fontFamily: "'Space Grotesk', sans-serif",
+                        fontFamily: "'Inter', sans-serif",
                       }}
                       onMouseOver={(e) => {
                         if (eventType !== et.id) {
@@ -324,7 +326,7 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
                   border: errors.title ? '1px solid rgba(255,255,255,0.4)' : '1px solid rgba(255,255,255,0.08)',
                   borderRadius: '6px',
                   padding: '11px 14px',
-                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   fontSize: '13px',
                   color: 'rgba(255,255,255,0.8)',
                   outline: 'none',
@@ -352,7 +354,7 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
                   border: '1px solid rgba(255,255,255,0.08)',
                   borderRadius: '6px',
                   padding: '11px 14px',
-                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   fontSize: '13px',
                   color: 'rgba(255,255,255,0.8)',
                   outline: 'none',
@@ -378,7 +380,7 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
                         border: mood === m ? '1px solid rgba(255,255,255,0.3)' : '1px solid rgba(255,255,255,0.1)',
                         borderRadius: '6px',
                         background: mood === m ? 'rgba(255,255,255,0.1)' : 'transparent',
-                        fontFamily: "'Space Grotesk', sans-serif",
+                        fontFamily: "'Inter', sans-serif",
                         fontSize: '9px',
                         color: mood === m ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)',
                         cursor: 'pointer',
@@ -405,7 +407,7 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
                         border: impact === imp ? '1px solid rgba(255,255,255,0.3)' : '1px solid rgba(255,255,255,0.1)',
                         borderRadius: '6px',
                         background: impact === imp ? 'rgba(255,255,255,0.1)' : 'transparent',
-                        fontFamily: "'Space Grotesk', sans-serif",
+                        fontFamily: "'Inter', sans-serif",
                         fontSize: '9px',
                         color: impact === imp ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)',
                         cursor: 'pointer',
@@ -459,7 +461,7 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
                       border: '1px solid rgba(255,255,255,0.08)',
                       borderRadius: '6px',
                       padding: '11px 14px',
-                      fontFamily: "'Space Grotesk', sans-serif",
+                      fontFamily: "'Inter', sans-serif",
                       fontSize: '13px',
                       color: 'rgba(255,255,255,0.8)',
                       outline: 'none',
@@ -470,7 +472,7 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '9px', color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: '8px' }}>
-                    What You'd Do Differently
+                    What You&apos;d Do Differently
                   </label>
                   <textarea
                     value={whatYouddoDifferently}
@@ -483,7 +485,7 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
                       border: '1px solid rgba(255,255,255,0.08)',
                       borderRadius: '6px',
                       padding: '11px 14px',
-                      fontFamily: "'Space Grotesk', sans-serif",
+                      fontFamily: "'Inter', sans-serif",
                       fontSize: '13px',
                       color: 'rgba(255,255,255,0.8)',
                       outline: 'none',
@@ -511,7 +513,7 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
                   border: '1px solid rgba(255,255,255,0.08)',
                   borderRadius: '6px',
                   padding: '11px 14px',
-                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   fontSize: '13px',
                   color: 'rgba(255,255,255,0.8)',
                   outline: 'none',
@@ -531,7 +533,7 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
               border: '1px solid rgba(255,255,255,0.12)',
               borderRadius: '999px',
               padding: '9px 20px',
-              fontFamily: "'Space Grotesk', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: '11px',
               fontWeight: 500,
               color: 'rgba(255,255,255,0.5)',
@@ -557,7 +559,7 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
               border: 'none',
               borderRadius: '999px',
               padding: '10px 24px',
-              fontFamily: "'Space Grotesk', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: '11px',
               fontWeight: 600,
               color: '#080808',
@@ -590,3 +592,4 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
     </>
   );
 }
+

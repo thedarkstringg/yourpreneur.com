@@ -1,189 +1,359 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { useStore, Venture, VentureEvent } from '@/lib/useStore';
-
-const TAB_OPTIONS = ['OVERVIEW', 'BEHAVIOR', 'RISK', 'TIMELINE HEAT', 'AI REPORT'] as const;
-type Tab = typeof TAB_OPTIONS[number];
-
-const MOOD_COLORS: Record<string, string> = {
-  energized: 'rgba(100, 220, 150, 0.7)',
-  focused: 'rgba(255, 255, 255, 0.7)',
-  uncertain: 'rgba(220, 180, 80, 0.6)',
-  lost: 'rgba(150, 150, 180, 0.6)',
-  proud: 'rgba(180, 140, 255, 0.6)',
-  regretful: 'rgba(200, 100, 80, 0.6)',
-  burned_out: 'rgba(120, 120, 120, 0.5)',
-};
+import { Download, Share2, X } from 'lucide-react';
+import { useMemo } from 'react';
+import { useStore } from '@/lib/useStore';
 
 export default function PatternsScreen({ onClose }: { onClose: () => void }) {
   const { ventures, events } = useStore();
-  const [activeTab, setActiveTab] = useState<Tab>('OVERVIEW');
 
-  const stats = useMemo(() => {
-    const totalVentures = ventures.length;
-    const activeVentures = ventures.filter(v => v.status === 'active').length;
-    const completedVentures = ventures.filter(v => v.status === 'exited' || v.status === 'shutdown').length;
-    const totalEvents = events.length;
-    
-    // Average venture life
-    const lifeDays = ventures.map(v => {
-      const start = new Date(v.startedDate);
-      const end = v.endedDate ? new Date(v.endedDate) : new Date();
-      return (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
-    });
-    const avgLife = lifeDays.length ? Math.round(lifeDays.reduce((a, b) => a + b, 0) / lifeDays.length) : 0;
+  const report = useMemo(() => {
+    const year = 2024;
+    const yearEvents = events
+      .filter((event) => new Date(event.eventDate).getFullYear() === year)
+      .sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
+    const monthCounts = Array.from({ length: 12 }, (_, month) => ({
+      month,
+      count: yearEvents.filter((event) => new Date(event.eventDate).getMonth() === month).length,
+    }));
+    const bestMonth = monthCounts.slice().sort((a, b) => b.count - a.count)[0];
+    const pivots = yearEvents.filter((event) => event.type === 'pivot' || event.type === 'decision').length;
+    const ventureIds = new Set(yearEvents.map((event) => event.ventureId));
+    const strategicPivots = Math.max(pivots, ventures.filter((venture) => venture.status === 'pivot').length);
+    const highImpact = yearEvents.filter((event) => event.impact === 'high' || event.impact === 'critical').length;
 
-    const pivotRate = totalVentures ? Math.round((ventures.filter(v => events.some(e => e.ventureId === v.id && e.type === 'pivot')).length / totalVentures) * 100) : 0;
-    
-    const highImpactCount = events.filter(e => e.impact === 'high' || e.impact === 'critical').length;
+    return {
+      year,
+      events: yearEvents,
+      bestMonth,
+      monthCounts,
+      venturesStarted: ventures.filter((venture) => new Date(venture.startedDate).getFullYear() === year).length || ventureIds.size,
+      milestones: yearEvents.length,
+      strategicPivots,
+      highImpact,
+    };
+  }, [events, ventures]);
 
-    return { totalVentures, activeVentures, completedVentures, totalEvents, avgLife, pivotRate, highImpactCount };
-  }, [ventures, events]);
+  const maxMonth = Math.max(...report.monthCounts.map((item) => item.count), 1);
+  const monthLabel = new Date(report.year, report.bestMonth.month).toLocaleString('en-US', { month: 'long' });
 
   return (
-    <div className="fixed inset-0 z-[200] bg-[#0c0a0a] flex flex-col font-mono text-white overflow-hidden">
-      {/* Navigation */}
-      <div className="flex items-center justify-between px-10 pt-10 pb-6 border-b border-white/5">
-        <div className="flex gap-10">
-          {TAB_OPTIONS.map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`text-[10px] tracking-[0.2em] transition-all pb-2 border-b-2 ${
-                activeTab === tab ? 'border-white text-white' : 'border-transparent text-white/30 hover:text-white/60'
-              }`}
-            >
-              {tab}
+    <div style={screenStyle}>
+      <button onClick={onClose} style={closeStyle} aria-label="Close review">
+        <X size={17} />
+      </button>
+
+      <main style={reportStyle}>
+        <section style={heroStyle}>
+          <div style={eyebrowStyle}>Annual review</div>
+          <h1 style={titleStyle}>{report.year}: The Year of the Pivot</h1>
+          <p style={ledeStyle}>
+            A definitive record of strategic shifts, foundational realignments, and calculated risks.
+            This year was defined not by linear progression, but by the courage to alter the course when the data demanded it.
+          </p>
+          <div style={actionRowStyle}>
+            <button style={lightButtonStyle}>
+              <Share2 size={13} />
+              Share report
             </button>
-          ))}
-        </div>
-        <button onClick={onClose} className="text-white/40 hover:text-white transition-colors text-xs tracking-widest">
-          CLOSE ✕
-        </button>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto p-10">
-        {activeTab === 'OVERVIEW' && (
-          <div className="max-w-6xl mx-auto grid grid-cols-3 gap-6">
-            <StatCard value={stats.totalVentures} label="Total Ventures" />
-            <StatCard value={stats.activeVentures} label="Currently Active" />
-            <StatCard value={stats.completedVentures} label="Ventures Completed" />
-            <StatCard value={stats.totalEvents} label="Total Events Logged" />
-            <StatCard value={`${stats.avgLife} days`} label="Average Venture Life" />
-            <StatCard value={`${stats.pivotRate}%`} label="Pivot Rate" />
-            <StatCard value={stats.highImpactCount} label="High Impact Events" />
+            <button style={darkButtonStyle}>
+              <Download size={13} />
+              Export PDF
+            </button>
           </div>
-        )}
+        </section>
 
-        {activeTab === 'BEHAVIOR' && (
-           <div className="max-w-4xl mx-auto space-y-12">
-             <section>
-               <h3 className="text-[11px] tracking-widest text-white/30 mb-8 uppercase">Momentum Map</h3>
-               <MomentumMap events={events} />
-             </section>
-             <section>
-                <h3 className="text-[11px] tracking-widest text-white/30 mb-8 uppercase">Mood Over Time</h3>
-                <MoodChart events={events} />
-             </section>
-           </div>
-        )}
+        <section style={metricGridStyle}>
+          <Metric label="Ventures started" value={report.venturesStarted} />
+          <div style={{ ...metricStyle, gridColumn: 'span 2' }}>
+            <div style={metricLabelStyle}>Milestones recorded</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+              <strong style={metricValueStyle}>{report.milestones}</strong>
+              <span style={metricLineStyle} />
+            </div>
+          </div>
+          <Metric label="Strategic pivots" value={report.strategicPivots} />
+        </section>
 
-        {activeTab === 'RISK' && (
-           <div className="max-w-4xl mx-auto">
-             <RiskAnalysis ventures={ventures} events={events} />
-           </div>
-        )}
-        
-        {(activeTab === 'TIMELINE HEAT' || activeTab === 'AI REPORT') && (
-           <div className="flex items-center justify-center h-64 text-white/20 italic">
-             Coming soon in Phase 3 implementation...
-           </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function StatCard({ value, label }: { value: string | number, label: string }) {
-  return (
-    <div className="bg-[#120e0e] border border-white/10 rounded-xl p-8 hover:border-white/20 transition-all group">
-      <div className="font-display text-5xl text-white/85 mb-3 group-hover:text-white transition-colors">
-        {value}
-      </div>
-      <div className="text-[9px] tracking-widest text-white/30 uppercase">
-        {label}
-      </div>
-    </div>
-  );
-}
-
-function MomentumMap({ events }: { events: VentureEvent[] }) {
-  // Simplistic momentum map (GitHub style)
-  const weeks = Array.from({ length: 52 });
-  const years = [2024, 2025];
-  
-  return (
-    <div className="flex flex-col gap-1">
-      {years.map(year => (
-        <div key={year} className="flex gap-1 items-center">
-          <span className="text-[8px] text-white/20 w-8">{year}</span>
-          <div className="flex gap-[2px]">
-            {weeks.map((_, i) => (
-              <div 
-                key={i} 
-                className="w-3 h-3 rounded-[1px] bg-white/5 hover:bg-white/20 transition-colors"
-                title={`Week ${i+1}, ${year}`}
-              />
+        <section style={performanceStyle}>
+          <div>
+            <div style={metricLabelStyle}>Peak performance</div>
+            <strong style={{ ...metricValueStyle, fontSize: '17px' }}>Best Month: {monthLabel}</strong>
+          </div>
+          <div style={barWrapStyle}>
+            {report.monthCounts.map((item) => (
+              <div key={item.month} style={barColumnStyle}>
+                {item.month === report.bestMonth.month && <span style={barMonthStyle}>{monthLabel.slice(0, 3).toUpperCase()}</span>}
+                <span
+                  style={{
+                    ...barStyle,
+                    height: `${Math.max(8, (item.count / maxMonth) * 44)}px`,
+                    background: item.month === report.bestMonth.month ? '#ffffff' : 'rgba(255,255,255,0.18)',
+                  }}
+                />
+              </div>
             ))}
           </div>
-        </div>
-      ))}
+        </section>
+
+        <section style={narrativeStyle}>
+          <h2 style={sectionTitleStyle}>The Narrative</h2>
+          <div style={narrativeColumnsStyle}>
+            <p>
+              The trajectory of {report.year} was defined by necessary recalibration. Early projections indicated a steady,
+              linear growth path, but the strongest signals came from moments where the portfolio changed shape.
+            </p>
+            <p>
+              By Q3, market focus crystallized around the ventures with clearer operator pull. The review shows
+              {` ${report.highImpact} `}high-impact moments and {report.strategicPivots} strategic pivot signals.
+            </p>
+          </div>
+        </section>
+
+        <section style={tableStyle}>
+          <div style={{ ...metricLabelStyle, marginBottom: '14px' }}>Chronicle entries</div>
+          {report.events.length === 0 ? (
+            <div style={emptyStyle}>No events logged for {report.year} yet.</div>
+          ) : (
+            report.events.map((event) => {
+              const venture = ventures.find((item) => item.id === event.ventureId);
+              return (
+                <div key={event.id} style={entryStyle}>
+                  <span>{new Date(event.eventDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                  <strong>{event.title}</strong>
+                  <span>{venture?.name || 'Linked venture missing'}</span>
+                </div>
+              );
+            })
+          )}
+        </section>
+      </main>
     </div>
   );
 }
 
-function MoodChart({ events }: { events: VentureEvent[] }) {
-  const moodData = events.filter(e => e.mood).sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
-  if (moodData.length < 3) return <div className="text-white/20 text-xs italic">Insufficient mood data to render chart.</div>;
-
+function Metric({ label, value }: { label: string; value: number }) {
   return (
-    <div className="h-48 w-full bg-white/[0.02] border border-white/5 rounded-lg flex items-end px-4 py-6 gap-2">
-       {moodData.slice(-20).map((e, i) => {
-         const moodLevels: Record<string, number> = {
-            burned_out: 1, lost: 2, regretful: 3, uncertain: 4, focused: 5, proud: 6, energized: 7
-         };
-         const level = moodLevels[e.mood || ''] || 0;
-         return (
-           <div 
-             key={i} 
-             className="flex-1 bg-white/10 rounded-t-sm transition-all hover:bg-white/30 cursor-help"
-             style={{ height: `${(level / 7) * 100}%`, backgroundColor: MOOD_COLORS[e.mood || ''] }}
-             title={`${e.eventDate}: ${e.mood}`}
-           />
-         );
-       })}
+    <div style={metricStyle}>
+      <div style={metricLabelStyle}>{label}</div>
+      <strong style={metricValueStyle}>{value}</strong>
     </div>
   );
 }
 
-function RiskAnalysis({ ventures, events }: { ventures: Venture[], events: VentureEvent[] }) {
-  return (
-    <div className="space-y-8">
-       <div className="bg-[#1a0f0f] border border-red-900/20 rounded-xl p-8">
-         <h4 className="text-red-400/80 text-[10px] tracking-[0.2em] uppercase mb-6">Burnout Signals Detected</h4>
-         <div className="space-y-4">
-            <div className="flex justify-between items-center border-b border-white/5 pb-4">
-              <span className="text-xs text-white/60">Logging gap — 34 days</span>
-              <span className="text-[10px] text-white/30 uppercase">Jan 2025</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-xs text-white/60">Setback cluster — {ventures[0]?.name}</span>
-              <span className="text-[10px] text-white/30 uppercase">Q4 2024</span>
-            </div>
-         </div>
-       </div>
-    </div>
-  );
-}
+const screenStyle: React.CSSProperties = {
+  position: 'fixed',
+  inset: 0,
+  zIndex: 250,
+  background: '#111111',
+  color: '#ffffff',
+  overflowY: 'auto',
+  fontFamily: "'Inter', sans-serif",
+};
+
+const closeStyle: React.CSSProperties = {
+  position: 'fixed',
+  right: '24px',
+  top: '22px',
+  width: '36px',
+  height: '36px',
+  borderRadius: '50%',
+  border: '1px solid rgba(255,255,255,0.12)',
+  background: 'rgba(0,0,0,0.6)',
+  color: 'rgba(255,255,255,0.72)',
+  display: 'grid',
+  placeItems: 'center',
+  cursor: 'pointer',
+};
+
+const reportStyle: React.CSSProperties = {
+  width: 'min(100%, 720px)',
+  margin: '0 auto',
+  padding: '48px 24px 80px',
+};
+
+const heroStyle: React.CSSProperties = {
+  minHeight: '236px',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  textAlign: 'center',
+  justifyContent: 'center',
+  background: 'radial-gradient(circle at 50% 38%, rgba(255,255,255,0.055), transparent 58%)',
+};
+
+const eyebrowStyle: React.CSSProperties = {
+  fontFamily: 'Georgia, serif',
+  fontSize: '10px',
+  fontWeight: 700,
+  textTransform: 'uppercase',
+  letterSpacing: 0,
+};
+
+const titleStyle: React.CSSProperties = {
+  margin: '8px 0 22px',
+  fontFamily: "'Plus Jakarta Sans', sans-serif",
+  fontSize: '34px',
+  lineHeight: 1.08,
+  fontWeight: 900,
+  letterSpacing: 0,
+};
+
+const ledeStyle: React.CSSProperties = {
+  maxWidth: '520px',
+  color: 'rgba(255,255,255,0.86)',
+  fontSize: '12px',
+  lineHeight: 1.55,
+};
+
+const actionRowStyle: React.CSSProperties = {
+  display: 'flex',
+  gap: '10px',
+  marginTop: '28px',
+};
+
+const lightButtonStyle: React.CSSProperties = {
+  height: '30px',
+  border: '1px solid #ffffff',
+  background: '#ffffff',
+  color: '#070707',
+  padding: '0 18px',
+  textTransform: 'uppercase',
+  fontSize: '9px',
+  fontWeight: 900,
+  letterSpacing: '0.08em',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  cursor: 'pointer',
+};
+
+const darkButtonStyle: React.CSSProperties = {
+  ...lightButtonStyle,
+  background: 'transparent',
+  color: '#ffffff',
+  border: '1px solid rgba(255,255,255,0.18)',
+};
+
+const metricGridStyle: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: '1fr 2fr 1fr',
+  gap: '6px',
+};
+
+const metricStyle: React.CSSProperties = {
+  minHeight: '94px',
+  border: '1px solid rgba(255,255,255,0.1)',
+  background: 'rgba(255,255,255,0.012)',
+  padding: '20px',
+};
+
+const metricLabelStyle: React.CSSProperties = {
+  fontFamily: 'Georgia, serif',
+  color: '#ffffff',
+  fontSize: '9px',
+  fontWeight: 700,
+  textTransform: 'uppercase',
+};
+
+const metricValueStyle: React.CSSProperties = {
+  display: 'block',
+  marginTop: '5px',
+  fontFamily: "'Plus Jakarta Sans', sans-serif",
+  fontSize: '28px',
+  lineHeight: 1,
+};
+
+const metricLineStyle: React.CSSProperties = {
+  display: 'block',
+  height: '1px',
+  flex: 1,
+  background: 'linear-gradient(90deg, #ffffff 0 64%, rgba(255,255,255,0.18) 64%)',
+};
+
+const performanceStyle: React.CSSProperties = {
+  marginTop: '6px',
+  minHeight: '88px',
+  border: '1px solid rgba(255,255,255,0.1)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: '24px',
+  padding: '18px 22px',
+};
+
+const barWrapStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'flex-end',
+  gap: '5px',
+  height: '56px',
+};
+
+const barColumnStyle: React.CSSProperties = {
+  position: 'relative',
+  width: '15px',
+  height: '54px',
+  display: 'flex',
+  alignItems: 'flex-end',
+};
+
+const barStyle: React.CSSProperties = {
+  width: '100%',
+  minHeight: '8px',
+};
+
+const barMonthStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: '-2px',
+  left: '50%',
+  transform: 'translate(-50%, -100%)',
+  fontSize: '8px',
+  fontWeight: 800,
+};
+
+const narrativeStyle: React.CSSProperties = {
+  marginTop: '42px',
+  paddingTop: '46px',
+  borderTop: '1px solid rgba(255,255,255,0.08)',
+  position: 'relative',
+};
+
+const sectionTitleStyle: React.CSSProperties = {
+  textAlign: 'center',
+  fontFamily: "'Plus Jakarta Sans', sans-serif",
+  fontSize: '17px',
+  margin: '0 0 24px',
+};
+
+const narrativeColumnsStyle: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr',
+  gap: '48px',
+  color: 'rgba(255,255,255,0.86)',
+  fontSize: '12px',
+  lineHeight: 1.6,
+};
+
+const tableStyle: React.CSSProperties = {
+  marginTop: '42px',
+  borderTop: '1px solid rgba(255,255,255,0.08)',
+  paddingTop: '22px',
+};
+
+const entryStyle: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: '90px 1fr 160px',
+  gap: '18px',
+  alignItems: 'center',
+  minHeight: '44px',
+  borderBottom: '1px solid rgba(255,255,255,0.07)',
+  color: 'rgba(255,255,255,0.58)',
+  fontSize: '11px',
+};
+
+const emptyStyle: React.CSSProperties = {
+  border: '1px solid rgba(255,255,255,0.08)',
+  color: 'rgba(255,255,255,0.42)',
+  padding: '18px',
+  fontSize: '12px',
+};

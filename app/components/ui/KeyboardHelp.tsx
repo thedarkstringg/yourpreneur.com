@@ -1,7 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-
 export default function KeyboardHelp({
   isOpen,
   onClose,
@@ -10,12 +8,15 @@ export default function KeyboardHelp({
   onClose: () => void;
 }) {
   const shortcuts = [
-    { key: 'Alt+N', action: 'Create new venture' },
-    { key: 'Alt+M', action: 'Modify selected venture (if selected)' },
-    { key: 'Alt+P', action: 'Toggle preview mode' },
-    { key: 'Alt+L', action: 'Toggle ventures list' },
-    { key: 'Alt+S', action: 'Show statistics' },
-    { key: 'Alt+H', action: 'Show this help' },
+    { key: '/', action: 'Focus global search' },
+    { key: 'N', action: 'Create new venture' },
+    { key: 'E', action: 'Log an event' },
+    { key: 'M', action: 'Modify selected venture' },
+    { key: 'F', action: 'Focus canvas' },
+    { key: 'L', action: 'Toggle ventures list' },
+    { key: 'R', action: 'Open annual review' },
+    { key: 'T', action: 'Open task canvas' },
+    { key: '?', action: 'Show this help' },
     { key: 'Double Click', action: 'Open modify panel for venture' },
     { key: 'Space + Drag', action: 'Pan the canvas' },
     { key: 'Scroll', action: 'Zoom in/out' },

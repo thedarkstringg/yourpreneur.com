@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { Upload, X, Check } from 'lucide-react';
 import { useStore } from '@/lib/useStore';
 import { useToasts } from './Toast';
@@ -20,13 +20,8 @@ export default function LogoUploadOverlay({ ventureId, onClose }: LogoUploadOver
 
   const venture = ventures.find((v) => v.id === ventureId);
 
-  useEffect(() => {
-    if (venture?.logoUrl) {
-      setPreview(venture.logoUrl);
-    }
-  }, [venture]);
-
   if (!venture) return null;
+  const previewSrc = preview ?? venture.logoUrl ?? null;
 
   const handleFile = (file: File) => {
     const validTypes = ['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'];
@@ -94,7 +89,7 @@ export default function LogoUploadOverlay({ ventureId, onClose }: LogoUploadOver
         boxShadow: '0 12px 40px rgba(0,0,0,0.7)',
         zIndex: 600,
         animation: 'logoUploadOpen 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
-        fontFamily: "'Space Grotesk', sans-serif",
+        fontFamily: "'Inter', sans-serif",
       }}
       onClick={(e) => e.stopPropagation()}
     >
@@ -131,9 +126,9 @@ export default function LogoUploadOverlay({ ventureId, onClose }: LogoUploadOver
           (e.currentTarget as HTMLElement).style.background = isDragOver ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.02)';
         }}
       >
-        {preview ? (
+        {previewSrc ? (
           <img
-            src={preview}
+            src={previewSrc}
             alt="preview"
             style={{
               width: '100%',
@@ -160,14 +155,14 @@ export default function LogoUploadOverlay({ ventureId, onClose }: LogoUploadOver
       />
 
       {/* Or Text */}
-      {!preview && (
+      {!previewSrc && (
         <div style={{ textAlign: 'center', margin: '8px 0', fontSize: '9px', color: 'rgba(255,255,255,0.2)' }}>
           or
         </div>
       )}
 
       {/* Browse Button */}
-      {!preview && (
+      {!previewSrc && (
         <button
           onClick={handleBrowse}
           style={{
@@ -179,7 +174,7 @@ export default function LogoUploadOverlay({ ventureId, onClose }: LogoUploadOver
             color: 'rgba(255,255,255,0.4)',
             cursor: 'pointer',
             fontSize: '10px',
-            fontFamily: "'Space Grotesk', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             transition: 'all 150ms',
             marginBottom: '12px',
           }}
@@ -197,7 +192,7 @@ export default function LogoUploadOverlay({ ventureId, onClose }: LogoUploadOver
       )}
 
       {/* Actions */}
-      {preview && (
+      {previewSrc && (
         <div style={{ display: 'flex', gap: '6px', marginTop: '12px' }}>
           <button
             onClick={() => setPreview(null)}
@@ -210,7 +205,7 @@ export default function LogoUploadOverlay({ ventureId, onClose }: LogoUploadOver
               color: 'rgba(255,255,255,0.4)',
               cursor: 'pointer',
               fontSize: '10px',
-              fontFamily: "'Space Grotesk', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               transition: 'all 150ms',
             }}
             onMouseOver={(e) => {
@@ -233,7 +228,7 @@ export default function LogoUploadOverlay({ ventureId, onClose }: LogoUploadOver
               color: '#080808',
               cursor: 'pointer',
               fontSize: '10px',
-              fontFamily: "'Space Grotesk', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontWeight: 600,
               transition: 'opacity 150ms',
             }}
@@ -247,3 +242,4 @@ export default function LogoUploadOverlay({ ventureId, onClose }: LogoUploadOver
     </div>
   );
 }
+

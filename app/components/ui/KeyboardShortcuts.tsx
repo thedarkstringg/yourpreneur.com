@@ -9,7 +9,10 @@ export default function KeyboardShortcuts({
   onModify,
   onFocus,
   onList,
-  onInsights,
+  onReview,
+  onHelp,
+  onTaskCanvas,
+  onFlipSelected,
   onNavigatePrev,
   onNavigateNext,
 }: {
@@ -18,7 +21,10 @@ export default function KeyboardShortcuts({
   onModify?: () => void;
   onFocus?: () => void;
   onList?: () => void;
-  onInsights?: () => void;
+  onReview?: () => void;
+  onHelp?: () => void;
+  onTaskCanvas?: () => void;
+  onFlipSelected?: () => void;
   onNavigatePrev?: () => void;
   onNavigateNext?: () => void;
 }) {
@@ -77,10 +83,27 @@ export default function KeyboardShortcuts({
         onList?.();
       }
 
-      // I - Go to insights
-      if (e.key === 'i' || e.key === 'I') {
+      // R - Open annual review
+      if (e.key === 'r' || e.key === 'R') {
         e.preventDefault();
-        onInsights?.();
+        onReview?.();
+      }
+
+      if (e.key === '?') {
+        e.preventDefault();
+        onHelp?.();
+      }
+
+      if (e.key === 't' || e.key === 'T') {
+        e.preventDefault();
+        onTaskCanvas?.();
+      }
+
+      if (e.key === 'v' || e.key === 'V') {
+        e.preventDefault();
+        if (selectedVentureId) {
+          onFlipSelected?.();
+        }
       }
 
       // Arrow keys - Navigate between ventures
@@ -103,7 +126,7 @@ export default function KeyboardShortcuts({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedVentureId, ventures, onNewVenture, onLogEvent, onModify, onFocus, onList, onInsights, onNavigatePrev, onNavigateNext]);
+  }, [selectedVentureId, ventures, onNewVenture, onLogEvent, onModify, onFocus, onList, onReview, onHelp, onTaskCanvas, onFlipSelected, onNavigatePrev, onNavigateNext]);
 
   return null;
 }

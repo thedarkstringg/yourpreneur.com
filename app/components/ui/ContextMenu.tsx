@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Pencil, Plus, GitBranch, Crosshair, Link, Trash2 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 interface ContextMenuProps {
   x: number;
@@ -32,25 +33,8 @@ export default function ContextMenu({
   onCopyLink,
   onDelete,
 }: ContextMenuProps) {
-  const [position, setPosition] = useState({ x, y });
-
-  useEffect(() => {
-    if (isOpen) {
-      // Adjust position to stay within viewport
-      let adjustedX = x;
-      let adjustedY = y;
-
-      if (x + 180 > window.innerWidth) {
-        adjustedX = window.innerWidth - 180 - 16;
-      }
-
-      if (y + 250 > window.innerHeight) {
-        adjustedY = window.innerHeight - 250 - 16;
-      }
-
-      setPosition({ x: adjustedX, y: adjustedY });
-    }
-  }, [isOpen, x, y]);
+  const adjustedX = typeof window !== 'undefined' && x + 180 > window.innerWidth ? window.innerWidth - 180 - 16 : x;
+  const adjustedY = typeof window !== 'undefined' && y + 250 > window.innerHeight ? window.innerHeight - 250 - 16 : y;
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -76,7 +60,14 @@ export default function ContextMenu({
 
   if (!isOpen) return null;
 
-  const items: any[] = [
+  void ventureId;
+  void ventureName;
+
+  type ContextMenuItem =
+    | { icon: LucideIcon; label: string; onClick?: () => void; isDangerous?: boolean; isDivider?: false }
+    | { isDivider: true };
+
+  const items: ContextMenuItem[] = [
     { icon: Pencil, label: 'Edit Venture', onClick: onEdit },
     { icon: Plus, label: 'Log Event', onClick: onLogEvent },
     { icon: GitBranch, label: 'Create Branch', onClick: onBranch },
@@ -90,8 +81,8 @@ export default function ContextMenu({
     <div
       style={{
         position: 'fixed',
-        top: position.y,
-        left: position.x,
+        top: adjustedY,
+        left: adjustedX,
         background: 'rgba(12,9,9,0.97)',
         border: '1px solid rgba(255,255,255,0.1)',
         borderRadius: '10px',
@@ -138,7 +129,7 @@ export default function ContextMenu({
               cursor: 'pointer',
               fontSize: '10px',
               color: item.isDangerous ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.65)',
-              fontFamily: "'Space Grotesk', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               transition: 'all 150ms',
             }}
             onMouseOver={(e) => {
@@ -180,3 +171,4 @@ export function showContextMenu(
     ...callbacks,
   };
 }
+

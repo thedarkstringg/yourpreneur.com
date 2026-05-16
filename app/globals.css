@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 @config "../tailwind.config.ts";
 
@@ -6,7 +6,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Space Grotesk', sans-serif; /* default for all UI */
+  font-family: 'Inter', sans-serif; /* default for all UI */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -66,7 +66,7 @@ html::before {
   width: 400px; height: 100vh;
   background: #0e0b0b;
   border-left: 1px solid rgba(255,255,255,0.08);
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   overflow-y: auto;
   z-index: 100;
@@ -86,7 +86,7 @@ html::before {
 
 .modify-panel label {
   display: block;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 8px;
   color: rgba(255,255,255,0.22);
   text-transform: uppercase;
@@ -103,7 +103,7 @@ html::before {
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 6px;
   padding: 11px 14px;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 12px;
   color: rgba(255,255,255,0.8);
   outline: none;
@@ -125,7 +125,7 @@ html::before {
 
 /* Status pills */
 .status-pill {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -154,7 +154,7 @@ html::before {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .btn-delete {
@@ -183,7 +183,7 @@ html::before {
 
 /* Toolbar Font Fix */
 .toolbar-item {
-  font-family: 'Space Mono', monospace !important;
+  font-family: 'Inter', monospace !important;
   font-size: 11px;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -422,5 +422,6 @@ input:focus, textarea:focus, select:focus {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255,255,255,0.2);
 }
+
 
 

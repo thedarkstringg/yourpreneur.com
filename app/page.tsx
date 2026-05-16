@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import PixiApp from './components/canvas/PixiApp';
 import Toolbar from './components/ui/Toolbar';
 import TopBar from './components/ui/TopBar';
@@ -12,26 +12,74 @@ import NewVentureModal from './components/ui/NewVentureModal';
 import EventLogPanel from './components/ui/EventLogPanel';
 import ModifyPanel from './components/ui/ModifyPanel';
 import KeyboardHelp from './components/ui/KeyboardHelp';
-import VentureList from './components/ui/VentureList';
 import DataManager from './components/ui/DataManager';
-import Statistics from './components/ui/Statistics';
 import PatternsScreen from './components/ui/PatternsScreen';
+import TaskCanvas from './components/ui/TaskCanvas';
 import { useStore } from '@/lib/useStore';
 import { useEventManagement } from '@/lib/useEventManagement';
+import { calculateLayout } from '@/lib/layoutAlgorithm';
 
 export default function Home() {
   const [isModifyPanelOpen, setIsModifyPanelOpen] = useState(false);
   const [isNewVentureOpen, setIsNewVentureOpen] = useState(false);
   const [isEventLogOpen, setIsEventLogOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
-  const [isPortfolioOpen, setIsPortfolioOpen] = useState(false);
   const [isDataManagerOpen, setIsDataManagerOpen] = useState(false);
-  const [isPatternsOpen, setIsPatternsOpen] = useState(false);
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [isTaskCanvasOpen, setIsTaskCanvasOpen] = useState(false);
+  const [isTaskTopologyOpen, setIsTaskTopologyOpen] = useState(false);
+  const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
+  const [isRightPanelCollapsed, setIsRightPanelCollapsed] = useState(false);
   const [currentYear, setCurrentYear] = useState(2024);
-  const [zoomLevel, setZoomLevel] = useState(100);
 
-  const { selectedVentureId, ventures, addVenture } = useStore();
+  const { selectedVentureId, ventures, addVenture, updateVenture, zoomLevel, onNavigateToTarget } = useStore();
   const { addEvent } = useEventManagement();
+
+  useEffect(() => {
+    const openEventLog = (event: Event) => {
+      const ventureId = (event as CustomEvent<{ ventureId?: string }>).detail?.ventureId;
+      if (ventureId) useStore.setState({ selectedVentureId: ventureId });
+      setIsEventLogOpen(true);
+    };
+
+    const closeExpandedNode = () => useStore.setState({ selectedVentureId: null });
+
+    window.addEventListener('open-event-log', openEventLog as EventListener);
+    window.addEventListener('venture-node-close', closeExpandedNode);
+    return () => {
+      window.removeEventListener('open-event-log', openEventLog as EventListener);
+      window.removeEventListener('venture-node-close', closeExpandedNode);
+    };
+  }, []);
+
+  const focusSelectedVenture = () => {
+    if (!selectedVentureId) return;
+    const layout = calculateLayout(ventures);
+    const position = layout.positions.get(selectedVentureId);
+    if (position) {
+      onNavigateToTarget?.(position.x + 110, position.y + 60, 1);
+    }
+  };
+
+  const flipSelectedVenture = () => {
+    if (!selectedVentureId) return;
+    const venture = ventures.find((item) => item.id === selectedVentureId);
+    if (!venture) return;
+    updateVenture(selectedVentureId, {
+      timelineSide: venture.timelineSide === 'above' ? 'below' : 'above',
+    });
+  };
+
+  const fitPortfolio = () => {
+    const layout = calculateLayout(ventures);
+    const positions = Array.from(layout.positions.values());
+    if (positions.length === 0) return;
+    const minX = Math.min(...positions.map((position) => position.x));
+    const maxX = Math.max(...positions.map((position) => position.x + position.width));
+    const minY = Math.min(...positions.map((position) => position.y));
+    const maxY = Math.max(...positions.map((position) => position.y + position.height));
+    onNavigateToTarget?.((minX + maxX) / 2, (minY + maxY) / 2, 0.82);
+  };
 
   return (
     <>
@@ -52,9 +100,12 @@ export default function Home() {
         onNewVenture={() => setIsNewVentureOpen(true)}
         onLogEvent={() => setIsEventLogOpen(true)}
         onModify={() => selectedVentureId && setIsModifyPanelOpen(true)}
-        onFocus={() => {}}
-        onList={() => setIsPortfolioOpen(true)}
-        onInsights={() => setIsPatternsOpen(true)}
+        onFocus={focusSelectedVenture}
+        onList={() => setIsLeftPanelCollapsed(false)}
+        onReview={() => setIsReviewOpen(true)}
+        onHelp={() => setIsHelpOpen(true)}
+        onTaskCanvas={() => setIsTaskCanvasOpen(true)}
+        onFlipSelected={flipSelectedVenture}
         onNavigatePrev={() => {}}
         onNavigateNext={() => {}}
       />
@@ -63,7 +114,10 @@ export default function Home() {
         currentYear={currentYear}
         onYearChange={setCurrentYear}
         onNewVenture={() => setIsNewVentureOpen(true)}
-        zoomLevel={zoomLevel}
+        onTaskCanvas={() => setIsTaskCanvasOpen(true)}
+        onHelpClick={() => setIsHelpOpen(true)}
+        onFitClick={fitPortfolio}
+        zoomLevel={zoomLevel * 100}
       />
 
       <LeftPanel
@@ -71,9 +125,15 @@ export default function Home() {
         ventures={ventures}
         selectedVentureId={selectedVentureId}
         onSelectVenture={(id) => useStore.setState({ selectedVentureId: id })}
+        collapsed={isLeftPanelCollapsed}
+        onToggleCollapsed={() => setIsLeftPanelCollapsed((value) => !value)}
       />
 
-      <RightPanel ventures={ventures} />
+      <RightPanel
+        ventures={ventures}
+        collapsed={isRightPanelCollapsed}
+        onToggleCollapsed={() => setIsRightPanelCollapsed((value) => !value)}
+      />
 
       <PixiApp
         onNodeDoubleClick={(ventureId) => {
@@ -82,17 +142,25 @@ export default function Home() {
         }}
         onNewVenture={() => setIsNewVentureOpen(true)}
         onHelpToggle={() => setIsHelpOpen(!isHelpOpen)}
-        onListToggle={() => setIsPortfolioOpen(!isPortfolioOpen)}
-        onStatsToggle={() => setIsPatternsOpen(!isPatternsOpen)}
+        onListToggle={() => setIsLeftPanelCollapsed((value) => !value)}
+        onStatsToggle={() => setIsReviewOpen(!isReviewOpen)}
+        taskTopologyVentureId={isTaskTopologyOpen ? selectedVentureId : null}
       />
 
       <Toolbar
         onGenerateClick={() => setIsNewVentureOpen(true)}
         onModifyClick={() => selectedVentureId && setIsModifyPanelOpen(true)}
-        onPreviewClick={() => {}}
-        onPatternsClick={() => setIsPatternsOpen(true)}
-        onListClick={() => setIsPortfolioOpen(true)}
+        onPreviewClick={focusSelectedVenture}
+        onAxisClick={() => {
+          window.dispatchEvent(new CustomEvent('flash-year-watermark', { detail: { year: currentYear } }));
+          useStore.getState().onNavigateToYear?.(currentYear);
+        }}
+        onLogEventClick={() => setIsEventLogOpen(true)}
+        onReviewClick={() => setIsReviewOpen(true)}
+        onListClick={() => setIsLeftPanelCollapsed(false)}
         onHelpClick={() => setIsHelpOpen(true)}
+        onTaskCanvasClick={() => setIsTaskTopologyOpen((value) => !value)}
+        onFlipSelectedClick={flipSelectedVenture}
       />
 
       <NewVentureModal
@@ -105,7 +173,15 @@ export default function Home() {
             description: venture.description || '',
             industry: venture.industry || '',
             startedDate: venture.startDate,
-            status: (venture.status as 'active' | 'pivot' | 'paused' | 'shutdown' | 'exited') || 'active',
+            status: (venture.status as 'active' | 'stealth' | 'graveyard' | 'pivot' | 'paused' | 'shutdown' | 'exited' | 'archived' | 'acquired' | 'failed') || 'active',
+            logoUrl: venture.logoUrl,
+            burnRate: 0,
+            runwayMonths: 0,
+            collaborators: [],
+            healthScore: 55,
+            mrrTrend: [1, 2, 3, 4, 5, 6, 7],
+            lastSyncedAt: new Date().toISOString(),
+            source: 'manual',
           });
           setIsNewVentureOpen(false);
         }}
@@ -141,19 +217,14 @@ export default function Home() {
         />
       )}
 
-      {isPatternsOpen && (
-        <PatternsScreen onClose={() => setIsPatternsOpen(false)} />
+      {isReviewOpen && (
+        <PatternsScreen onClose={() => setIsReviewOpen(false)} />
       )}
 
       <KeyboardHelp isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
 
-      <VentureList
-        isOpen={isPortfolioOpen}
-        onClose={() => setIsPortfolioOpen(false)}
-        onSelectVenture={(id) => useStore.setState({ selectedVentureId: id })}
-      />
-
       <DataManager isOpen={isDataManagerOpen} onClose={() => setIsDataManagerOpen(false)} />
+      <TaskCanvas isOpen={isTaskCanvasOpen} onClose={() => setIsTaskCanvasOpen(false)} ventureId={selectedVentureId} />
     </>
   );
 }

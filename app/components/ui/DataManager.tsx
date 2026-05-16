@@ -28,18 +28,18 @@ export default function DataManager({
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    input.onchange = (e: any) => {
-      const file = e.target.files?.[0];
+    input.onchange = (e: Event) => {
+      const file = (e.target as HTMLInputElement | null)?.files?.[0];
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = (event: any) => {
+      reader.onload = (event: ProgressEvent<FileReader>) => {
         try {
-          const data = JSON.parse(event.target.result);
+          const data = JSON.parse(String(event.target?.result || ''));
           localStorage.setItem('ventures-app-state', JSON.stringify(data));
           alert('Data imported successfully! Please refresh the page.');
           window.location.reload();
-        } catch (error) {
+        } catch {
           alert('Invalid file format');
         }
       };

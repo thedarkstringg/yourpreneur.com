@@ -160,7 +160,7 @@ export default function LogoUploadPanel({ onSave, onCancel, currentLogo }: LogoU
             color: 'rgba(255,255,255,0.4)',
             cursor: 'pointer',
             fontSize: '10px',
-            fontFamily: "'Space Grotesk', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             transition: 'all 150ms',
             marginBottom: '12px',
           }}
@@ -191,7 +191,7 @@ export default function LogoUploadPanel({ onSave, onCancel, currentLogo }: LogoU
               color: 'rgba(255,255,255,0.4)',
               cursor: 'pointer',
               fontSize: '10px',
-              fontFamily: "'Space Grotesk', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               transition: 'all 150ms',
             }}
             onMouseOver={(e) => {
@@ -218,7 +218,7 @@ export default function LogoUploadPanel({ onSave, onCancel, currentLogo }: LogoU
               color: '#080808',
               cursor: 'pointer',
               fontSize: '10px',
-              fontFamily: "'Space Grotesk', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontWeight: 600,
               transition: 'opacity 150ms',
             }}
@@ -232,3 +232,4 @@ export default function LogoUploadPanel({ onSave, onCancel, currentLogo }: LogoU
     </div>
   );
 }
+

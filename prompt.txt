@@ -1,479 +1,108 @@
-PRENEURS — ANIMATIONS + YEAR NAVIGATION + LOGOS + ICONS + DEEP FUNCTIONALITY
-Add this on top of all previous prompts. Do not revert any previous changes.
-
-1. YEAR NAVIGATION — ANIMATED FOCUS
-When the user clicks a year in the top bar navigation:
-1. Calculate the x position of that year's January 1st on the canvas
-   targetX = yearIndex * 1440 * zoom (1440px per year)
-
-2. Animate the canvas world transform smoothly:
-   Duration: 700ms
-   Easing: easeInOutCubic
-   Both x (pan) and scale animate simultaneously if needed
-   The year's content should end up centered in the viewport
-   accounting for left panel (240px) and right panel (200px)
-
-3. During animation:
-   - Year label in top bar updates immediately on click
-   - Active year underline slides to the new year with a
-     200ms CSS transition (transform: translateX)
-   - Canvas cards that are entering the viewport fade in
-     as they cross the left panel edge (opacity 0→1, 300ms)
-   - Cards leaving the viewport fade out as they cross right panel edge
-
-4. After animation lands:
-   - Flash the year watermark: rgba(255,255,255,0.04) → rgba(255,255,255,0.1)
-     then back to rgba(255,255,255,0.04) over 600ms
-   - Show toast: "Viewing 2024 · {N} ventures"
-
-2. CLICK-TO-FOCUS NAVIGATION
-Clicking ANYTHING that references a venture triggers a smooth canvas navigation to that venture.
-Triggers:
-
-Clicking a venture name in the left panel portfolio list
-Clicking a venture row in the LIST overlay
-Clicking an event in the right panel live feed
-Clicking a branch label on the canvas
-Using ← → keyboard arrows to navigate between ventures
-
-Animation spec:
-1. Calculate target transform:
-   targetX = ventureCard.worldX - (viewportWidth - leftPanel - rightPanel) / 2
-   targetY = ventureCard.worldY - viewportHeight / 2 + 80
-   targetScale = clamp(currentScale, 0.8, 1.2)
-   — don't zoom in too much, just center it
-
-2. Animate world container:
-   Duration: 650ms
-   Easing: easeInOutCubic
-   Interpolate x, y, scale simultaneously
-
-3. On arrival:
-   — Select the venture card (triggers white outline + glow)
-   — Card performs a subtle "attention" animation:
-     scale 1.0 → 1.03 → 1.0 over 400ms, easeInOutSine
-   — The dot on the timeline pulses:
-     radius 5 → 9 → 5 over 500ms with a fading ring expanding outward
-     ring: circle growing from radius 5 to 24, alpha 0.4→0, strokeWidth 1px
-   — Left panel: highlight that venture's row
-
-4. If the venture is in a different year than currently viewed:
-   — First snap the year selector to the correct year (no animation for year label)
-   — Then run the canvas pan animation
-   — Show toast: "FreightOS Node · Jun 2024"
-
-3. VENTURE LOGO SYSTEM
-Every venture card has a logo area. Full spec:
-Logo placeholder (when no logo uploaded):
-Size: 36×36px, positioned top-right inside card, 12px margin from edges
-
-Shape: rounded square, borderRadius 8px
-Background: rgba(255,255,255,0.06)
-Border: 1px solid rgba(255,255,255,0.1)
-
-Content: first letter of venture name
-  Font: Montserrat 500, 16px, rgba(255,255,255,0.5)
-  Centered horizontally and vertically
-
-On hover of card: placeholder border → rgba(255,255,255,0.2)
-                  shows a tiny upload icon overlay:
-                    camera icon ◎ 10px rgba(255,255,255,0.4)
-                    appears with opacity 0→1, 150ms
-                  cursor: pointer on the placeholder area
-
-Clicking the placeholder: opens logo upload for that venture
-Logo upload flow:
-Clicking logo area opens a small floating panel anchored to the card:
-  background: #0f0f0f
-  border: 1px solid rgba(255,255,255,0.1)
-  border-radius: 10px
-  padding: 16px
-  width: 200px
-  box-shadow: 0 12px 40px rgba(0,0,0,0.7)
-
-  Drop zone:
-    80×80px centered
-    border: 1px dashed rgba(255,255,255,0.15)
-    border-radius: 8px
-    background: rgba(255,255,255,0.02)
-    Space Grotesk 9px rgba(255,255,255,0.3) "Drop logo here"
-    Accepts: PNG, JPG, SVG, WEBP
-    Max size: 2MB
-    On drag over: border → rgba(255,255,255,0.35), background → rgba(255,255,255,0.05)
-
-  Below drop zone:
-    "or" Space Grotesk 9px rgba(255,255,255,0.2)
-    [Browse files] outlined button Space Grotesk 10px
-
-  On file selected:
-    Show preview in the drop zone (objectFit: cover)
-    Show [Remove] and [Save] buttons below
-
-  On Save:
-    Store logo as base64 in Zustand (and Supabase storage when connected)
-    Close the float panel
-    Update card logo area with the uploaded image
-    Animation: new logo fades in over 300ms
-Logo rendering on card:
-When logoUrl exists:
-  Render as PixiJS Sprite, 36×36px
-  Apply a RoundedRectangle mask: borderRadius 8px
-  If the original image is wider than tall (landscape/rectangle):
-    objectFit: cover — fill the 36×36 square, crop center
-    Apply the same rounded mask
-    No letterboxing, no stretching
-  If the original image is taller than wide (portrait):
-    objectFit: cover — fill the 36×36 square, crop center
-  All logos end up as perfect 36×36 rounded squares regardless of source dimensions
-
-  On card hover: logo gets a very subtle brightness increase (ColorMatrixFilter brightness +0.1)
-
-In left panel portfolio list:
-  Show 18×18px version of logo (or letter placeholder) to the left of venture name
-  Same rounded mask, same cover crop
-  Adds life and recognition to the list
-
-In LIST overlay table:
-  Show 24×24px logo at start of each row
-  Same treatment
-
-4. ICON SYSTEM — CONSISTENT ACROSS ALL UI
-Use a single icon library throughout. Do not mix sources.
-Icon library: Lucide Icons (https://lucide.dev)
-Import method: lucide-react package
-All icons: strokeWidth 1.5, no fill, color inherited from parent
-
-ICON ASSIGNMENTS:
-
-Toolbar:
-  NEW:      <Plus />
-  FOCUS:    <Maximize2 />
-  GRID:     <Grid />
-  LIST:     <List />
-  INSIGHTS: <BarChart2 />
-  REVIEW:   <BookOpen />
-  COACH:    <Sparkles />
-
-Top bar:
-  Logo mark:        <Asterisk /> or ✦ unicode
-  Year nav arrows:  <ChevronLeft /> <ChevronRight />
-  New venture btn:  <Plus /> before text
-  Avatar:           <User /> if no photo
-
-Left panel:
-  Portfolio label:  <Briefcase /> 10px before "PORTFOLIO"
-  Venture dot:      filled circle drawn in CSS, not icon
-  Edit action:      <Pencil />
-  Stats section:    <TrendingUp /> before stat label
-
-Right panel:
-  Live feed label:  <Activity /> before "LIVE FEED"
-  Momentum label:   <Zap /> before "MOMENTUM"
-
-Event type icons (in event log, expanded card, live feed):
-  milestone:  <Flag />
-  launch:     <Rocket />
-  funding:    <DollarSign />
-  team:       <Users />
-  pivot:      <RefreshCw />
-  setback:    <AlertTriangle />
-  exit:       <LogOut />
-  decision:   <GitBranch />
-  lesson:     <BookOpen />
-  feeling:    <Heart />
-  other:      <Circle />
-
-Modify panel:
-  Close:      <X />
-  Delete:     <Trash2 />
-  Save:       <Check /> before "SAVE" text
-  Logo upload area: <Upload />
-  Logo camera overlay: <Camera />
-
-Context menu:
-  Edit:       <Pencil />
-  Log event:  <Plus />
-  Branch:     <GitBranch />
-  Focus:      <Crosshair />
-  Copy link:  <Link />
-  Delete:     <Trash2 />
-
-Toast notifications:
-  Success:    <CheckCircle />
-  Info:       <Info />
-  Error:      <XCircle />
-
-All icon sizes:
-  Toolbar buttons:      18px
-  Top bar:              14px
-  Panel labels:         10px
-  Event type icons:     12px
-  Context menu:         12px
-  Toast:                14px
-  Logo upload:          20px
-
-Icon color always inherits from parent — never hardcoded
-Icons never have their own color — they follow the text color of their context
-
-5. GENERAL ANIMATION SYSTEM
-Apply these animations consistently across all interactions:
-Page/canvas load sequence:
-t=0ms    Top bar slides down from -48px, opacity 0→1, 400ms easeOutCubic
-t=50ms   Left panel slides in from -240px, opacity 0→1, 450ms easeOutCubic
-t=50ms   Right panel slides in from +200px, opacity 0→1, 450ms easeOutCubic
-t=200ms  Timeline line draws outward from center, 800ms easeOutExpo
-t=400ms  Year watermarks fade in, 500ms
-t=500ms  Month labels fade in staggered left to right, 20ms each
-t=600ms  Venture dots fall in from y-20, staggered 120ms, 350ms easeOutCubic each
-t=750ms  Cards fade up from y+12, staggered 80ms after each dot, 280ms easeOutCubic
-t=1100ms Branch lines draw along bezier path, 450ms easeInOutCubic
-t=1400ms Toolbar rises from bottom +60px, opacity 0→1, 400ms easeOutCubic
-Panel open/close:
-Modify panel:
-  Open:  translateX(100%) → translateX(0), 300ms cubic-bezier(0.4,0,0.2,1)
-  Close: translateX(0) → translateX(100%), 250ms cubic-bezier(0.4,0,0.2,1)
-  Canvas: when panel opens, canvas right boundary shrinks by 400px smoothly (200ms)
-         so content doesn't hide behind the panel
-
-Quick-add panel (new venture):
-  Open:  scale(0.95) opacity(0) → scale(1) opacity(1), 250ms easeOutCubic
-  Close: scale(1) opacity(1) → scale(0.97) opacity(0), 180ms easeInCubic
-  Backdrop: rgba(0,0,0,0) → rgba(0,0,0,0.5), 250ms
-
-Context menu:
-  Open:  scale(0.95) opacity(0) → scale(1) opacity(1), 150ms easeOutCubic
-         transform origin: top left (or whichever corner is closest to cursor)
-  Close: opacity(1) → opacity(0), 100ms
-
-List overlay:
-  Open:  opacity(0) blur(8px) → opacity(1) blur(0), 300ms easeOutCubic
-  Close: opacity(1) → opacity(0), 200ms
-
-Logo upload float:
-  Open:  translateY(8px) opacity(0) → translateY(0) opacity(1), 200ms easeOutCubic
-  Close: translateY(0) opacity(1) → translateY(4px) opacity(0), 150ms
-Micro-interactions:
-Button press:     scale 1 → 0.97 → 1, 120ms
-Badge hover:      border opacity increases, 150ms
-Input focus:      border brightens + very subtle background lightens, 180ms
-Row hover:        background fades in, 120ms
-Logo placeholder: camera icon fades in, 150ms
-Card expand:      height animates easeOutCubic 260ms, content fades in 200ms after
-New node spawn:   scale 0.8→1.0 + opacity 0→1, 300ms easeOutCubic
-                  followed by brief glow pulse: outerStrength 0→1.5→0, 800ms
-Delete card:      scale 1→0.9 + opacity 1→0, 250ms easeInCubic
-                  then card position closes gap: siblings animate together
-
-6. ALL PANELS — MATCH THE DESIGN SYSTEM
-Every panel, modal, overlay must use identical styling. No exceptions.
-UNIVERSAL PANEL RULES:
-
-Background:     #0f0f0f
-Border:         1px solid rgba(255,255,255,0.08)
-Border-radius:  12px (floating panels) or 0 (edge-attached slide panels)
-Font:           Space Grotesk throughout
-Display font:   Montserrat for titles/headers only
-
-Section labels inside panels:
-  Space Grotesk 500, 9px, rgba(255,255,255,0.25), uppercase, letter-spacing 0.18em
-  margin-top: 24px, margin-bottom: 10px
-  display: flex, align-items: center, gap: 6px
-  Lucide icon 10px before label text
-
-Input fields (ALL inputs everywhere):
-  background: rgba(255,255,255,0.03)
-  border: 1px solid rgba(255,255,255,0.08)
-  border-radius: 6px
-  padding: 11px 14px
-  font: Space Grotesk 400, 13px, rgba(255,255,255,0.8)
-  placeholder: rgba(255,255,255,0.2)
-  outline: none
-  Focus: border rgba(255,255,255,0.22), background rgba(255,255,255,0.05)
-  Transition: 180ms ease
-
-Dropdowns/selects:
-  Same as input fields
-  Custom dropdown: dark panel below, rgba(255,255,255,0.04) per option hover
-  Chevron icon: <ChevronDown /> 12px, rgba(255,255,255,0.3), right side of field
-
-Pill selectors (status, event type, mood, impact):
-  border: 1px solid rgba(255,255,255,0.1)
-  border-radius: 999px
-  padding: 7px 14px
-  Space Grotesk 500, 10px, rgba(255,255,255,0.4), uppercase
-  cursor: pointer, transition: all 150ms
-  Selected: background rgba(255,255,255,0.1), border rgba(255,255,255,0.3), color rgba(255,255,255,0.9)
-
-Primary button (SAVE, ADD, CONFIRM):
-  background: rgba(255,255,255,0.92)
-  color: #080808
-  border: none
-  border-radius: 999px
-  padding: 10px 24px
-  Space Grotesk 600, 11px, uppercase, letter-spacing 0.08em
-  hover: opacity 0.85
-  active: scale 0.97
-
-Secondary button (CANCEL, BACK):
-  background: transparent
-  border: 1px solid rgba(255,255,255,0.12)
-  border-radius: 999px
-  padding: 9px 20px
-  Space Grotesk 500, 11px, rgba(255,255,255,0.5), uppercase
-  hover: border rgba(255,255,255,0.25), color rgba(255,255,255,0.8)
-
-Destructive button (DELETE):
-  background: transparent, border: none
-  Space Grotesk 500, 11px, rgba(255,255,255,0.3), uppercase
-  hover: rgba(255,255,255,0.7)
-  No red. White only.
-
-Dividers: 1px solid rgba(255,255,255,0.06), full width
-
-Scrollbars (all panels):
-  width: 3px
-  track: transparent
-  thumb: rgba(255,255,255,0.1), border-radius 999px
-  thumb hover: rgba(255,255,255,0.2)
-
-7. NEW ENTRY PANEL — DEEP FUNCTIONALITY
-Trigger: toolbar NEW button, "N" key, "+ NEW VENTURE" top bar, double-click empty canvas
-
-Appears as centered floating modal with backdrop
-background: #0f0f0f
-border: 1px solid rgba(255,255,255,0.1)
-border-radius: 14px
-padding: 32px
-width: 440px
-box-shadow: 0 32px 80px rgba(0,0,0,0.8)
-
-HEADER:
-  <Plus /> icon 16px rgba(255,255,255,0.4)
-  "New Venture" Montserrat 500, 24px, rgba(255,255,255,0.9)
-  Side by side, gap 10px
-  <X /> close button top-right
-  Divider below header
-
-FIELDS (all use universal input styles above):
-
-  VENTURE NAME *
-  text input, placeholder "What did you build?"
-  autofocus on open
-  real-time character count: Space Grotesk 10px rgba(255,255,255,0.2) right-aligned below field
-
-  ONE-LINE DESCRIPTION
-  text input, placeholder "In one sentence..."
-  optional
-
-  INDUSTRY
-  custom dropdown, options:
-  Fintech · AgriTech · SaaS · EdTech · HealthTech · CleanTech · AI/ML
-  Logistics · E-commerce · Web3 · Hardware · Consumer · B2B · Other
-
-  STARTED DATE *
-  date input, default: today
-  Shows which year/month this will appear on the timeline below the field:
-  Space Grotesk 10px rgba(255,255,255,0.25) "Will appear at Jun 2024 on your timeline"
-  Updates live as date changes
-
-  STATUS
-  pill selector row: Active · Pivot · Paused
-  default: Active selected
-
-  LOGO (optional)
-  compact version of logo upload:
-  40×40px drop zone inline + "Upload logo" label beside it
-  Same file handling as full logo system above
-
-FOOTER:
-  Left: [Cancel]  Right: [Add to Timeline →]
-  Both use universal button styles
-
-VALIDATION:
-  Name required — if empty and save clicked:
-    input border → rgba(255,255,255,0.4)
-    shake animation: translateX -4px → +4px → 0, 3 cycles, 300ms
-    below input: Space Grotesk 10px rgba(255,255,255,0.4) "Name is required"
-  Date required — same treatment
-
-ON SUCCESSFUL SAVE:
-  1. Modal closes with scale+opacity out animation
-  2. Canvas navigates to the new venture's date position (650ms)
-  3. New card spawns with scale 0.8→1 + opacity 0→1 + glow pulse
-  4. Left panel list updates: new row slides in from top
-  5. Toast: "FreightOS Node added to 2024"
-
-8. EVENT LOG PANEL — DEEP FUNCTIONALITY
-Opens as right slide panel (same container as Modify panel)
-Header: <Plus /> "Log Event" Montserrat 500 24px
-
-FIELDS:
-
-  VENTURE *
-  Searchable dropdown — pre-selected if opened from a card
-  Shows logo thumbnail + venture name in dropdown options
-
-  DATE *
-  date input, default today
-  Shows relative label: "Today" / "3 days ago" / "Last week"
-  Space Grotesk 10px rgba(255,255,255,0.3) beside the date field
-
-  EVENT TYPE *
-  Icon + label pill grid (3 per row):
-  Each pill: Lucide icon 12px + Space Grotesk 10px label
-  <Flag /> Milestone    <Rocket /> Launch      <DollarSign /> Funding
-  <Users /> Team        <RefreshCw /> Pivot     <AlertTriangle /> Setback
-  <LogOut /> Exit       <GitBranch /> Decision  <BookOpen /> Lesson
-  <Heart /> Feeling     <Circle /> Other
-  Selected pill: background rgba(255,255,255,0.1), border rgba(255,255,255,0.3)
-
-  TITLE *
-  text input, 60 char max
-  char counter bottom-right
-
-  NOTES
-  textarea, 4 rows, expandable by drag
-
-  MOOD (optional)
-  horizontal pill row, smaller pills, single select:
-  ⚡ Energized · ◎ Focused · ? Uncertain · ↯ Lost · ✦ Proud · ↩ Regretful · ⬡ Burned Out
-  Space Grotesk 9px
-
-  IMPACT (optional)
-  4 pills: Low · Medium · High · Critical
-
-  [+ Add depth] toggle link — Space Grotesk 10px rgba(255,255,255,0.3)
-  Expands to reveal:
-    LESSON LEARNED textarea "What did this teach you?"
-    WHAT YOU'D DO DIFFERENTLY textarea "Looking back..."
-
-  LINK URL
-  text input with <Link /> icon prefix inside field, optional
-
-FOOTER:
-  [Cancel]  [Save Event →]
-
-ON SAVE:
-  1. Panel closes
-  2. If venture card is expanded on canvas: new event dot animates onto mini timeline
-     dot spawns with scale 0.5→1 + opacity 0→1, 250ms
-  3. Right panel live feed: new entry slides in at top, pushes others down
-  4. Left panel event count updates with a brief number flash animation
-     (old number fades out, new number fades in, 300ms)
-  5. Toast: "Event logged · FreightOS Node"
-
-FINAL AUDIT CHECKLIST
-□ Zero warm colors anywhere — grep for #1a, #18, #16 warm tones and remove
-□ Zero Space Mono or Cormorant Garamond references anywhere in codebase
-□ All text uses Space Grotesk or Montserrat — check every component file
-□ All Lucide icons use strokeWidth={1.5} and no hardcoded fill colors
-□ Logo upload works: file → preview → save → renders on card
-□ Logos are always masked to 36×36 rounded square regardless of source dimensions
-□ Year click → canvas animates to that year's content
-□ Venture click (from anywhere) → canvas pans and zooms to that card
-□ New venture modal: validation, animation, canvas navigation on save
-□ Event log panel: all fields functional, saves to store, updates live feed
-□ All panels use identical input/button/label styles
-□ Custom scrollbars on all scrollable panels
-□ All animations run at 60fps — no jank
-□ NaN replaced everywhere with calculated values or "—"
+You are working on Yourpreneur Canvas — a founder-focused platform where entrepreneurs record, track, and visualize their ventures on an interactive timeline canvas. Ventures appear as nodes on a horizontal time axis, positioned by date, with events logged beneath each node. The platform syncs data from external tools (Notion, GitHub, Linear, Vercel, Product Hunt) and displays everything as a living chronicle.
+Your job is to audit the entire codebase, understand the current structure, and apply the following fixes. Do not break existing functionality. Where functionality is missing or incomplete, implement it yourself.
+
+1. DESIGN SYSTEM — UNIFY EVERYTHING
+
+Audit all components and enforce a single design token system: one background color scale, one text scale, one border radius, one spacing scale, one color palette for statuses (ACTIVE = teal, PIVOT = amber/coral, ARCHIVED = grey, ACQUIRED = gold)
+All cards, panels, sidebars, modals must share the same border style, corner radius, and background opacity
+Typography must be consistent — one font, defined size scale (xs/sm/base/lg/xl), no random sizing
+All icon sizes must be uniform across toolbar, sidebar, and feed
+Fix all grammar bugs — "1 EVENTS" → "1 EVENT", "2 EVENTS" stays — apply pluralization logic globally
+Remove or replace any placeholder/test data visible in the UI (e.g. entries named "Fuckedup", "N" initials, "UNASSIGNED" labels)
+The bottom toolbar icons must all be the same size, weight, and style — audit and normalize them
+
+
+2. CANVAS
+
+The timeline rail must span the full canvas width with consistent month labels (JAN, FEB... DEC) at equal intervals — never cut off at edges, always fade out gracefully with a gradient mask
+Every node card on the canvas must have a visible, clean vertical line connecting it to its exact dot position on the timeline rail — no floating cards
+Nodes positioned above the timeline = pre-launch / ideation phase. Nodes below = active / launched. Add a faint label on left edge of canvas: "IDEATION" above the rail, "ACTIVE" below. This makes the vertical axis meaningful
+All node cards must be the same base size — do not scale them by zoom proximity. Zoom affects the canvas, not individual card sizes
+Orphaned timeline dots (dots with no connected card) must either show a tooltip on hover explaining what they are, or be removed if they serve no purpose
+The large year watermark (e.g. "2024", "2025") in the canvas background is good — keep it, ensure it doesn't interfere with card readability
+Canvas must support free drag of node cards. Dragging a node horizontally updates its date. Dragging vertically moves it above/below the rail
+Add subtle edge fade (gradient mask) on all four sides of the canvas to communicate it is scrollable/pannable in all directions
+Add a "Fit to Screen" button next to the zoom percentage indicator — clicking it resets zoom and centers all nodes
+
+
+3. RIGHT PANEL — UNIFIED CONTEXT PANEL
+This is the most important structural change. Replace the current separate Live Feed with a unified right-side context panel that has two states:
+Default state (no node selected):
+
+Show Live Feed (synced + auto events in a scrollable list)
+Each feed item must show: venture avatar, venture name, event title, date, source (via notion / via github etc.)
+Every feed item must have a consistent layout — no missing dates, no missing sources
+"MOMENTUM" section: implement it — show a simple spark chart of events logged per week over last 8 weeks. If no data, show empty state message "Log events to see momentum" not a blank section
+SYNCED and AUTO counters at top of panel are good — keep them
+
+Selected state (user clicks a node on canvas):
+
+Panel slides to show that venture's detail view
+Top: venture name, category badge, status badge, health score with sparkline, sync source
+Middle: scrollable event list for that venture — each event shows icon ($ for funding, 🚀 for launch, 📦 for product, ⚙️ for ops), title, date, source
+"+ ADD EVENT" button opens an inline form directly in this panel — fields: event type (dropdown), title, date, notes, source. Submitting adds it to the timeline and live feed
+Bottom: venture-specific TASKS section — a simple checklist. Each task has: title, due date, status (TODO / IN PROGRESS / DONE). "Add task" inline. Tasks are stored per venture
+A close/back arrow at top of panel returns to default Live Feed state
+This means users never need a separate modal or page to log events or manage tasks — everything happens in this panel
+
+
+4. SIDEBAR
+
+Fix the bottom user indicator — it shows "N" with "Last activity: Xm ago" — replace "N" with the actual user avatar initial pulled from the founder profile, styled consistently with other avatars in the app
+"Find a venture" search in sidebar: scope it to filter the sidebar portfolio list AND highlight matching nodes on the canvas. Differentiate it from global search in the top bar (global search searches everything including events)
+Portfolio list items: clicking one must pan and center the canvas to that venture's node with a smooth animation
+Event count next to each venture in sidebar must reflect a timeframe — either total or "this year" — add a small label so it's clear. Example: "2 EVENTS THIS YEAR"
+Sidebar collapse arrow (top right of sidebar) must work — collapse sidebar to icon-only rail, expand on click
+
+
+5. NODE CARD DETAIL
+
+Every node card must have a consistent layout: category label top left, avatar top right, venture name large, health score + sparkline, status badge, sync source label
+Health score must be a real calculated value — define the formula: (events logged in last 30 days × 10) + (sync active ? 20 : 0) + (tasks completed ratio × 30), capped at 100. Implement this
+Clicking a node on canvas: card does a subtle scale-up (1.0 → 1.04), right panel switches to that venture's context (see section 3)
+Do not open a floating modal over the canvas — all detail lives in the right panel
+"Spinoff" relationship label between nodes is good — also support "Pivot", "Acquired by", "Merged with" — render as a labeled curved line between the two related nodes
+
+
+6. HEADER
+
+"PRIVATE" button must toggle the canvas between private and public shareable view — implement share URL generation when switched to public
+Zoom percentage must always reflect actual canvas zoom — clicking it resets to 100%
+The sync/history icon next to zoom must open a small dropdown showing last 5 sync events with timestamps
+"PROFILE PANEL READY" / "BILLING WORKSPACE READY" / "SYNCED 2M AGO" status messages in header subline — these are contextual, keep them but ensure they cycle or update dynamically based on actual app state, not hardcoded strings
+Notification bell must show a badge count when there are unread live feed items
+
+
+7. TASK CANVAS MODE
+
+"TASK CANVAS" button in header switches the main canvas to a task-focused view
+In this mode, each venture node expands to show its task list inline on the canvas
+Tasks can be dragged between ventures
+A global task list appears in the right panel showing all tasks across all ventures, filterable by status and venture
+Switching back to Chronicle mode returns the canvas to the timeline view — preserve zoom and pan position
+
+
+8. TOOLBAR
+
+All toolbar buttons must have keyboard shortcuts — implement them and display them in a tooltip on hover (e.g. "NEW · N", "FOCUS · F", "AXIS · A")
+"HOVER FOR KEYS" hint next to CANVAS TOOLS — clicking it should open a keyboard shortcut legend overlay
+LOG tool: opens the right panel ADD EVENT form for the currently selected venture, or prompts to select a venture first if none selected
+COACH tool: opens an AI-powered suggestion panel in the right panel — "Based on your last activity, here's what to focus on this week" — implement with a simple heuristic (e.g. if no events logged in 14 days, suggest logging a status update)
+REVIEW tool: generates a text summary of the selected year's activity across all ventures — render it in the right panel as a readable chronicle entry
+
+
+9. ONBOARDING — EMPTY STATES
+
+If a user has 0 ventures: canvas shows a centered prompt "Start your chronicle — add your first venture" with a large "+ NEW VENTURE" button in the middle of the canvas
+If a venture has 0 events: its node shows a pulsing ring and a tooltip "Log your first event for [venture name]"
+If no integrations connected: Live Feed shows "Connect Notion, GitHub, or Linear to start syncing events automatically" with integration icons as buttons
+
+
+10. GENERAL CODE QUALITY
+
+Remove all hardcoded placeholder strings from the UI
+All dates must format consistently: "Mar 1, 2025" — no mixing of formats
+All async data fetches must have loading states — show a skeleton loader, not a blank space
+All interactive elements must have hover states — buttons, cards, feed items, toolbar icons
+Test the full flow: create venture → log event → view on canvas → view in feed → add task → complete task → check health score updates
+

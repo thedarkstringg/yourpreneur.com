@@ -19,7 +19,7 @@ export default function NewVentureDialog({
     startedDate: new Date().toISOString().split('T')[0],
   });
 
-  const handleChange = (key: keyof Venture, value: any) => {
+  const handleChange = (key: keyof Venture, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [key]: value,
@@ -37,7 +37,7 @@ export default function NewVentureDialog({
       name: formData.name || '',
       description: formData.description || '',
       industry: formData.industry || '',
-      status: (formData.status as any) || 'active',
+      status: (formData.status as Venture['status']) || 'active',
       startedDate: formData.startedDate || '',
       color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
     };

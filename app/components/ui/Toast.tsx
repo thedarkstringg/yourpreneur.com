@@ -10,10 +10,11 @@ export interface Toast {
   duration?: number;
 }
 
-const toastStore: { toasts: Toast[]; listeners: Set<Function> } = {
+const toastStore: { toasts: Toast[]; listeners: Set<() => void> } = {
   toasts: [],
   listeners: new Set(),
 };
+let toastCounter = 0;
 
 export function useToasts() {
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -28,7 +29,7 @@ export function useToasts() {
   }, []);
 
   const addToast = (type: Toast['type'], message: string, duration = 2500) => {
-    const id = Math.random().toString(36);
+    const id = `toast-${toastCounter++}`;
     const toast: Toast = { id, type, message, duration };
 
     toastStore.toasts.push(toast);
@@ -84,7 +85,7 @@ export default function ToastContainer() {
               display: 'flex',
               alignItems: 'center',
               gap: '10px',
-              fontFamily: "'Space Grotesk', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: '10px',
               color: 'rgba(255,255,255,0.75)',
               backdropFilter: 'blur(16px)',

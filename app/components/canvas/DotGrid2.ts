@@ -6,7 +6,7 @@ export class DotGrid extends Container {
   private gridSize = 28; // pixels between dots (spec)
   private dotRadius = 1; // radius in px
   private mousePos = new Point(0, 0);
-  private influenceRadius = 120; // how far from cursor dots are affected
+  private influenceRadius = 70; // how far from cursor dots are affected
   private graphicsMap: Map<string, Graphics> = new Map();
 
   constructor() {
@@ -27,7 +27,7 @@ export class DotGrid extends Container {
 
     ctx.clearRect(0, 0, size, size);
     // Very subtle white dot per spec
-    ctx.fillStyle = 'rgba(255,255,255,0.07)';
+    ctx.fillStyle = 'rgba(255,255,255,0.035)';
     ctx.beginPath();
     ctx.arc(size / 2, size / 2, this.dotRadius, 0, Math.PI * 2);
     ctx.fill();
@@ -49,11 +49,11 @@ export class DotGrid extends Container {
     if (this.tilingSprite) {
       // Very subtle, do not emphasize on zoom
       if (zoomLevel < 0.5) {
-        this.tilingSprite.alpha = 0.06;
+        this.tilingSprite.alpha = 0.035;
       } else if (zoomLevel > 2) {
-        this.tilingSprite.alpha = 0.08;
+        this.tilingSprite.alpha = 0.045;
       } else {
-        this.tilingSprite.alpha = 0.07;
+        this.tilingSprite.alpha = 0.04;
       }
     }
   }
@@ -71,6 +71,7 @@ export class DotGrid extends Container {
   }
 
   updateMousePosition(globalX: number, globalY: number) {
+    if (this.destroyed || !this.parent) return;
     this.mousePos.set(globalX, globalY);
     this.updateInteractiveDots();
   }
@@ -103,8 +104,8 @@ export class DotGrid extends Container {
         if (distance <= this.influenceRadius) {
           const influence = 1 - distance / this.influenceRadius;
           const expandedRadius = this.dotRadius + influence * 1.5;
-          let opacity = 0.07 + influence * 0.93;
-          if (influence > 0.85) opacity = 1; // very close = fully opaque
+          let opacity = 0.04 + influence * 0.34;
+          if (influence > 0.9) opacity = 0.46;
 
           const pushDistance = influence * 10;
           const angle = Math.atan2(dotY - y, dotX - x);
@@ -120,7 +121,7 @@ export class DotGrid extends Container {
           gfx.alpha = 1;
         } else {
           gfx.clear();
-          gfx.beginFill(0xffffff, 0.07);
+          gfx.beginFill(0xffffff, 0.035);
           gfx.drawCircle(0, 0, this.dotRadius);
           gfx.endFill();
           gfx.x = dotX;

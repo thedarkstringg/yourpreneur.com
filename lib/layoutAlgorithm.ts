@@ -41,8 +41,8 @@ export function calculateLayout(ventures: Venture[]): LayoutResult {
     return months * MONTH_WIDTH + dayProgress * MONTH_WIDTH;
   }
 
-  // Build year positions map
-  const allYears = new Set<number>();
+  // Build a stable axis from 2022-2026 so navigation and empty years remain visible.
+  const allYears = new Set<number>([2022, 2023, 2024, 2025, 2026]);
   ventures.forEach((v) => {
     allYears.add(new Date(v.startedDate).getFullYear());
   });
@@ -59,10 +59,11 @@ export function calculateLayout(ventures: Venture[]): LayoutResult {
   const branches = ventures.filter((v) => v.parentId);
 
   // Position root ventures
-  const rootPositions = new Map<string, { x: number; stemLevel: number }>();
+  const rootPositions = new Map<string, { x: number; stemLevel: number; side: 'above' | 'below' }>();
 
   rootVentures.forEach((venture) => {
-    const x = dateToX(venture.startedDate);
+    const x = venture.position?.x ?? dateToX(venture.startedDate);
+    const side = venture.timelineSide || 'below';
 
     // Detect overlaps with other ventures at similar X positions
     let stemLevel = 0;
@@ -70,13 +71,19 @@ export function calculateLayout(ventures: Venture[]): LayoutResult {
     while (overlap) {
       overlap = false;
       const currentStemHeight = STEM_HEIGHT_BASE + stemLevel * STEM_OVERLAP_OFFSET;
-      const currentY = TIMELINE_Y + currentStemHeight + NODE_HEIGHT;
+      const currentY =
+        side === 'above'
+          ? TIMELINE_Y - currentStemHeight - NODE_HEIGHT - 20
+          : TIMELINE_Y + currentStemHeight;
       const currentCardBottom = currentY + NODE_HEIGHT;
 
       // Check if this position overlaps with any other positioned venture
       rootPositions.forEach((pos) => {
         const otherStemHeight = STEM_HEIGHT_BASE + pos.stemLevel * STEM_OVERLAP_OFFSET;
-        const otherY = TIMELINE_Y + otherStemHeight + NODE_HEIGHT;
+        const otherY =
+          pos.side === 'above'
+            ? TIMELINE_Y - otherStemHeight - NODE_HEIGHT - 20
+            : TIMELINE_Y + otherStemHeight;
         const otherCardBottom = otherY + NODE_HEIGHT;
 
         // Cards overlap if X ranges overlap and Y ranges overlap
@@ -92,17 +99,23 @@ export function calculateLayout(ventures: Venture[]): LayoutResult {
     }
 
     const stemHeight = STEM_HEIGHT_BASE + stemLevel * STEM_OVERLAP_OFFSET;
-    const y = TIMELINE_Y + stemHeight + NODE_HEIGHT;
+    const y = venture.position?.y ?? (side === 'above' ? TIMELINE_Y - stemHeight - NODE_HEIGHT - 20 : TIMELINE_Y + stemHeight);
+
+    const actualStemHeight = venture.position
+      ? y < TIMELINE_Y
+        ? -(TIMELINE_Y - (y + NODE_HEIGHT + 20))
+        : y - TIMELINE_Y
+      : side === 'above' ? -stemHeight : stemHeight;
 
     positions.set(venture.id, {
       x,
-      y: y - NODE_HEIGHT, // Top of card
+      y,
       width: NODE_WIDTH,
       height: NODE_HEIGHT,
-      stemHeight,
+      stemHeight: actualStemHeight,
     });
 
-    rootPositions.set(venture.id, { x, stemLevel });
+    rootPositions.set(venture.id, { x, stemLevel, side });
   });
 
   // Position branch ventures
@@ -129,7 +142,6 @@ export function calculateLayout(ventures: Venture[]): LayoutResult {
       positions.forEach((pos) => {
         if (pos.stemHeight === undefined) return;
 
-        const otherStemHeight = pos.stemHeight;
         const otherY = pos.y;
         const otherCardBottom = otherY + NODE_HEIGHT;
 
