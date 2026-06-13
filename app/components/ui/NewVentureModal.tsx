@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react';
 import { X, Plus, Upload } from 'lucide-react';
 import { useToasts } from './Toast';
+import { colors, spacing, radius, typography, transitions, shadows, components } from '@/styles/tokens';
 
 interface NewVentureModalProps {
   isOpen: boolean;
@@ -96,10 +97,10 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
         style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(0,0,0,0.5)',
+          background: 'rgba(0,0,0,0.4)',
           backdropFilter: 'blur(4px)',
           zIndex: 500,
-          animation: 'fadeIn 250ms ease',
+          animation: `fadeIn ${transitions.fast}`,
         }}
         onClick={onClose}
       />
@@ -111,16 +112,16 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          background: '#0f0f0f',
-          border: '1px solid rgba(255,255,255,0.1)',
-          borderRadius: '14px',
-          padding: '32px',
-          width: '440px',
+          background: colors.background.base,
+          border: `1px solid ${colors.border.default}`,
+          borderRadius: radius.lg,
+          padding: spacing['2xl'],
+          width: 440,
           maxHeight: '90vh',
           overflowY: 'auto',
-          boxShadow: '0 32px 80px rgba(0,0,0,0.8)',
+          boxShadow: shadows.elevated,
           zIndex: 501,
-          animation: 'modalOpen 250ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+          animation: `modalOpen ${transitions.spring}`,
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -129,17 +130,17 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '10px',
-            marginBottom: '24px',
+            gap: spacing.sm,
+            marginBottom: spacing.lg,
           }}
         >
-          <Plus size={16} strokeWidth={1.5} style={{ color: 'rgba(255,255,255,0.4)' }} />
+          <Plus size={16} strokeWidth={1.5} style={{ color: colors.text.secondary }} />
           <h2
             style={{
-              fontFamily: "'Montserrat', sans-serif",
-              fontSize: '24px',
-              fontWeight: 500,
-              color: 'rgba(255,255,255,0.9)',
+              fontFamily: typography.family.display,
+              fontSize: typography.size['2xl'],
+              fontWeight: typography.weight.medium,
+              color: colors.text.primary,
               margin: 0,
             }}
           >
@@ -152,30 +153,30 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              color: 'rgba(255,255,255,0.4)',
-              padding: '4px',
-              transition: 'color 150ms',
+              color: colors.text.secondary,
+              padding: spacing.xs,
+              transition: transitions.default,
             }}
-            onMouseOver={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.8)')}
-            onMouseOut={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}
+            onMouseOver={(e) => (e.currentTarget.style.color = colors.text.primary)}
+            onMouseOut={(e) => (e.currentTarget.style.color = colors.text.secondary)}
           >
             <X size={20} strokeWidth={1.5} />
           </button>
         </div>
 
-        <div style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', marginBottom: '24px' }} />
+        <div style={{ borderBottom: `1px solid ${colors.border.subtle}`, marginBottom: spacing.lg }} />
 
         {/* Form Fields */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.md }}>
           <div>
             <label
               style={{
                 display: 'block',
-                fontSize: '9px',
-                color: 'rgba(255,255,255,0.25)',
+                fontSize: typography.size.xs,
+                color: colors.text.tertiary,
                 textTransform: 'uppercase',
                 letterSpacing: '0.18em',
-                marginBottom: '8px',
+                marginBottom: spacing.sm,
               }}
             >
               Venture Logo
@@ -191,24 +192,24 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
               onClick={() => logoInputRef.current?.click()}
               style={{
                 width: '100%',
-                minHeight: '58px',
-                border: '1px dashed rgba(255,255,255,0.16)',
-                borderRadius: '10px',
-                background: 'rgba(255,255,255,0.025)',
-                color: 'rgba(255,255,255,0.58)',
+                minHeight: 58,
+                border: `1px dashed ${colors.border.default}`,
+                borderRadius: radius.md,
+                background: colors.background.surface,
+                color: colors.text.secondary,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '10px',
+                gap: spacing.sm,
                 cursor: 'pointer',
               }}
             >
               {logoUrl ? (
                 <span
                   style={{
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '9px',
+                    width: 36,
+                    height: 36,
+                    borderRadius: radius.sm,
                     backgroundImage: `url(${logoUrl})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
@@ -226,11 +227,11 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
             <label
               style={{
                 display: 'block',
-                fontSize: '9px',
-                color: 'rgba(255,255,255,0.25)',
+                fontSize: typography.size.xs,
+                color: colors.text.tertiary,
                 textTransform: 'uppercase',
                 letterSpacing: '0.18em',
-                marginBottom: '8px',
+                marginBottom: spacing.sm,
               }}
             >
               Venture Name *
@@ -251,38 +252,38 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
                 autoFocus
                 style={{
                   width: '100%',
-                  background: 'rgba(255,255,255,0.03)',
-                  border: errors.name ? '1px solid rgba(255,255,255,0.4)' : '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: '6px',
-                  padding: '11px 14px',
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: '13px',
-                  color: 'rgba(255,255,255,0.8)',
+                  background: colors.background.surface,
+                  border: errors.name ? `1px solid ${colors.border.strong}` : `1px solid ${colors.border.default}`,
+                  borderRadius: radius.sm,
+                  padding: `${spacing.xs + 3}px ${spacing.sm - 2}px`,
+                  fontFamily: typography.family.base,
+                  fontSize: typography.size.base,
+                  color: colors.text.primary,
                   outline: 'none',
-                  transition: 'border 180ms ease, background 180ms ease',
+                  transition: `border ${transitions.default}, background ${transitions.default}`,
                   boxSizing: 'border-box',
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.22)';
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                  e.currentTarget.style.borderColor = colors.border.strong;
+                  e.currentTarget.style.background = colors.background.elevated;
                 }}
                 onBlur={(e) => {
-                  e.currentTarget.style.borderColor = errors.name ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.08)';
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+                  e.currentTarget.style.borderColor = errors.name ? colors.border.strong : colors.border.default;
+                  e.currentTarget.style.background = colors.background.surface;
                 }}
               />
             </div>
             {errors.name && (
-              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', marginTop: '4px' }}>
+              <div style={{ fontSize: typography.size.xs, color: colors.status.failed, marginTop: spacing.xs }}>
                 {errors.name}
               </div>
             )}
             <div
               style={{
-                fontSize: '10px',
-                color: 'rgba(255,255,255,0.2)',
+                fontSize: typography.size.xs,
+                color: colors.text.disabled,
                 textAlign: 'right',
-                marginTop: '4px',
+                marginTop: spacing.xs,
               }}
             >
               {name.length}/60
@@ -294,11 +295,11 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
             <label
               style={{
                 display: 'block',
-                fontSize: '9px',
-                color: 'rgba(255,255,255,0.25)',
+                fontSize: typography.size.xs,
+                color: colors.text.tertiary,
                 textTransform: 'uppercase',
                 letterSpacing: '0.18em',
-                marginBottom: '8px',
+                marginBottom: spacing.sm,
               }}
             >
               One-line Description
@@ -310,24 +311,24 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
               placeholder="In one sentence..."
               style={{
                 width: '100%',
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: '6px',
-                padding: '11px 14px',
-                fontFamily: "'Inter', sans-serif",
-                fontSize: '13px',
-                color: 'rgba(255,255,255,0.8)',
+                background: colors.background.surface,
+                border: `1px solid ${colors.border.default}`,
+                borderRadius: radius.sm,
+                padding: `${spacing.xs + 3}px ${spacing.sm - 2}px`,
+                fontFamily: typography.family.base,
+                fontSize: typography.size.base,
+                color: colors.text.primary,
                 outline: 'none',
-                transition: 'border 180ms ease, background 180ms ease',
+                transition: `border ${transitions.default}, background ${transitions.default}`,
                 boxSizing: 'border-box',
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.22)';
-                e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                e.currentTarget.style.borderColor = colors.border.strong;
+                e.currentTarget.style.background = colors.background.elevated;
               }}
               onBlur={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-                e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+                e.currentTarget.style.borderColor = colors.border.default;
+                e.currentTarget.style.background = colors.background.surface;
               }}
             />
           </div>
@@ -337,11 +338,11 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
             <label
               style={{
                 display: 'block',
-                fontSize: '9px',
-                color: 'rgba(255,255,255,0.25)',
+                fontSize: typography.size.xs,
+                color: colors.text.tertiary,
                 textTransform: 'uppercase',
                 letterSpacing: '0.18em',
-                marginBottom: '8px',
+                marginBottom: spacing.sm,
               }}
             >
               Industry
@@ -351,29 +352,29 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
               onChange={(e) => setIndustry(e.target.value)}
               style={{
                 width: '100%',
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: '6px',
-                padding: '11px 14px',
-                fontFamily: "'Inter', sans-serif",
-                fontSize: '13px',
-                color: 'rgba(255,255,255,0.8)',
+                background: colors.background.surface,
+                border: `1px solid ${colors.border.default}`,
+                borderRadius: radius.sm,
+                padding: `${spacing.xs + 3}px ${spacing.sm - 2}px`,
+                fontFamily: typography.family.base,
+                fontSize: typography.size.base,
+                color: colors.text.primary,
                 outline: 'none',
-                transition: 'border 180ms ease, background 180ms ease',
+                transition: `border ${transitions.default}, background ${transitions.default}`,
                 boxSizing: 'border-box',
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.22)';
-                e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                e.currentTarget.style.borderColor = colors.border.strong;
+                e.currentTarget.style.background = colors.background.elevated;
               }}
               onBlur={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-                e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+                e.currentTarget.style.borderColor = colors.border.default;
+                e.currentTarget.style.background = colors.background.surface;
               }}
             >
               <option value="">Select industry...</option>
               {industries.map((ind) => (
-                <option key={ind} value={ind} style={{ background: '#0f0f0f', color: 'rgba(255,255,255,0.8)' }}>
+                <option key={ind} value={ind} style={{ background: colors.background.base, color: colors.text.primary }}>
                   {ind}
                 </option>
               ))}
@@ -385,11 +386,11 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
             <label
               style={{
                 display: 'block',
-                fontSize: '9px',
-                color: 'rgba(255,255,255,0.25)',
+                fontSize: typography.size.xs,
+                color: colors.text.tertiary,
                 textTransform: 'uppercase',
                 letterSpacing: '0.18em',
-                marginBottom: '8px',
+                marginBottom: spacing.sm,
               }}
             >
               Started Date *
@@ -403,31 +404,31 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
               }}
               style={{
                 width: '100%',
-                background: 'rgba(255,255,255,0.03)',
-                border: errors.startDate ? '1px solid rgba(255,255,255,0.4)' : '1px solid rgba(255,255,255,0.08)',
-                borderRadius: '6px',
-                padding: '11px 14px',
-                fontFamily: "'Inter', sans-serif",
-                fontSize: '13px',
-                color: 'rgba(255,255,255,0.8)',
+                background: colors.background.surface,
+                border: errors.startDate ? `1px solid ${colors.border.strong}` : `1px solid ${colors.border.default}`,
+                borderRadius: radius.sm,
+                padding: `${spacing.xs + 3}px ${spacing.sm - 2}px`,
+                fontFamily: typography.family.base,
+                fontSize: typography.size.base,
+                color: colors.text.primary,
                 outline: 'none',
-                transition: 'border 180ms ease, background 180ms ease',
+                transition: `border ${transitions.default}, background ${transitions.default}`,
                 boxSizing: 'border-box',
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.22)';
-                e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                e.currentTarget.style.borderColor = colors.border.strong;
+                e.currentTarget.style.background = colors.background.elevated;
               }}
               onBlur={(e) => {
-                e.currentTarget.style.borderColor = errors.startDate ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.08)';
-                e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+                e.currentTarget.style.borderColor = errors.startDate ? colors.border.strong : colors.border.default;
+                e.currentTarget.style.background = colors.background.surface;
               }}
             />
-            <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.25)', marginTop: '4px' }}>
+            <div style={{ fontSize: typography.size.xs, color: colors.text.tertiary, marginTop: spacing.xs }}>
               Will appear at {getTimelinePosition()} on your timeline
             </div>
             {errors.startDate && (
-              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', marginTop: '4px' }}>
+              <div style={{ fontSize: typography.size.xs, color: colors.status.failed, marginTop: spacing.xs }}>
                 {errors.startDate}
               </div>
             )}
@@ -438,42 +439,42 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
             <label
               style={{
                 display: 'block',
-                fontSize: '9px',
-                color: 'rgba(255,255,255,0.25)',
+                fontSize: typography.size.xs,
+                color: colors.text.tertiary,
                 textTransform: 'uppercase',
                 letterSpacing: '0.18em',
-                marginBottom: '8px',
+                marginBottom: spacing.sm,
               }}
             >
               Status
             </label>
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: spacing.sm }}>
               {['Active', 'Stealth', 'Graveyard', 'Pivot', 'Paused', 'Archived'].map((s) => (
                 <button
                   key={s}
                   onClick={() => setStatus(s.toLowerCase())}
                   style={{
                     flex: 1,
-                    border: status === s.toLowerCase() ? '1px solid rgba(255,255,255,0.3)' : '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '999px',
-                    padding: '7px 14px',
-                    fontFamily: "'Inter', sans-serif",
-                    fontSize: '10px',
-                    fontWeight: 500,
-                    color: status === s.toLowerCase() ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)',
-                    background: status === s.toLowerCase() ? 'rgba(255,255,255,0.1)' : 'transparent',
+                    border: status === s.toLowerCase() ? `1px solid ${colors.border.strong}` : `1px solid ${colors.border.subtle}`,
+                    borderRadius: radius.full,
+                    padding: `${spacing.xs - 1}px ${spacing.sm}px`,
+                    fontFamily: typography.family.base,
+                    fontSize: typography.size.xs,
+                    fontWeight: typography.weight.medium,
+                    color: status === s.toLowerCase() ? colors.text.primary : colors.text.disabled,
+                    background: status === s.toLowerCase() ? colors.border.default : 'transparent',
                     cursor: 'pointer',
                     textTransform: 'uppercase',
-                    transition: 'all 150ms',
+                    transition: `all ${transitions.fast}`,
                   }}
                   onMouseOver={(e) => {
                     if (status !== s.toLowerCase()) {
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
+                      e.currentTarget.style.borderColor = colors.border.default;
                     }
                   }}
                   onMouseOut={(e) => {
                     if (status !== s.toLowerCase()) {
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                      e.currentTarget.style.borderColor = colors.border.subtle;
                     }
                   }}
                 >
@@ -485,29 +486,29 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
         </div>
 
         {/* Footer */}
-        <div style={{ marginTop: '32px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '24px', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+        <div style={{ marginTop: spacing['2xl'], borderTop: `1px solid ${colors.border.subtle}`, paddingTop: spacing['2xl'], display: 'flex', gap: spacing.md, justifyContent: 'flex-end' }}>
           <button
             onClick={onClose}
             style={{
               background: 'transparent',
-              border: '1px solid rgba(255,255,255,0.12)',
-              borderRadius: '999px',
-              padding: '9px 20px',
-              fontFamily: "'Inter', sans-serif",
-              fontSize: '11px',
-              fontWeight: 500,
-              color: 'rgba(255,255,255,0.5)',
+              border: `1px solid ${colors.border.default}`,
+              borderRadius: radius.full,
+              padding: `${spacing.xs + 2}px ${spacing.lg}px`,
+              fontFamily: typography.family.base,
+              fontSize: typography.size.xs,
+              fontWeight: typography.weight.medium,
+              color: colors.text.secondary,
               textTransform: 'uppercase',
               cursor: 'pointer',
-              transition: 'all 150ms',
+              transition: `all ${transitions.fast}`,
             }}
             onMouseOver={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)';
-              e.currentTarget.style.color = 'rgba(255,255,255,0.8)';
+              e.currentTarget.style.borderColor = colors.border.strong;
+              e.currentTarget.style.color = colors.text.primary;
             }}
             onMouseOut={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)';
-              e.currentTarget.style.color = 'rgba(255,255,255,0.5)';
+              e.currentTarget.style.borderColor = colors.border.default;
+              e.currentTarget.style.color = colors.text.secondary;
             }}
           >
             Cancel
@@ -515,21 +516,21 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
           <button
             onClick={handleSubmit}
             style={{
-              background: 'rgba(255,255,255,0.92)',
+              background: colors.text.primary,
               border: 'none',
-              borderRadius: '999px',
-              padding: '10px 24px',
-              fontFamily: "'Inter', sans-serif",
-              fontSize: '11px',
-              fontWeight: 600,
-              color: '#080808',
+              borderRadius: radius.full,
+              padding: `${spacing.xs + 2}px ${spacing.lg}px`,
+              fontFamily: typography.family.base,
+              fontSize: typography.size.xs,
+              fontWeight: typography.weight.semibold,
+              color: colors.background.base,
               textTransform: 'uppercase',
               letterSpacing: '0.08em',
               cursor: 'pointer',
-              transition: 'opacity 150ms',
+              transition: `opacity ${transitions.fast}`,
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: spacing.xs,
             }}
             onMouseOver={(e) => (e.currentTarget.style.opacity = '0.85')}
             onMouseOut={(e) => (e.currentTarget.style.opacity = '1')}

@@ -3,6 +3,7 @@
 import { Activity, Bot, Cable, ChevronLeft, ChevronRight, CircleDot, Database, Edit3, Flame, Radio, Zap } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useStore, Venture } from '@/lib/useStore';
+import { colors, spacing, radius, layout, transitions } from '@/styles/tokens';
 
 export default function RightPanel({
   ventures = [],
@@ -72,26 +73,53 @@ export default function RightPanel({
         style={{
           position: 'fixed',
           right: 0,
-          top: '64px',
-          width: '48px',
-          height: 'calc(100vh - 64px)',
-          background: 'rgba(5,5,5,0.72)',
-          borderLeft: '1px solid rgba(255,255,255,0.08)',
+          top: `${layout.header.height}px`,
+          width: `${layout.sidebar.collapsedWidth}px`,
+          height: `calc(100vh - ${layout.header.height}px)`,
+          background: colors.background.base,
+          borderLeft: `1px solid ${colors.border.default}`,
           backdropFilter: 'blur(22px)',
-          zIndex: 90,
+          zIndex: layout.sidebar.zIndex,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          paddingTop: '18px',
-          gap: '14px',
+          paddingTop: 18,
+          gap: 14,
           fontFamily: "'Inter', sans-serif",
         }}
       >
-        <button onClick={onToggleCollapsed} style={collapseButtonStyle} aria-label="Expand right panel">
+        <button onClick={onToggleCollapsed} style={{
+          width: 28,
+          height: 28,
+          borderRadius: '50%',
+          border: `1px solid ${colors.border.subtle}`,
+          background: colors.background.surface,
+          color: colors.text.secondary,
+          display: 'grid',
+          placeItems: 'center',
+          cursor: 'pointer',
+        }} aria-label="Expand right panel">
           <ChevronLeft size={15} />
         </button>
-        <div style={railMarkStyle}>{allEvents.length}</div>
-        <div style={{ writingMode: 'vertical-rl', color: 'rgba(255,255,255,0.34)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
+        <div style={{
+          width: 28,
+          height: 28,
+          borderRadius: radius.md,
+          display: 'grid',
+          placeItems: 'center',
+          color: colors.background.base,
+          background: colors.text.primary,
+          fontFamily: "'Plus Jakarta Sans', sans-serif",
+          fontWeight: 900,
+          fontSize: 13,
+        }}>{allEvents.length}</div>
+        <div style={{
+          writingMode: 'vertical-rl',
+          color: colors.text.tertiary,
+          fontSize: 10,
+          textTransform: 'uppercase',
+          letterSpacing: '0.12em',
+        }}>
           Live feed
         </div>
       </div>
@@ -103,15 +131,15 @@ export default function RightPanel({
       style={{
         position: 'fixed',
         right: 0,
-        top: '64px',
-        width: '238px',
-        height: 'calc(100vh - 64px)',
-        background: 'rgba(5,5,5,0.66)',
-        borderLeft: '1px solid rgba(255,255,255,0.08)',
+        top: `${layout.header.height}px`,
+        width: 238,
+        height: `calc(100vh - ${layout.header.height}px)`,
+        background: colors.background.base,
+        borderLeft: `1px solid ${colors.border.default}`,
         backdropFilter: 'blur(22px)',
         display: 'flex',
         flexDirection: 'column',
-        zIndex: 90,
+        zIndex: layout.sidebar.zIndex,
         fontFamily: "'Inter', sans-serif",
         overflow: 'hidden',
         animation: 'slideInRight 450ms cubic-bezier(0.34, 1.56, 0.64, 1) 50ms both',
@@ -119,24 +147,45 @@ export default function RightPanel({
     >
       <div
         style={{
-          padding: '18px 16px 14px',
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          padding: `${18}px ${spacing.lg}px ${14}px`,
+          borderBottom: `1px solid ${colors.border.subtle}`,
           position: 'relative',
         }}
       >
-        <button onClick={onToggleCollapsed} style={{ ...collapseButtonStyle, position: 'absolute', right: '12px', top: '12px' }} aria-label="Collapse right panel">
+        <button onClick={onToggleCollapsed} style={{
+          position: 'absolute',
+          right: 12,
+          top: 12,
+          width: 28,
+          height: 28,
+          borderRadius: '50%',
+          border: `1px solid ${colors.border.subtle}`,
+          background: colors.background.surface,
+          color: colors.text.secondary,
+          display: 'grid',
+          placeItems: 'center',
+          cursor: 'pointer',
+        }} aria-label="Collapse right panel">
           <ChevronRight size={15} />
         </button>
-        <div style={eyebrowStyle}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: spacing.xs,
+          fontSize: 9,
+          color: colors.text.tertiary,
+          textTransform: 'uppercase',
+          letterSpacing: '0.12em',
+        }}>
           <Activity size={12} strokeWidth={1.7} />
           Live feed
         </div>
         <div
           style={{
-            marginTop: '12px',
+            marginTop: 12,
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
-            gap: '8px',
+            gap: spacing.sm,
           }}
         >
           <MiniMetric icon={Radio} value={connectedVentures.length} label="Synced" />
@@ -144,7 +193,13 @@ export default function RightPanel({
         </div>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', padding: '8px' }}>
+      <div style={{
+        flex: 1,
+        overflowY: 'auto',
+        padding: `${spacing.md}px ${spacing.xs}px`,
+        maxHeight: 'calc(100vh - 200px)',
+        scrollBehavior: 'smooth',
+      }}>
         {allEvents.length === 0 ? (
           <div
             style={{
@@ -157,9 +212,21 @@ export default function RightPanel({
               textAlign: 'center',
             }}
           >
-            <CircleDot size={34} strokeWidth={1.2} style={{ color: 'rgba(255,255,255,0.14)', marginBottom: '12px' }} />
-            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', fontWeight: 700 }}>No activity yet</div>
-            <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.28)', marginTop: '5px', lineHeight: 1.5 }}>
+            <CircleDot size={34} strokeWidth={1.2} style={{
+              color: colors.text.disabled,
+              marginBottom: 12,
+            }} />
+            <div style={{
+              fontSize: 12,
+              color: colors.text.secondary,
+              fontWeight: 700,
+            }}>No activity yet</div>
+            <div style={{
+              fontSize: 10,
+              color: colors.text.tertiary,
+              marginTop: 5,
+              lineHeight: 1.5,
+            }}>
               Log a launch, pivot, funding note, or lesson to populate this stream.
             </div>
           </div>
@@ -171,44 +238,58 @@ export default function RightPanel({
                 key={event.id}
                 style={{
                   width: '100%',
-                  padding: '10px',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                  borderRadius: '12px',
-                  background: 'rgba(255,255,255,0.028)',
+                  padding: spacing.md,
+                  border: `1px solid ${colors.border.subtle}`,
+                  borderRadius: radius.lg,
+                  background: colors.background.surface,
                   cursor: 'pointer',
-                  transition: 'background 150ms',
+                  transition: `background ${transitions.default}`,
                   display: 'grid',
                   gridTemplateColumns: '30px 1fr',
-                  gap: '10px',
+                  gap: spacing.md,
                   alignItems: 'start',
-                  marginBottom: '8px',
+                  marginBottom: spacing.sm,
                   textAlign: 'left',
                 }}
               >
-                <span style={logoStyle(event.color, event.logoUrl)}>{!event.logoUrl && event.ventureName.slice(0, 1).toUpperCase()}</span>
+                <span style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: radius.md,
+                  display: 'grid',
+                  placeItems: 'center',
+                  color: colors.background.base,
+                  fontWeight: 900,
+                  background: event.logoUrl ? `center / cover no-repeat url(${event.logoUrl})` : event.color ? `linear-gradient(145deg, ${event.color}, ${colors.text.primary})` : colors.text.primary,
+                  flexShrink: 0,
+                }}>{!event.logoUrl && event.ventureName.slice(0, 1).toUpperCase()}</span>
                 <span style={{ minWidth: 0 }}>
                   <span
                     style={{
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      gap: '8px',
-                      fontSize: '9px',
-                      color: 'rgba(255,255,255,0.38)',
+                      gap: spacing.sm,
+                      fontSize: 9,
+                      color: colors.text.tertiary,
                       textTransform: 'uppercase',
                       letterSpacing: '0.08em',
                     }}
                   >
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{event.ventureName}</span>
+                    <span style={{
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}>{event.ventureName}</span>
                     {automated ? <Database size={11} strokeWidth={1.7} /> : <Edit3 size={10} strokeWidth={1.7} />}
                   </span>
                   <span
                     style={{
                       display: 'block',
-                      marginTop: '4px',
-                      fontFamily: "'Montserrat', sans-serif",
-                      fontSize: '12px',
-                      color: 'rgba(255,255,255,0.78)',
+                      marginTop: 4,
+                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                      fontSize: 12,
+                      color: colors.text.secondary,
                       fontWeight: 700,
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -217,7 +298,12 @@ export default function RightPanel({
                   >
                     {event.title}
                   </span>
-                  <span style={{ display: 'block', marginTop: '5px', fontSize: '9px', color: 'rgba(255,255,255,0.28)' }}>
+                  <span style={{
+                    display: 'block',
+                    marginTop: 5,
+                    fontSize: 9,
+                    color: colors.text.disabled,
+                  }}>
                     {new Date(event.eventDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     {' | '}
                     {automated ? `via ${event.source}` : 'manual'}
@@ -231,41 +317,102 @@ export default function RightPanel({
 
       <div
         style={{
-          padding: '16px',
-          borderTop: '1px solid rgba(255,255,255,0.08)',
-          background: 'rgba(255,255,255,0.025)',
+          padding: spacing.lg,
+          borderTop: `1px solid ${colors.border.subtle}`,
+          background: colors.background.surface,
         }}
       >
-        <div style={eyebrowStyle}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: spacing.xs,
+          fontSize: 9,
+          color: colors.text.tertiary,
+          textTransform: 'uppercase',
+          letterSpacing: '0.12em',
+        }}>
           <Flame size={12} strokeWidth={1.7} />
           Venture vitals
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '12px', marginBottom: '18px' }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: spacing.sm,
+          marginTop: 12,
+          marginBottom: 18,
+        }}>
           <MiniMetric icon={Flame} value={Math.round(totalBurn / 1000)} label="Burn $k" />
           <MiniMetric icon={Activity} value={shortestRunway ?? 0} label="Runway mo" />
         </div>
-        <button onClick={syncMilestone} style={syncButtonStyle}>
+        <button onClick={syncMilestone} style={{
+          width: '100%',
+          height: 32,
+          borderRadius: '999px',
+          border: `1px solid ${colors.border.default}`,
+          background: colors.background.base,
+          color: colors.text.secondary,
+          cursor: 'pointer',
+          fontSize: 9,
+          fontWeight: 800,
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+          marginBottom: 18,
+          transition: `background ${transitions.default}`,
+        }}>
           Auto-sync milestone
         </button>
-        <div style={eyebrowStyle}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: spacing.xs,
+          fontSize: 9,
+          color: colors.text.tertiary,
+          textTransform: 'uppercase',
+          letterSpacing: '0.12em',
+        }}>
           <Zap size={12} strokeWidth={1.7} />
           Momentum
         </div>
-        <div style={{ display: 'flex', alignItems: 'flex-end', height: '46px', gap: '4px', marginTop: '12px' }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'flex-end',
+          height: 46,
+          gap: spacing.xs,
+          marginTop: 12,
+          marginBottom: 10,
+        }}>
           {weekCounts.map((count, index) => (
             <div
               key={index}
               title={`${count} events`}
               style={{
                 flex: 1,
-                height: count > 0 ? `${Math.max(8, (count / Math.max(...weekCounts, 1)) * 46)}px` : '3px',
+                height: count > 0 ? `${Math.max(8, (count / Math.max(...weekCounts, 1)) * 46)}px` : 3,
                 borderRadius: '999px',
-                background: count > 0 ? 'rgba(255,255,255,0.66)' : 'rgba(255,255,255,0.12)',
+                background: count > 0 ? colors.text.secondary : colors.border.subtle,
               }}
             />
           ))}
         </div>
-        <div style={{ marginTop: '12px', display: 'flex', gap: '7px', color: 'rgba(255,255,255,0.34)', fontSize: '9px', lineHeight: 1.4 }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          fontSize: 7,
+          color: colors.text.disabled,
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+        }}>
+          <span>8w ago</span>
+          <span>now</span>
+        </div>
+        <div style={{
+          marginTop: 12,
+          display: 'flex',
+          gap: spacing.xs,
+          color: colors.text.tertiary,
+          fontSize: 9,
+          lineHeight: 1.4,
+        }}>
           <Cable size={12} strokeWidth={1.7} style={{ flexShrink: 0 }} />
           Automated markers are separated from manual notes so founders can trust what came from integrations.
         </div>
@@ -280,12 +427,31 @@ function cleanEventTitle(title: string) {
 
 function MiniMetric({ icon: Icon, value, label }: { icon: LucideIcon; value: number; label: string }) {
   return (
-    <div style={{ border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '9px', background: 'rgba(255,255,255,0.035)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'rgba(255,255,255,0.34)', fontSize: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+    <div style={{
+      border: `1px solid ${colors.border.subtle}`,
+      borderRadius: radius.lg,
+      padding: spacing.sm,
+      background: colors.background.base,
+    }}>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: spacing.xs,
+        color: colors.text.tertiary,
+        fontSize: 8,
+        textTransform: 'uppercase',
+        letterSpacing: '0.08em',
+      }}>
         <Icon size={11} strokeWidth={1.7} />
         {label}
       </div>
-      <div style={{ marginTop: '7px', color: 'rgba(255,255,255,0.88)', fontFamily: "'Montserrat', sans-serif", fontSize: '20px', fontWeight: 800 }}>
+      <div style={{
+        marginTop: 7,
+        color: colors.text.secondary,
+        fontFamily: "'Plus Jakarta Sans', sans-serif",
+        fontSize: 20,
+        fontWeight: 800,
+      }}>
         {value}
       </div>
     </div>
@@ -295,32 +461,32 @@ function MiniMetric({ icon: Icon, value, label }: { icon: LucideIcon; value: num
 const eyebrowStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  gap: '7px',
-  fontSize: '9px',
-  color: 'rgba(255,255,255,0.36)',
+  gap: spacing.xs,
+  fontSize: 9,
+  color: colors.text.tertiary,
   textTransform: 'uppercase',
   letterSpacing: '0.12em',
 };
 
 const logoStyle = (color?: string, logoUrl?: string): React.CSSProperties => ({
-  width: '30px',
-  height: '30px',
-  borderRadius: '9px',
+  width: 30,
+  height: 30,
+  borderRadius: radius.md,
   display: 'grid',
   placeItems: 'center',
-  color: '#050505',
+  color: colors.background.base,
   fontWeight: 900,
-  background: logoUrl ? `center / cover no-repeat url(${logoUrl})` : color ? `linear-gradient(145deg, ${color}, rgba(255,255,255,0.9))` : 'rgba(255,255,255,0.86)',
+  background: logoUrl ? `center / cover no-repeat url(${logoUrl})` : color ? `linear-gradient(145deg, ${color}, ${colors.text.primary})` : colors.text.primary,
   flexShrink: 0,
 });
 
 const collapseButtonStyle: React.CSSProperties = {
-  width: '28px',
-  height: '28px',
+  width: 28,
+  height: 28,
   borderRadius: '50%',
-  border: '1px solid rgba(255,255,255,0.11)',
-  background: 'rgba(255,255,255,0.045)',
-  color: 'rgba(255,255,255,0.58)',
+  border: `1px solid ${colors.border.subtle}`,
+  background: colors.background.surface,
+  color: colors.text.secondary,
   display: 'grid',
   placeItems: 'center',
   cursor: 'pointer',
@@ -328,28 +494,29 @@ const collapseButtonStyle: React.CSSProperties = {
 
 const syncButtonStyle: React.CSSProperties = {
   width: '100%',
-  height: '32px',
+  height: 32,
   borderRadius: '999px',
-  border: '1px solid rgba(255,255,255,0.14)',
-  background: 'rgba(255,255,255,0.055)',
-  color: 'rgba(255,255,255,0.72)',
+  border: `1px solid ${colors.border.default}`,
+  background: colors.background.base,
+  color: colors.text.secondary,
   cursor: 'pointer',
-  fontSize: '9px',
+  fontSize: 9,
   fontWeight: 800,
   textTransform: 'uppercase',
   letterSpacing: '0.08em',
-  marginBottom: '18px',
+  marginBottom: 18,
+  transition: `background ${transitions.default}`,
 };
 
 const railMarkStyle: React.CSSProperties = {
-  width: '28px',
-  height: '28px',
-  borderRadius: '9px',
+  width: 28,
+  height: 28,
+  borderRadius: radius.md,
   display: 'grid',
   placeItems: 'center',
-  color: '#050505',
-  background: 'rgba(255,255,255,0.88)',
-  fontFamily: "'Montserrat', sans-serif",
+  color: colors.background.base,
+  background: colors.text.primary,
+  fontFamily: "'Plus Jakarta Sans', sans-serif",
   fontWeight: 900,
-  fontSize: '13px',
+  fontSize: 13,
 };

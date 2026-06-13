@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { Pencil, Plus, GitBranch, Crosshair, Link, Trash2 } from 'lucide-react';
+import { colors, spacing, radius, typography, transitions, shadows } from '@/styles/tokens';
 import type { LucideIcon } from 'lucide-react';
 
 interface ContextMenuProps {
@@ -84,10 +85,10 @@ export default function ContextMenu({
         top: adjustedY,
         left: adjustedX,
         background: 'rgba(12,9,9,0.97)',
-        border: '1px solid rgba(255,255,255,0.1)',
-        borderRadius: '10px',
-        padding: '6px',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+        border: `1px solid ${colors.border.default}`,
+        borderRadius: radius.md,
+        padding: spacing.xs,
+        boxShadow: shadows.elevated,
         minWidth: '180px',
         zIndex: 1000,
         animation: 'contextMenuOpen 150ms cubic-bezier(0.34, 1.56, 0.64, 1)',
@@ -101,8 +102,8 @@ export default function ContextMenu({
               key={idx}
               style={{
                 height: '1px',
-                background: 'rgba(255,255,255,0.06)',
-                margin: '4px 0',
+                background: colors.border.subtle,
+                margin: `${spacing.xs}px 0`,
               }}
             />
           );
@@ -118,27 +119,27 @@ export default function ContextMenu({
             }}
             style={{
               width: '100%',
-              height: '36px',
+              height: 36,
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
-              padding: '0 12px',
-              borderRadius: '6px',
+              gap: spacing.sm,
+              padding: `0 ${spacing.sm}px`,
+              borderRadius: radius.sm,
               border: 'none',
               background: 'transparent',
               cursor: 'pointer',
-              fontSize: '10px',
-              color: item.isDangerous ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.65)',
-              fontFamily: "'Inter', sans-serif",
-              transition: 'all 150ms',
+              fontSize: typography.size.xs,
+              color: item.isDangerous ? colors.text.tertiary : colors.text.secondary,
+              fontFamily: typography.family.base,
+              transition: transitions.default,
             }}
             onMouseOver={(e) => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
-              e.currentTarget.style.color = 'rgba(255,255,255,0.9)';
+              e.currentTarget.style.background = colors.border.subtle;
+              e.currentTarget.style.color = colors.text.primary;
             }}
             onMouseOut={(e) => {
               e.currentTarget.style.background = 'transparent';
-              e.currentTarget.style.color = item.isDangerous ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.65)';
+              e.currentTarget.style.color = item.isDangerous ? colors.text.tertiary : colors.text.secondary;
             }}
           >
             <Icon size={12} strokeWidth={1.5} style={{ opacity: 0.6 }} />

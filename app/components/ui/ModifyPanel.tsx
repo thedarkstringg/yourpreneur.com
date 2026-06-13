@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react';
 import { CalendarDays, GitBranch, Palette, Plus, Save, Trash2, Upload, X } from 'lucide-react';
 import { useStore, Venture } from '@/lib/useStore';
+import { colors, spacing, radius, typography, transitions, shadows } from '@/styles/tokens';
 import EventForm from './EventForm';
 
 const STATUSES: Venture['status'][] = ['active', 'stealth', 'graveyard', 'pivot', 'paused', 'archived', 'acquired', 'failed', 'shutdown', 'exited'];
@@ -208,7 +209,7 @@ export default function ModifyPanel({
           />
 
           <label>ACCENT COLOR</label>
-          <div style={{ display: 'grid', gridTemplateColumns: '42px 1fr', gap: '10px', alignItems: 'center' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '42px 1fr', gap: spacing.md, alignItems: 'center' }}>
             <span style={{ ...colorPreviewStyle, background: formData.color || 'rgba(255,255,255,0.9)' }}>
               <Palette size={16} />
             </span>
@@ -263,7 +264,7 @@ export default function ModifyPanel({
           <button
             onClick={() => setIsAddingEvent(true)}
             className="w-full btn-cancel"
-            style={{ marginTop: '28px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
+            style={{ marginTop: spacing.xl, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: spacing.sm }}
           >
             <Plus size={14} />
             Add event
@@ -271,15 +272,15 @@ export default function ModifyPanel({
         </div>
 
         <div className="modify-footer">
-          <button onClick={handleDelete} className="btn-delete" style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+          <button onClick={handleDelete} className="btn-delete" style={{ display: 'flex', alignItems: 'center', gap: spacing.xs }}>
             <Trash2 size={13} />
             Delete
           </button>
-          <div className="flex gap-3">
+          <div style={{ display: 'flex', gap: spacing.md }}>
             <button onClick={handleCloseAnimated} className="btn-cancel">
               Cancel
             </button>
-            <button onClick={handleSave} className="btn-save" style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+            <button onClick={handleSave} className="btn-save" style={{ display: 'flex', alignItems: 'center', gap: spacing.xs }}>
               <Save size={13} />
               Save
             </button>
@@ -298,69 +299,69 @@ const headerStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'flex-start',
   justifyContent: 'space-between',
-  borderBottom: '1px solid rgba(255,255,255,0.1)',
-  padding: '28px',
+  borderBottom: `1px solid ${colors.border.default}`,
+  padding: spacing.lg,
 };
 
 const eyebrowStyle: React.CSSProperties = {
-  color: 'rgba(255,255,255,0.34)',
-  fontSize: '9px',
+  color: colors.text.tertiary,
+  fontSize: typography.size.xs,
   textTransform: 'uppercase',
   letterSpacing: '0.14em',
 };
 
 const subheadStyle: React.CSSProperties = {
-  marginTop: '10px',
+  marginTop: 10,
   display: 'flex',
-  gap: '8px',
-  color: 'rgba(255,255,255,0.42)',
-  fontSize: '11px',
+  gap: spacing.sm,
+  color: colors.text.secondary,
+  fontSize: typography.size.sm,
 };
 
 const iconButtonStyle: React.CSSProperties = {
-  width: '34px',
-  height: '34px',
+  width: 34,
+  height: 34,
   borderRadius: '50%',
-  border: '1px solid rgba(255,255,255,0.12)',
+  border: `1px solid ${colors.border.default}`,
   background: 'rgba(255,255,255,0.04)',
-  color: 'rgba(255,255,255,0.62)',
+  color: colors.text.secondary,
   display: 'grid',
   placeItems: 'center',
   cursor: 'pointer',
 };
 
 const summaryStyle: React.CSSProperties = {
-  marginTop: '18px',
+  marginTop: 18,
   display: 'grid',
   gridTemplateColumns: '1fr 1fr',
-  gap: '8px',
-  color: 'rgba(255,255,255,0.46)',
-  fontSize: '10px',
+  gap: spacing.sm,
+  color: colors.text.secondary,
+  fontSize: typography.size.xs,
 };
 
 const colorPreviewStyle: React.CSSProperties = {
-  height: '38px',
-  borderRadius: '10px',
+  height: 38,
+  borderRadius: radius.md,
   color: '#090909',
   display: 'grid',
   placeItems: 'center',
-  border: '1px solid rgba(255,255,255,0.12)',
+  border: `1px solid ${colors.border.default}`,
 };
 
 const logoButtonStyle: React.CSSProperties = {
   width: '100%',
-  minHeight: '54px',
+  minHeight: 54,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  gap: '10px',
+  gap: spacing.sm,
 };
 
 const logoPreviewStyle: React.CSSProperties = {
-  width: '34px',
-  height: '34px',
-  borderRadius: '9px',
+  width: 34,
+  height: 34,
+  borderRadius: radius.sm,
   backgroundSize: 'cover',
   backgroundPosition: 'center',
-  border: '1px solid rgba(255,255,255,0.16)',
+  border: `1px solid ${colors.border.default}`,
 };

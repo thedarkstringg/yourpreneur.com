@@ -166,20 +166,19 @@ export class VentureNode extends Container {
     industry.y = 18;
     this.contentContainer.addChild(industry);
 
-    // Venture name: Plus Jakarta Sans, 26px, font-weight 500, rgba(255,255,255,0.9)
+    // Venture name: Plus Jakarta Sans, 22px, font-weight 600, rgba(255,255,255,0.92)
     const nameStyle = new TextStyle({
       fontFamily: 'Plus Jakarta Sans',
-      fontSize: 26,
-      fontWeight: '500',
-      fill: 'rgba(255,255,255,0.9)',
+      fontSize: 22,
+      fontWeight: '600',
+      fill: 'rgba(255,255,255,0.92)',
     });
     const name = new Text({ text: this.venture.name, style: nameStyle });
     name.resolution = window.devicePixelRatio * 6;
     name.x = 24;
-    name.y = 40;
+    name.y = 42;
     this.contentContainer.addChild(name);
 
-    this.drawSparkline();
     this.drawHealthAndSync();
 
     // Status badge: Inter, 9px, outlined pill
@@ -404,6 +403,14 @@ export class VentureNode extends Container {
       color: this.venture.color ? parseInt(this.venture.color.slice(1), 16) : 0xffffff,
       alpha: 0.65,
     });
+
+    // Create clipping mask to contain sparkline within bounds
+    const mask = new Graphics();
+    mask.rect(x, y, width, height);
+    mask.fill({ color: 0xffffff, alpha: 0 });
+    spark.mask = mask;
+
+    this.contentContainer.addChild(mask);
     this.contentContainer.addChild(spark);
   }
 
@@ -415,7 +422,8 @@ export class VentureNode extends Container {
     const labelStyle = new TextStyle({
       fontFamily: 'Inter',
       fontSize: 8,
-      fill: 'rgba(255,255,255,0.34)',
+      fontWeight: '600',
+      fill: 'rgba(255,255,255,0.36)',
       letterSpacing: 1,
     });
 
@@ -428,15 +436,21 @@ export class VentureNode extends Container {
     const bar = new Graphics();
     bar.roundRect(122, 86, 62, 3, 999);
     bar.fill({ color: 0xffffff, alpha: 0.09 });
-    bar.roundRect(122, 86, Math.max(4, (health / 100) * 62), 3, 999);
+    bar.roundRect(122, 86, Math.max(2, (health / 100) * 62), 3, 999);
     bar.fill({ color: health > 80 ? 0x82ffbe : health > 60 ? 0xffda8a : 0xff9687, alpha: 0.72 });
     this.contentContainer.addChild(bar);
 
-    const syncText = new Text({ text: `${sync} / ${source}`, style: labelStyle });
+    const syncStyle = new TextStyle({
+      fontFamily: 'Inter',
+      fontSize: 7,
+      fill: 'rgba(255,255,255,0.24)',
+      letterSpacing: 0.5,
+    });
+
+    const syncText = new Text({ text: `${sync} / ${source}`, style: syncStyle });
     syncText.resolution = window.devicePixelRatio * 4;
     syncText.x = 122;
     syncText.y = 93;
-    syncText.alpha = 0.72;
     this.contentContainer.addChild(syncText);
   }
 

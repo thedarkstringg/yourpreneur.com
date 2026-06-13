@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { Briefcase, CalendarDays, ChevronLeft, ChevronRight, Layers, Radio, Search, Target, TrendingUp } from 'lucide-react';
 import { useStore, Venture } from '@/lib/useStore';
 import { calculateLayout } from '@/lib/layoutAlgorithm';
+import { colors, spacing, radius, typography, transitions, layout } from '@/styles/tokens';
 
 export default function LeftPanel({
   userName = 'Founder',
@@ -92,26 +93,53 @@ export default function LeftPanel({
         style={{
           position: 'fixed',
           left: 0,
-          top: '64px',
-          width: '48px',
-          height: 'calc(100vh - 64px)',
-          background: 'rgba(5,5,5,0.72)',
-          borderRight: '1px solid rgba(255,255,255,0.09)',
+          top: `${layout.header.height}px`,
+          width: `${layout.sidebar.collapsedWidth}px`,
+          height: `calc(100vh - ${layout.header.height}px)`,
+          background: `${colors.background.base}`,
+          borderRight: `1px solid ${colors.border.default}`,
           backdropFilter: 'blur(24px)',
-          zIndex: 90,
+          zIndex: layout.sidebar.zIndex,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          paddingTop: '18px',
-          gap: '14px',
+          paddingTop: 18,
+          gap: 14,
           fontFamily: "'Inter', sans-serif",
         }}
       >
-        <button onClick={onToggleCollapsed} style={collapseButtonStyle} aria-label="Expand left panel">
+        <button onClick={onToggleCollapsed} style={{
+          width: 28,
+          height: 28,
+          borderRadius: '50%',
+          border: `1px solid ${colors.border.subtle}`,
+          background: colors.background.surface,
+          color: colors.text.secondary,
+          display: 'grid',
+          placeItems: 'center',
+          cursor: 'pointer',
+        }} aria-label="Expand left panel">
           <ChevronRight size={15} />
         </button>
-        <div style={railMarkStyle}>{ventures.length}</div>
-        <div style={{ writingMode: 'vertical-rl', color: 'rgba(255,255,255,0.34)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
+        <div style={{
+          width: 28,
+          height: 28,
+          borderRadius: radius.md,
+          display: 'grid',
+          placeItems: 'center',
+          color: colors.background.base,
+          background: colors.text.primary,
+          fontFamily: "'Plus Jakarta Sans', sans-serif",
+          fontWeight: 900,
+          fontSize: 13,
+        }}>{ventures.length}</div>
+        <div style={{
+          writingMode: 'vertical-rl',
+          color: colors.text.tertiary,
+          fontSize: 10,
+          textTransform: 'uppercase',
+          letterSpacing: '0.12em',
+        }}>
           Portfolio
         </div>
       </div>
@@ -123,15 +151,15 @@ export default function LeftPanel({
       style={{
         position: 'fixed',
         left: 0,
-        top: '64px',
-        width: '282px',
-        height: 'calc(100vh - 64px)',
-        background: 'rgba(5,5,5,0.76)',
-        borderRight: '1px solid rgba(255,255,255,0.09)',
+        top: `${layout.header.height}px`,
+        width: `${layout.sidebar.width}px`,
+        height: `calc(100vh - ${layout.header.height}px)`,
+        background: colors.background.base,
+        borderRight: `1px solid ${colors.border.default}`,
         backdropFilter: 'blur(24px)',
         display: 'flex',
         flexDirection: 'column',
-        zIndex: 90,
+        zIndex: layout.sidebar.zIndex,
         fontFamily: "'Inter', sans-serif",
         overflow: 'hidden',
         animation: 'slideInLeft 450ms cubic-bezier(0.34, 1.56, 0.64, 1) 50ms both',
@@ -140,23 +168,39 @@ export default function LeftPanel({
     >
       {!isShowingDetail ? (
         <>
-          <div style={{ padding: '22px 20px 18px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-            <button onClick={onToggleCollapsed} style={{ ...collapseButtonStyle, position: 'absolute', right: '12px', top: '12px' }} aria-label="Collapse left panel">
+          <div style={{
+            padding: `${22}px ${spacing.md}px ${18}px`,
+            borderBottom: `1px solid ${colors.border.subtle}`,
+          }}>
+            <button onClick={onToggleCollapsed} style={{
+              position: 'absolute',
+              right: 12,
+              top: 12,
+              width: 28,
+              height: 28,
+              borderRadius: '50%',
+              border: `1px solid ${colors.border.subtle}`,
+              background: colors.background.surface,
+              color: colors.text.secondary,
+              display: 'grid',
+              placeItems: 'center',
+              cursor: 'pointer',
+            }} aria-label="Collapse left panel">
               <ChevronLeft size={15} />
             </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: spacing.md }}>
               <div
                 style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '14px',
-                  border: '1px solid rgba(255,255,255,0.16)',
+                  width: 42,
+                  height: 42,
+                  borderRadius: radius.lg,
+                  border: `1px solid ${colors.border.default}`,
                   display: 'grid',
                   placeItems: 'center',
-                  fontSize: '14px',
-                  color: '#050505',
-                  background: 'rgba(255,255,255,0.9)',
-                  fontFamily: "'Montserrat', sans-serif",
+                  fontSize: 14,
+                  color: colors.background.base,
+                  background: colors.text.primary,
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
                   fontWeight: 900,
                 }}
               >
@@ -165,15 +209,23 @@ export default function LeftPanel({
               <div>
                 <div
                   style={{
-                    fontFamily: "'Montserrat', sans-serif",
-                    fontSize: '17px',
-                    color: 'rgba(255,255,255,0.92)',
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontSize: 17,
+                    color: colors.text.primary,
                     fontWeight: 750,
                   }}
                 >
                   {userName}
                 </div>
-                <div style={eyebrowStyle}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: spacing.xs,
+                  fontSize: 9,
+                  color: colors.text.tertiary,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.11em',
+                }}>
                   <Radio size={10} strokeWidth={1.7} />
                   Portfolio live
                 </div>
@@ -182,27 +234,41 @@ export default function LeftPanel({
 
             <div
               style={{
-                marginTop: '18px',
+                marginTop: 18,
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
-                gap: '8px',
+                gap: spacing.sm,
               }}
             >
               {stats.map((stat) => {
                 const Icon = stat.icon;
                 const isPrompt = typeof stat.value === 'string' && stat.value.startsWith('Add');
                 return (
-                  <div key={stat.label} style={statCardStyle}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'rgba(255,255,255,0.33)' }}>
+                  <div key={stat.label} style={{
+                    padding: spacing.sm,
+                    borderRadius: radius.lg,
+                    border: `1px solid ${colors.border.subtle}`,
+                    background: colors.background.surface,
+                  }}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: spacing.xs,
+                      color: colors.text.tertiary,
+                    }}>
                       <Icon size={12} strokeWidth={1.7} />
-                      <span style={{ fontSize: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{stat.label}</span>
+                      <span style={{
+                        fontSize: 8,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.08em',
+                      }}>{stat.label}</span>
                     </div>
                     <div
                       style={{
-                        marginTop: '7px',
-                        fontFamily: "'Montserrat', sans-serif",
-                        fontSize: isPrompt ? '12px' : '20px',
-                        color: isPrompt ? 'rgba(255,255,255,0.46)' : 'rgba(255,255,255,0.9)',
+                        marginTop: 7,
+                        fontFamily: "'Plus Jakarta Sans', sans-serif",
+                        fontSize: isPrompt ? 12 : 20,
+                        color: isPrompt ? colors.text.secondary : colors.text.primary,
                         fontWeight: 800,
                       }}
                     >
@@ -214,12 +280,21 @@ export default function LeftPanel({
             </div>
           </div>
 
-          <div style={{ padding: '16px 16px 12px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <div style={{
+            padding: `${spacing.lg}px ${spacing.lg}px ${spacing.sm}px`,
+            borderBottom: `1px solid ${colors.border.subtle}`,
+          }}>
             <div style={{ position: 'relative' }}>
               <Search
                 size={14}
                 strokeWidth={1.6}
-                style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.32)' }}
+                style={{
+                  position: 'absolute',
+                  left: spacing.md,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: colors.text.tertiary,
+                }}
               />
               <input
                 value={searchTerm}
@@ -227,22 +302,32 @@ export default function LeftPanel({
                 placeholder="Find a venture"
                 style={{
                   width: '100%',
-                  height: '36px',
-                  border: '1px solid rgba(255,255,255,0.09)',
-                  borderRadius: '10px',
-                  background: 'rgba(255,255,255,0.045)',
-                  color: 'rgba(255,255,255,0.82)',
-                  padding: '0 12px 0 35px',
+                  height: 36,
+                  border: `1px solid ${colors.border.default}`,
+                  borderRadius: radius.lg,
+                  background: colors.background.surface,
+                  color: colors.text.primary,
+                  padding: `0 ${spacing.md}px 0 ${spacing.lg * 2}px`,
                   outline: 'none',
-                  fontSize: '12px',
+                  fontSize: 12,
                 }}
               />
             </div>
           </div>
 
-          <div style={{ padding: '16px', flex: 1, overflowY: 'auto' }}>
-            <div style={{ ...eyebrowStyle, justifyContent: 'space-between', marginBottom: '12px' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+          <div style={{ padding: spacing.lg, flex: 1, overflowY: 'auto' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: spacing.xs,
+              fontSize: 9,
+              color: colors.text.tertiary,
+              textTransform: 'uppercase',
+              letterSpacing: '0.11em',
+              justifyContent: 'space-between',
+              marginBottom: spacing.md,
+            }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: spacing.xs }}>
                 <Briefcase size={11} strokeWidth={1.7} />
                 Portfolio
               </span>
@@ -250,7 +335,12 @@ export default function LeftPanel({
             </div>
 
             {filteredVentures.length === 0 ? (
-              <div style={{ padding: '34px 10px', textAlign: 'center', color: 'rgba(255,255,255,0.34)', fontSize: '12px' }}>
+              <div style={{
+                padding: '34px 10px',
+                textAlign: 'center',
+                color: colors.text.tertiary,
+                fontSize: 12,
+              }}>
                 No ventures match that search.
               </div>
             ) : (
@@ -266,26 +356,37 @@ export default function LeftPanel({
                       display: 'grid',
                       gridTemplateColumns: '34px 1fr auto',
                       alignItems: 'center',
-                      gap: '10px',
-                      minHeight: '58px',
-                      padding: '9px 10px',
-                      borderRadius: '12px',
+                      gap: spacing.md,
+                      minHeight: 58,
+                      padding: `${spacing.xs}px ${spacing.sm}px`,
+                      borderRadius: radius.lg,
                       cursor: 'pointer',
-                      transition: 'all 150ms',
-                      marginBottom: '8px',
-                      background: isSelected ? 'rgba(255,255,255,0.11)' : 'rgba(255,255,255,0.035)',
-                      border: isSelected ? '1px solid rgba(255,255,255,0.24)' : '1px solid rgba(255,255,255,0.06)',
+                      transition: `all ${transitions.default}`,
+                      marginBottom: spacing.sm,
+                      background: isSelected ? colors.background.elevated : colors.background.surface,
+                      border: `1px solid ${isSelected ? colors.border.strong : colors.border.subtle}`,
                       textAlign: 'left',
                     }}
                   >
-                    <span style={logoStyle(venture.color, venture.logoUrl)}>{!venture.logoUrl && venture.name.slice(0, 1).toUpperCase()}</span>
+                    <span style={{
+                      width: 34,
+                      height: 34,
+                      borderRadius: radius.lg,
+                      display: 'grid',
+                      placeItems: 'center',
+                      background: venture.logoUrl ? `center / cover no-repeat url(${venture.logoUrl})` : venture.color ? `linear-gradient(145deg, ${venture.color}, ${colors.text.primary})` : colors.text.primary,
+                      color: colors.background.base,
+                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                      fontWeight: 900,
+                      boxShadow: venture.color ? `0 0 22px ${venture.color}33` : 'none',
+                    }}>{!venture.logoUrl && venture.name.slice(0, 1).toUpperCase()}</span>
                     <span style={{ minWidth: 0 }}>
                       <span
                         style={{
                           display: 'block',
-                          fontFamily: "'Montserrat', sans-serif",
-                          fontSize: '13px',
-                          color: isSelected ? '#ffffff' : 'rgba(255,255,255,0.82)',
+                          fontFamily: "'Plus Jakarta Sans', sans-serif",
+                          fontSize: 13,
+                          color: isSelected ? colors.text.primary : colors.text.primary,
                           fontWeight: 750,
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
@@ -297,9 +398,9 @@ export default function LeftPanel({
                       <span
                         style={{
                           display: 'block',
-                          marginTop: '3px',
-                          fontSize: '9px',
-                          color: venture.industry ? 'rgba(255,255,255,0.36)' : 'rgba(255,255,255,0.28)',
+                          marginTop: 3,
+                          fontSize: 9,
+                          color: venture.industry ? colors.text.tertiary : colors.text.disabled,
                           textTransform: 'uppercase',
                           letterSpacing: '0.1em',
                           overflow: 'hidden',
@@ -310,7 +411,19 @@ export default function LeftPanel({
                         {venture.industry || 'Add industry'} | {ventureEvents.length} {ventureEvents.length === 1 ? 'event' : 'events'} all-time
                       </span>
                     </span>
-                    <span style={statusStyle(venture.status)}>{venture.status}</span>
+                    <span style={{
+                      border: `1px solid ${colors.status[venture.status as keyof typeof colors.status] || colors.text.tertiary}`,
+                      color: colors.status[venture.status as keyof typeof colors.status] || colors.text.tertiary,
+                      borderRadius: '999px',
+                      padding: `3px 7px`,
+                      fontSize: 7,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.08em',
+                      maxWidth: 70,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}>{venture.status}</span>
                   </button>
                 );
               })
@@ -319,28 +432,53 @@ export default function LeftPanel({
 
           <div
             style={{
-              padding: '16px 18px 18px',
-              borderTop: '1px solid rgba(255,255,255,0.08)',
-              background: 'rgba(255,255,255,0.025)',
+              padding: `${spacing.lg}px ${spacing.lg}px ${spacing.lg * 1.5}px`,
+              borderTop: `1px solid ${colors.border.subtle}`,
+              background: colors.background.surface,
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'rgba(255,255,255,0.38)' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: spacing.sm,
+              color: colors.text.tertiary,
+            }}>
               <TrendingUp size={13} strokeWidth={1.7} />
-              <span style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+              <span style={{
+                fontSize: 9,
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+              }}>
                 {events.length} events total
               </span>
             </div>
-            <div style={{ marginTop: '9px', color: 'rgba(255,255,255,0.66)', fontSize: '12px' }}>
+            <div style={{
+              marginTop: 9,
+              color: colors.text.secondary,
+              fontSize: 12,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}>
               {lastEntry ? `Last activity: ${getRelativeDate(new Date(lastEntry.eventDate))}` : 'Add the first event to activate the feed.'}
             </div>
           </div>
         </>
       ) : (
-        <div style={{ padding: '20px' }}>
-          <button onClick={onBack} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.62)', cursor: 'pointer', fontSize: '12px' }}>
+        <div style={{ padding: spacing.lg }}>
+          <button onClick={onBack} style={{
+            background: 'none',
+            border: 'none',
+            color: colors.text.secondary,
+            cursor: 'pointer',
+            fontSize: 12,
+          }}>
             Back to portfolio
           </button>
-          <div style={{ color: 'rgba(255,255,255,0.5)', marginTop: '18px' }}>Venture detail</div>
+          <div style={{
+            color: colors.text.secondary,
+            marginTop: 18,
+          }}>Venture detail</div>
         </div>
       )}
     </div>
@@ -350,56 +488,56 @@ export default function LeftPanel({
 const eyebrowStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  gap: '7px',
-  fontSize: '9px',
-  color: 'rgba(255,255,255,0.34)',
+  gap: spacing.xs,
+  fontSize: 9,
+  color: colors.text.tertiary,
   textTransform: 'uppercase',
   letterSpacing: '0.11em',
 };
 
 const statCardStyle: React.CSSProperties = {
-  padding: '10px',
-  borderRadius: '12px',
-  border: '1px solid rgba(255,255,255,0.07)',
-  background: 'rgba(255,255,255,0.035)',
+  padding: spacing.sm,
+  borderRadius: radius.lg,
+  border: `1px solid ${colors.border.subtle}`,
+  background: colors.background.surface,
 };
 
 const logoStyle = (color?: string, logoUrl?: string): React.CSSProperties => ({
-  width: '34px',
-  height: '34px',
-  borderRadius: '10px',
+  width: 34,
+  height: 34,
+  borderRadius: radius.lg,
   display: 'grid',
   placeItems: 'center',
-  background: logoUrl ? `center / cover no-repeat url(${logoUrl})` : color ? `linear-gradient(145deg, ${color}, rgba(255,255,255,0.92))` : 'rgba(255,255,255,0.88)',
-  color: '#050505',
-  fontFamily: "'Montserrat', sans-serif",
+  background: logoUrl ? `center / cover no-repeat url(${logoUrl})` : color ? `linear-gradient(145deg, ${color}, ${colors.text.primary})` : colors.text.primary,
+  color: colors.background.base,
+  fontFamily: "'Plus Jakarta Sans', sans-serif",
   fontWeight: 900,
   boxShadow: color ? `0 0 22px ${color}33` : 'none',
 });
 
 const statusStyle = (status: Venture['status']): React.CSSProperties => {
   const accent: Record<Venture['status'], string> = {
-    active: 'rgba(130,255,190,0.72)',
-    stealth: 'rgba(180,140,255,0.72)',
-    graveyard: 'rgba(210,210,210,0.5)',
-    pivot: 'rgba(255,218,138,0.78)',
-    paused: 'rgba(255,255,255,0.5)',
-    shutdown: 'rgba(255,170,170,0.58)',
-    exited: 'rgba(210,190,255,0.76)',
-    archived: 'rgba(210,210,210,0.54)',
-    acquired: 'rgba(180,230,255,0.76)',
-    failed: 'rgba(255,150,135,0.7)',
+    active: colors.status.active,
+    stealth: colors.accent.purple,
+    graveyard: colors.text.secondary,
+    pivot: colors.status.pivot,
+    paused: colors.text.secondary,
+    shutdown: colors.status.failed,
+    exited: colors.accent.purple,
+    archived: colors.text.secondary,
+    acquired: colors.status.acquired,
+    failed: colors.status.failed,
   };
 
   return {
     border: `1px solid ${accent[status]}`,
     color: accent[status],
     borderRadius: '999px',
-    padding: '3px 7px',
-    fontSize: '7px',
+    padding: `3px 7px`,
+    fontSize: 7,
     textTransform: 'uppercase',
     letterSpacing: '0.08em',
-    maxWidth: '70px',
+    maxWidth: 70,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
@@ -407,26 +545,26 @@ const statusStyle = (status: Venture['status']): React.CSSProperties => {
 };
 
 const collapseButtonStyle: React.CSSProperties = {
-  width: '28px',
-  height: '28px',
+  width: 28,
+  height: 28,
   borderRadius: '50%',
-  border: '1px solid rgba(255,255,255,0.11)',
-  background: 'rgba(255,255,255,0.045)',
-  color: 'rgba(255,255,255,0.58)',
+  border: `1px solid ${colors.border.subtle}`,
+  background: colors.background.surface,
+  color: colors.text.secondary,
   display: 'grid',
   placeItems: 'center',
   cursor: 'pointer',
 };
 
 const railMarkStyle: React.CSSProperties = {
-  width: '28px',
-  height: '28px',
-  borderRadius: '9px',
+  width: 28,
+  height: 28,
+  borderRadius: radius.md,
   display: 'grid',
   placeItems: 'center',
-  color: '#050505',
-  background: 'rgba(255,255,255,0.88)',
-  fontFamily: "'Montserrat', sans-serif",
+  color: colors.background.base,
+  background: colors.text.primary,
+  fontFamily: "'Plus Jakarta Sans', sans-serif",
   fontWeight: 900,
-  fontSize: '13px',
+  fontSize: 13,
 };

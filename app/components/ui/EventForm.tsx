@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useStore, VentureEvent } from '@/lib/useStore';
+import { colors, spacing, radius, typography, transitions } from '@/styles/tokens';
 
 const MOODS = [
   { label: '⚡ Energized', value: 'energized' },
@@ -78,23 +79,32 @@ export default function EventForm({
   };
 
   return (
-    <div className="fixed right-0 top-0 h-screen w-[440px] bg-[#0e0b0b] border-l border-white/10 shadow-2xl z-[150] flex flex-col font-mono">
+    <div
+      className="fixed right-0 top-0 h-screen flex flex-col font-mono z-[150]"
+      style={{
+        width: 440,
+        backgroundColor: colors.background.elevated,
+        borderLeft: `1px solid ${colors.border.default}`,
+        boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+      }}
+    >
       {/* Header */}
-      <div className="flex items-center justify-between px-7 pt-8 pb-4">
-        <h2 className="font-display text-2xl text-white/90">Add Event</h2>
+      <div className="flex items-center justify-between" style={{ padding: spacing.lg, paddingTop: spacing.lg, paddingBottom: spacing.sm }}>
+        <h2 className="font-display text-2xl" style={{ color: colors.text.primary }}>Add Event</h2>
         <button
           onClick={onClose}
-          className="text-white/40 hover:text-white transition-colors text-xl"
+          style={{ color: colors.text.secondary }}
+          className="hover:text-white transition-colors text-xl"
         >
           ✕
         </button>
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-7 pb-6 space-y-7">
+      <div className="flex-1 overflow-y-auto" style={{ padding: `${spacing.lg}px ${spacing.lg}px ${spacing.md}px`, display: 'flex', flexDirection: 'column', gap: spacing.xl }}>
         {/* Title */}
         <div>
-          <label className="block text-[8px] tracking-[0.18em] text-white/20 mb-2">
+          <label className="block" style={{ fontSize: typography.size.xs, textTransform: 'uppercase', letterSpacing: '0.18em', color: colors.text.tertiary, marginBottom: spacing.sm }}>
             TITLE
           </label>
           <input
@@ -102,25 +112,49 @@ export default function EventForm({
             value={formData.title || ''}
             onChange={(e) => handleChange('title', e.target.value)}
             placeholder="What happened?"
-            className="w-full bg-white/[0.03] border border-white/10 rounded-md px-4 py-3 text-white/80 text-xs focus:outline-none focus:border-white/20 transition-all"
+            style={{
+              width: '100%',
+              backgroundColor: 'rgba(255,255,255,0.03)',
+              border: `1px solid ${colors.border.default}`,
+              borderRadius: radius.md,
+              padding: `${spacing.md}px ${spacing.sm}px`,
+              color: colors.text.primary,
+              fontSize: typography.size.xs,
+            }}
+            className="focus:outline-none transition-all"
+            onFocus={(e) => (e.currentTarget.style.borderColor = colors.border.strong)}
+            onBlur={(e) => (e.currentTarget.style.borderColor = colors.border.default)}
           />
         </div>
 
         {/* Type */}
         <div>
-          <label className="block text-[8px] tracking-[0.18em] text-white/20 mb-3">
+          <label className="block" style={{ fontSize: typography.size.xs, textTransform: 'uppercase', letterSpacing: '0.18em', color: colors.text.tertiary, marginBottom: spacing.md }}>
             TYPE
           </label>
-          <div className="flex flex-wrap gap-2">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: spacing.sm }}>
             {EVENT_TYPES.map((type) => (
               <button
                 key={type}
                 onClick={() => handleChange('type', type)}
-                className={`px-3 py-1.5 rounded-full text-[9px] uppercase tracking-wider transition-all border ${
-                  formData.type === type
-                    ? 'bg-white/10 border-white/30 text-white/90'
-                    : 'bg-transparent border-white/10 text-white/40 hover:border-white/20'
-                }`}
+                style={{
+                  padding: `${spacing.xs}px ${spacing.sm}px`,
+                  borderRadius: radius.full,
+                  fontSize: typography.size.xs,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                  border: formData.type === type ? `1px solid ${colors.border.strong}` : `1px solid ${colors.border.default}`,
+                  backgroundColor: formData.type === type ? 'rgba(255,255,255,0.1)' : 'transparent',
+                  color: formData.type === type ? colors.text.primary : colors.text.secondary,
+                  cursor: 'pointer',
+                  transition: transitions.default,
+                }}
+                onMouseEnter={(e) => {
+                  if (formData.type !== type) e.currentTarget.style.borderColor = colors.border.strong;
+                }}
+                onMouseLeave={(e) => {
+                  if (formData.type !== type) e.currentTarget.style.borderColor = colors.border.default;
+                }}
               >
                 {type}
               </button>
@@ -129,29 +163,48 @@ export default function EventForm({
         </div>
 
         {/* Date & Planned */}
-        <div className="flex gap-4">
-          <div className="flex-1">
-            <label className="block text-[8px] tracking-[0.18em] text-white/20 mb-2">
+        <div style={{ display: 'flex', gap: spacing.md }}>
+          <div style={{ flex: 1 }}>
+            <label className="block" style={{ fontSize: typography.size.xs, textTransform: 'uppercase', letterSpacing: '0.18em', color: colors.text.tertiary, marginBottom: spacing.sm }}>
               DATE
             </label>
             <input
               type="date"
               value={formData.eventDate || ''}
               onChange={(e) => handleChange('eventDate', e.target.value)}
-              className="w-full bg-white/[0.03] border border-white/10 rounded-md px-4 py-3 text-white/80 text-xs focus:outline-none focus:border-white/20"
+              style={{
+                width: '100%',
+                backgroundColor: 'rgba(255,255,255,0.03)',
+                border: `1px solid ${colors.border.default}`,
+                borderRadius: radius.md,
+                padding: `${spacing.md}px ${spacing.sm}px`,
+                color: colors.text.primary,
+                fontSize: typography.size.xs,
+              }}
+              className="focus:outline-none"
+              onFocus={(e) => (e.currentTarget.style.borderColor = colors.border.strong)}
+              onBlur={(e) => (e.currentTarget.style.borderColor = colors.border.default)}
             />
           </div>
-          <div className="w-32">
-            <label className="block text-[8px] tracking-[0.18em] text-white/20 mb-2">
+          <div style={{ width: 128 }}>
+            <label className="block" style={{ fontSize: typography.size.xs, textTransform: 'uppercase', letterSpacing: '0.18em', color: colors.text.tertiary, marginBottom: spacing.sm }}>
               INTENT
             </label>
             <button
               onClick={() => handleChange('wasPlanned', !formData.wasPlanned)}
-              className={`w-full py-3 rounded-md text-[9px] uppercase tracking-wider border transition-all ${
-                formData.wasPlanned
-                  ? 'bg-white/10 border-white/30 text-white/90'
-                  : 'bg-transparent border-white/10 text-white/40'
-              }`}
+              style={{
+                width: '100%',
+                padding: `${spacing.md}px`,
+                borderRadius: radius.md,
+                fontSize: typography.size.xs,
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                border: formData.wasPlanned ? `1px solid ${colors.border.strong}` : `1px solid ${colors.border.default}`,
+                backgroundColor: formData.wasPlanned ? 'rgba(255,255,255,0.1)' : 'transparent',
+                color: formData.wasPlanned ? colors.text.primary : colors.text.secondary,
+                cursor: 'pointer',
+                transition: transitions.default,
+              }}
             >
               {formData.wasPlanned ? 'Planned' : 'Reactive'}
             </button>
@@ -160,19 +213,30 @@ export default function EventForm({
 
         {/* Mood Selector */}
         <div>
-          <label className="block text-[8px] tracking-[0.18em] text-white/20 mb-3">
+          <label className="block" style={{ fontSize: typography.size.xs, textTransform: 'uppercase', letterSpacing: '0.18em', color: colors.text.tertiary, marginBottom: spacing.md }}>
             MOOD (OPTIONAL)
           </label>
-          <div className="flex flex-wrap gap-2">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: spacing.sm }}>
             {MOODS.map((m) => (
               <button
                 key={m.value}
                 onClick={() => handleChange('mood', m.value === formData.mood ? undefined : m.value)}
-                className={`px-3 py-1.5 rounded-full text-[8px] transition-all border ${
-                  formData.mood === m.value
-                    ? 'bg-white/10 border-white/30 text-white/90'
-                    : 'bg-transparent border-white/10 text-white/40 hover:border-white/20'
-                }`}
+                style={{
+                  padding: `${spacing.xs}px ${spacing.sm}px`,
+                  borderRadius: radius.full,
+                  fontSize: typography.size.xs,
+                  border: formData.mood === m.value ? `1px solid ${colors.border.strong}` : `1px solid ${colors.border.default}`,
+                  backgroundColor: formData.mood === m.value ? 'rgba(255,255,255,0.1)' : 'transparent',
+                  color: formData.mood === m.value ? colors.text.primary : colors.text.secondary,
+                  cursor: 'pointer',
+                  transition: transitions.default,
+                }}
+                onMouseEnter={(e) => {
+                  if (formData.mood !== m.value) e.currentTarget.style.borderColor = colors.border.strong;
+                }}
+                onMouseLeave={(e) => {
+                  if (formData.mood !== m.value) e.currentTarget.style.borderColor = colors.border.default;
+                }}
               >
                 {m.label}
               </button>
@@ -182,19 +246,33 @@ export default function EventForm({
 
         {/* Impact Selector */}
         <div>
-          <label className="block text-[8px] tracking-[0.18em] text-white/20 mb-3">
+          <label className="block" style={{ fontSize: typography.size.xs, textTransform: 'uppercase', letterSpacing: '0.18em', color: colors.text.tertiary, marginBottom: spacing.md }}>
             IMPACT
           </label>
-          <div className="flex gap-2">
+          <div style={{ display: 'flex', gap: spacing.sm }}>
             {IMPACTS.map((i) => (
               <button
                 key={i.value}
                 onClick={() => handleChange('impact', i.value)}
-                className={`flex-1 py-2 rounded-full text-[9px] uppercase tracking-wider transition-all border ${
-                  formData.impact === i.value
-                    ? 'bg-white/10 border-white/30 text-white/90'
-                    : 'bg-transparent border-white/10 text-white/40 hover:border-white/20'
-                }`}
+                style={{
+                  flex: 1,
+                  padding: `${spacing.sm}px`,
+                  borderRadius: radius.full,
+                  fontSize: typography.size.xs,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                  border: formData.impact === i.value ? `1px solid ${colors.border.strong}` : `1px solid ${colors.border.default}`,
+                  backgroundColor: formData.impact === i.value ? 'rgba(255,255,255,0.1)' : 'transparent',
+                  color: formData.impact === i.value ? colors.text.primary : colors.text.secondary,
+                  cursor: 'pointer',
+                  transition: transitions.default,
+                }}
+                onMouseEnter={(e) => {
+                  if (formData.impact !== i.value) e.currentTarget.style.borderColor = colors.border.strong;
+                }}
+                onMouseLeave={(e) => {
+                  if (formData.impact !== i.value) e.currentTarget.style.borderColor = colors.border.default;
+                }}
               >
                 {i.label}
               </button>
@@ -204,7 +282,7 @@ export default function EventForm({
 
         {/* Notes */}
         <div>
-          <label className="block text-[8px] tracking-[0.18em] text-white/20 mb-2">
+          <label className="block" style={{ fontSize: typography.size.xs, textTransform: 'uppercase', letterSpacing: '0.18em', color: colors.text.tertiary, marginBottom: spacing.sm }}>
             NOTES
           </label>
           <textarea
@@ -212,22 +290,45 @@ export default function EventForm({
             onChange={(e) => handleChange('notes', e.target.value)}
             placeholder="Details..."
             rows={3}
-            className="w-full bg-white/[0.03] border border-white/10 rounded-md px-4 py-3 text-white/80 text-xs focus:outline-none focus:border-white/20 resize-none"
+            style={{
+              width: '100%',
+              backgroundColor: 'rgba(255,255,255,0.03)',
+              border: `1px solid ${colors.border.default}`,
+              borderRadius: radius.md,
+              padding: `${spacing.md}px ${spacing.sm}px`,
+              color: colors.text.primary,
+              fontSize: typography.size.xs,
+              resize: 'none',
+            }}
+            className="focus:outline-none"
+            onFocus={(e) => (e.currentTarget.style.borderColor = colors.border.strong)}
+            onBlur={(e) => (e.currentTarget.style.borderColor = colors.border.default)}
           />
         </div>
 
         {/* Depth Link */}
         <button
           onClick={() => setShowDepth(!showDepth)}
-          className="text-[9px] uppercase tracking-[0.2em] text-white/30 hover:text-white/60 transition-colors"
+          style={{
+            fontSize: typography.size.xs,
+            textTransform: 'uppercase',
+            letterSpacing: '0.2em',
+            color: colors.text.tertiary,
+            backgroundColor: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            transition: transitions.default,
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = colors.text.secondary)}
+          onMouseLeave={(e) => (e.currentTarget.style.color = colors.text.tertiary)}
         >
           {showDepth ? '- Hide depth' : '+ Add depth'}
         </button>
 
         {showDepth && (
-          <div className="space-y-6 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.lg, paddingTop: spacing.sm, animation: `fadeIn ${transitions.default}` }}>
              <div>
-              <label className="block text-[8px] tracking-[0.18em] text-white/20 mb-2">
+              <label className="block" style={{ fontSize: typography.size.xs, textTransform: 'uppercase', letterSpacing: '0.18em', color: colors.text.tertiary, marginBottom: spacing.sm }}>
                 LESSON LEARNED
               </label>
               <textarea
@@ -235,11 +336,23 @@ export default function EventForm({
                 onChange={(e) => handleChange('lessonLearned', e.target.value)}
                 placeholder="What did this teach you?"
                 rows={2}
-                className="w-full bg-white/[0.03] border border-white/10 rounded-md px-4 py-3 text-white/80 text-xs focus:outline-none focus:border-white/20 resize-none"
+                style={{
+                  width: '100%',
+                  backgroundColor: 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${colors.border.default}`,
+                  borderRadius: radius.md,
+                  padding: `${spacing.md}px ${spacing.sm}px`,
+                  color: colors.text.primary,
+                  fontSize: typography.size.xs,
+                  resize: 'none',
+                }}
+                className="focus:outline-none"
+                onFocus={(e) => (e.currentTarget.style.borderColor = colors.border.strong)}
+                onBlur={(e) => (e.currentTarget.style.borderColor = colors.border.default)}
               />
             </div>
             <div>
-              <label className="block text-[8px] tracking-[0.18em] text-white/20 mb-2">
+              <label className="block" style={{ fontSize: typography.size.xs, textTransform: 'uppercase', letterSpacing: '0.18em', color: colors.text.tertiary, marginBottom: spacing.sm }}>
                 WHAT YOU&apos;D DO DIFFERENTLY
               </label>
               <textarea
@@ -247,23 +360,48 @@ export default function EventForm({
                 onChange={(e) => handleChange('counterfactual', e.target.value)}
                 placeholder="Looking back, what would you change?"
                 rows={2}
-                className="w-full bg-white/[0.03] border border-white/10 rounded-md px-4 py-3 text-white/80 text-xs focus:outline-none focus:border-white/20 resize-none"
+                style={{
+                  width: '100%',
+                  backgroundColor: 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${colors.border.default}`,
+                  borderRadius: radius.md,
+                  padding: `${spacing.md}px ${spacing.sm}px`,
+                  color: colors.text.primary,
+                  fontSize: typography.size.xs,
+                  resize: 'none',
+                }}
+                className="focus:outline-none"
+                onFocus={(e) => (e.currentTarget.style.borderColor = colors.border.strong)}
+                onBlur={(e) => (e.currentTarget.style.borderColor = colors.border.default)}
               />
             </div>
             <div>
-              <label className="block text-[8px] tracking-[0.18em] text-white/20 mb-2">
+              <label className="block" style={{ fontSize: typography.size.xs, textTransform: 'uppercase', letterSpacing: '0.18em', color: colors.text.tertiary, marginBottom: spacing.sm }}>
                 TRIGGER
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: spacing.sm }}>
                 {['internal', 'external', 'market', 'team', 'personal'].map((t) => (
                   <button
                     key={t}
                     onClick={() => handleChange('triggerType', t)}
-                    className={`px-3 py-1.5 rounded-md text-[9px] uppercase tracking-wider border transition-all ${
-                      formData.triggerType === t
-                        ? 'bg-white/10 border-white/30 text-white/90'
-                        : 'bg-transparent border-white/10 text-white/40'
-                    }`}
+                    style={{
+                      padding: `${spacing.xs}px ${spacing.sm}px`,
+                      borderRadius: radius.md,
+                      fontSize: typography.size.xs,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em',
+                      border: formData.triggerType === t ? `1px solid ${colors.border.strong}` : `1px solid ${colors.border.default}`,
+                      backgroundColor: formData.triggerType === t ? 'rgba(255,255,255,0.1)' : 'transparent',
+                      color: formData.triggerType === t ? colors.text.primary : colors.text.secondary,
+                      cursor: 'pointer',
+                      transition: transitions.default,
+                    }}
+                    onMouseEnter={(e) => {
+                      if (formData.triggerType !== t) e.currentTarget.style.borderColor = colors.border.strong;
+                    }}
+                    onMouseLeave={(e) => {
+                      if (formData.triggerType !== t) e.currentTarget.style.borderColor = colors.border.default;
+                    }}
                   >
                     {t}
                   </button>
@@ -275,7 +413,7 @@ export default function EventForm({
       </div>
 
       {/* Footer */}
-      <div className="modify-footer border-t border-white/10 px-7 py-6 flex gap-3">
+      <div className="modify-footer" style={{ borderTop: `1px solid ${colors.border.default}`, padding: spacing.lg, display: 'flex', gap: spacing.md }}>
         <button
           onClick={onClose}
           className="btn-cancel flex-1"

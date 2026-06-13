@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { supabase } from './supabaseClient';
 
 export interface Venture {
   id: string;
@@ -60,6 +61,10 @@ export interface TaskConnection {
 }
 
 interface CanvasState {
+  // Auth
+  user: { id: string; email: string; fullName: string; tier: 'free' | 'premium' } | null;
+  authLoading: boolean;
+
   // Data
   ventures: Venture[];
   events: VentureEvent[];
@@ -76,7 +81,16 @@ interface CanvasState {
   onNavigateToTarget?: (worldX: number, worldY: number, scale?: number) => void;
   onNavigateToYear?: (year: number) => void;
 
+  // Sync status
+  syncStatus: 'idle' | 'syncing' | 'synced' | 'error';
+  syncError: string | null;
+
   // Actions
+  setUser: (user: { id: string; email: string; fullName: string; tier: 'free' | 'premium' } | null) => void;
+  clearAuth: () => void;
+  setAuthLoading: (loading: boolean) => void;
+  setSyncStatus: (status: 'idle' | 'syncing' | 'synced' | 'error') => void;
+  setSyncError: (error: string | null) => void;
   setVentures: (ventures: Venture[]) => void;
   addVenture: (venture: Venture) => void;
   updateVenture: (id: string, updates: Partial<Venture>) => void;
@@ -97,6 +111,16 @@ interface CanvasState {
     onNavigateToTarget?: (worldX: number, worldY: number, scale?: number) => void,
     onNavigateToYear?: (year: number) => void
   ) => void;
+
+  // Async database functions
+  fetchVentures: (userId: string) => Promise<void>;
+  saveVenture: (venture: Venture) => Promise<void>;
+  deleteVentureFromDb: (id: string) => Promise<void>;
+  saveEvent: (event: VentureEvent) => Promise<void>;
+  deleteEventFromDb: (id: string) => Promise<void>;
+  fetchTasks: (userId: string) => Promise<void>;
+  saveTask: (task: FounderTask) => Promise<void>;
+  deleteTaskFromDb: (id: string) => Promise<void>;
 }
 
 const SEED_DATA: Venture[] = [
@@ -198,7 +222,12 @@ const SEED_TASK_CONNECTIONS: TaskConnection[] = [
   { id: 'task-link-2', fromTaskId: 'task-freight-retention', toTaskId: 'task-synthetica-launch' },
 ];
 
-export const useStore = create<CanvasState>((set) => ({
+export const useStore = create<CanvasState>((set, get) => ({
+  // Auth
+  user: null,
+  authLoading: true,
+
+  // Data
   ventures: SEED_DATA,
   events: SEED_EVENTS,
   tasks: SEED_TASKS,
@@ -207,6 +236,17 @@ export const useStore = create<CanvasState>((set) => ({
   zoomLevel: 1,
   panX: 0,
   panY: 0,
+
+  // Sync status
+  syncStatus: 'idle',
+  syncError: null,
+
+  // Auth actions
+  setUser: (user) => set({ user, authLoading: false }),
+  clearAuth: () => set({ user: null }),
+  setAuthLoading: (loading) => set({ authLoading: loading }),
+  setSyncStatus: (status) => set({ syncStatus: status }),
+  setSyncError: (error) => set({ syncError: error }),
 
   setVentures: (ventures) => set({ ventures }),
   addVenture: (venture) =>
@@ -265,4 +305,226 @@ export const useStore = create<CanvasState>((set) => ({
   resetView: () => set({ zoomLevel: 1, panX: 0, panY: 0 }),
   setCanvasNavigationCallbacks: (onNavigateToTarget, onNavigateToYear) =>
     set({ onNavigateToTarget, onNavigateToYear }),
+
+  // Async database functions
+  fetchVentures: async (userId: string) => {
+    try {
+      set({ syncStatus: 'syncing' });
+      const { data, error } = await supabase
+        .from('ventures')
+        .select('*')
+        .eq('user_id', userId);
+
+      if (error) throw error;
+
+      const ventures: Venture[] = (data || []).map((v: any) => ({
+        id: v.id,
+        name: v.name,
+        description: v.description,
+        industry: v.industry,
+        status: v.status,
+        startedDate: v.started_date,
+        endedDate: v.ended_date,
+        logoUrl: v.logo_url,
+        color: v.color,
+        parentId: v.parent_id,
+        branchLabel: v.branch_label,
+        position: { x: v.position_x || 0, y: v.position_y || 0 },
+        hardestLesson: v.hardest_lesson,
+        burnRate: v.burn_rate,
+        runwayMonths: v.runway_months,
+        collaborators: v.collaborators,
+        healthScore: v.health_score,
+        mrrTrend: v.mrr_trend,
+        lastSyncedAt: v.last_synced_at,
+        source: v.source,
+        timelineSide: v.timeline_side,
+      }));
+
+      set({ ventures, syncStatus: 'synced' });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to fetch ventures';
+      set({ syncStatus: 'error', syncError: message });
+    }
+  },
+
+  saveVenture: async (venture: Venture) => {
+    try {
+      set({ syncStatus: 'syncing' });
+      const { error } = await supabase
+        .from('ventures')
+        .upsert([
+          {
+            id: venture.id,
+            name: venture.name,
+            description: venture.description,
+            industry: venture.industry,
+            status: venture.status,
+            started_date: venture.startedDate,
+            ended_date: venture.endedDate,
+            logo_url: venture.logoUrl,
+            color: venture.color,
+            parent_id: venture.parentId,
+            branch_label: venture.branchLabel,
+            position_x: venture.position?.x,
+            position_y: venture.position?.y,
+            hardest_lesson: venture.hardestLesson,
+            burn_rate: venture.burnRate,
+            runway_months: venture.runwayMonths,
+            collaborators: venture.collaborators,
+            health_score: venture.healthScore,
+            mrr_trend: venture.mrrTrend,
+            last_synced_at: new Date().toISOString(),
+            source: venture.source,
+            timeline_side: venture.timelineSide,
+          },
+        ]);
+
+      if (error) throw error;
+      set({ syncStatus: 'synced' });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to save venture';
+      set({ syncStatus: 'error', syncError: message });
+    }
+  },
+
+  deleteVentureFromDb: async (id: string) => {
+    try {
+      set({ syncStatus: 'syncing' });
+      const { error } = await supabase
+        .from('ventures')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      set({ syncStatus: 'synced' });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to delete venture';
+      set({ syncStatus: 'error', syncError: message });
+    }
+  },
+
+  saveEvent: async (event: VentureEvent) => {
+    try {
+      set({ syncStatus: 'syncing' });
+      const { error } = await supabase
+        .from('events')
+        .upsert([
+          {
+            id: event.id,
+            venture_id: event.ventureId,
+            type: event.type,
+            title: event.title,
+            notes: event.notes,
+            event_date: event.eventDate,
+            link_url: event.linkUrl,
+            mood: event.mood,
+            impact: event.impact,
+            was_planned: event.wasPlanned,
+            trigger_type: event.triggerType,
+            lesson_learned: event.lessonLearned,
+            counterfactual: event.counterfactual,
+          },
+        ]);
+
+      if (error) throw error;
+      set({ syncStatus: 'synced' });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to save event';
+      set({ syncStatus: 'error', syncError: message });
+    }
+  },
+
+  deleteEventFromDb: async (id: string) => {
+    try {
+      set({ syncStatus: 'syncing' });
+      const { error } = await supabase
+        .from('events')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      set({ syncStatus: 'synced' });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to delete event';
+      set({ syncStatus: 'error', syncError: message });
+    }
+  },
+
+  fetchTasks: async (userId: string) => {
+    try {
+      set({ syncStatus: 'syncing' });
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('user_id', userId);
+
+      if (error) throw error;
+
+      const tasks: FounderTask[] = (data || []).map((t: any) => ({
+        id: t.id,
+        title: t.title,
+        ventureId: t.venture_id,
+        role: t.role,
+        deadline: t.deadline,
+        notes: t.notes,
+        status: t.status,
+        position: { x: t.position_x || 0, y: t.position_y || 0 },
+      }));
+
+      set({ tasks, syncStatus: 'synced' });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to fetch tasks';
+      set({ syncStatus: 'error', syncError: message });
+    }
+  },
+
+  saveTask: async (task: FounderTask) => {
+    try {
+      set({ syncStatus: 'syncing' });
+      const state = get();
+      const userId = state.user?.id;
+
+      if (!userId) throw new Error('User not authenticated');
+
+      const { error } = await supabase
+        .from('tasks')
+        .upsert([
+          {
+            id: task.id,
+            venture_id: task.ventureId,
+            user_id: userId,
+            title: task.title,
+            role: task.role,
+            deadline: task.deadline,
+            notes: task.notes,
+            status: task.status,
+            position_x: task.position.x,
+            position_y: task.position.y,
+          },
+        ]);
+
+      if (error) throw error;
+      set({ syncStatus: 'synced' });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to save task';
+      set({ syncStatus: 'error', syncError: message });
+    }
+  },
+
+  deleteTaskFromDb: async (id: string) => {
+    try {
+      set({ syncStatus: 'syncing' });
+      const { error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      set({ syncStatus: 'synced' });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to delete task';
+      set({ syncStatus: 'error', syncError: message });
+    }
+  },
 }));

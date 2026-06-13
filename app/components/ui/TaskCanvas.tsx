@@ -13,6 +13,7 @@ import {
   X,
 } from 'lucide-react';
 import { FounderTask, useStore } from '@/lib/useStore';
+import { colors, spacing, radius, typography, transitions, shadows, layout, components } from '@/styles/tokens';
 
 const ROLE_OPTIONS: FounderTask['role'][] = ['founder', 'ops', 'growth', 'product', 'finance'];
 const STATUS_OPTIONS: FounderTask['status'][] = ['todo', 'doing', 'blocked', 'done'];
@@ -250,7 +251,7 @@ export default function TaskCanvas({
                       <path
                         key={`venture-${task.id}`}
                         d={`M ${x1} ${y1} C ${mid} ${y1}, ${mid} ${y2}, ${x2} ${y2}`}
-                        stroke="rgba(255,255,255,0.18)"
+                        stroke={colors.border.default}
                         strokeWidth="1.2"
                         fill="none"
                       />
@@ -272,12 +273,12 @@ export default function TaskCanvas({
                 <g key={connection.id}>
                   <path
                     d={`M ${x1} ${y1} C ${mid} ${y1}, ${mid} ${y2}, ${x2} ${y2}`}
-                    stroke="rgba(255,255,255,0.28)"
+                    stroke={colors.border.strong}
                     strokeWidth="1.4"
                     fill="none"
                     strokeDasharray="5 7"
                   />
-                  <circle cx={x2} cy={y2} r="3.5" fill="rgba(255,255,255,0.74)" />
+                  <circle cx={x2} cy={y2} r="3.5" fill={colors.text.secondary} />
                 </g>
               );
             })}
@@ -396,14 +397,14 @@ const overlayStyle: React.CSSProperties = {
   position: 'fixed',
   inset: 0,
   zIndex: 260,
-  background: '#0b0b0b',
-  padding: '64px 0 0',
-  fontFamily: "'Inter', sans-serif",
+  background: colors.background.base,
+  padding: `${layout.header.height}px 0 0`,
+  fontFamily: typography.family.base,
 };
 
 const shellStyle: React.CSSProperties = {
   height: '100%',
-  background: 'linear-gradient(180deg, rgba(14,14,14,0.98), rgba(5,5,5,0.98))',
+  background: `linear-gradient(180deg, ${colors.background.surface}, ${colors.background.base})`,
   overflow: 'hidden',
   display: 'flex',
   flexDirection: 'column',
@@ -414,52 +415,52 @@ const headerStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  gap: '24px',
-  padding: '16px 22px',
-  borderBottom: '1px solid rgba(255,255,255,0.08)',
+  gap: spacing['2xl'],
+  padding: `${spacing.lg} ${spacing.lg + 6}px`,
+  borderBottom: `1px solid ${colors.border.default}`,
 };
 
 const eyebrowStyle: React.CSSProperties = {
-  color: 'rgba(255,255,255,0.36)',
-  fontSize: '10px',
+  color: colors.text.secondary,
+  fontSize: typography.size.xs,
   textTransform: 'uppercase',
   letterSpacing: '0.12em',
 };
 
 const titleStyle: React.CSSProperties = {
-  margin: '5px 0 0',
-  color: 'rgba(255,255,255,0.9)',
-  fontFamily: "'Plus Jakarta Sans', sans-serif",
-  fontSize: '19px',
-  fontWeight: 800,
+  margin: `${spacing.xs + 1}px 0 0`,
+  color: colors.text.primary,
+  fontFamily: typography.family.display,
+  fontSize: typography.size.xl,
+  fontWeight: typography.weight.bold,
   letterSpacing: 0,
 };
 
 const metricPillStyle: React.CSSProperties = {
-  border: '1px solid rgba(255,255,255,0.09)',
-  borderRadius: '999px',
-  padding: '7px 10px',
-  color: 'rgba(255,255,255,0.45)',
-  fontSize: '10px',
+  border: `1px solid ${colors.border.default}`,
+  borderRadius: radius.full,
+  padding: `${spacing.xs - 1}px ${spacing.xs + 2}px`,
+  color: colors.text.secondary,
+  fontSize: typography.size.xs,
   textTransform: 'uppercase',
   display: 'flex',
-  gap: '7px',
+  gap: spacing.xs - 1,
 };
 
 const composerStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  gap: '8px',
-  padding: '12px 16px',
-  borderBottom: '1px solid rgba(255,255,255,0.07)',
-  background: 'rgba(255,255,255,0.025)',
+  gap: spacing.sm,
+  padding: `${spacing.md} ${spacing.lg}px`,
+  borderBottom: `1px solid ${colors.border.subtle}`,
+  background: colors.background.surface,
 };
 
 const boardStyle: React.CSSProperties = {
   flex: 1,
   position: 'relative',
   overflow: 'hidden',
-  backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.065) 1px, transparent 0)',
+  backgroundImage: `radial-gradient(circle at 1px 1px, ${colors.border.subtle} 1px, transparent 0)`,
   backgroundSize: '28px 28px',
 };
 
@@ -475,15 +476,15 @@ const ventureAnchorStyle = (color?: string): React.CSSProperties => ({
   top: '50px',
   width: '210px',
   minHeight: '100px',
-  border: '1px solid rgba(255,255,255,0.14)',
-  borderRadius: '10px',
-  background: 'rgba(10,10,10,0.95)',
-  boxShadow: color ? `0 0 38px ${color}22` : '0 18px 46px rgba(0,0,0,0.45)',
-  padding: '16px',
-  color: 'rgba(255,255,255,0.86)',
+  border: `1px solid ${colors.border.default}`,
+  borderRadius: radius.lg,
+  background: colors.background.elevated,
+  boxShadow: color ? `0 0 38px ${color}22` : shadows.elevated,
+  padding: spacing.lg,
+  color: colors.text.primary,
   display: 'flex',
   flexDirection: 'column',
-  gap: '7px',
+  gap: spacing.xs + 2,
 });
 
 const connectionLayerStyle: React.CSSProperties = {
@@ -495,36 +496,36 @@ const connectionLayerStyle: React.CSSProperties = {
 };
 
 const fieldStyle: React.CSSProperties = {
-  height: '38px',
-  border: '1px solid rgba(255,255,255,0.1)',
-  borderRadius: '9px',
-  background: 'rgba(255,255,255,0.045)',
-  color: 'rgba(255,255,255,0.82)',
-  padding: '0 11px',
+  height: `${components.input.heightSmall}px`,
+  border: `1px solid ${colors.border.default}`,
+  borderRadius: radius.md,
+  background: colors.background.surface,
+  color: colors.text.primary,
+  padding: `0 ${components.input.paddingX}px`,
   outline: 'none',
-  fontSize: '12px',
+  fontSize: typography.size.sm,
 };
 
 const primaryButtonStyle: React.CSSProperties = {
   ...fieldStyle,
-  borderColor: 'rgba(255,255,255,0.5)',
-  color: '#050505',
-  background: 'rgba(255,255,255,0.92)',
-  fontWeight: 800,
+  borderColor: colors.text.primary,
+  color: colors.background.base,
+  background: colors.text.primary,
+  fontWeight: typography.weight.bold,
   textTransform: 'uppercase',
   display: 'flex',
   alignItems: 'center',
-  gap: '7px',
+  gap: spacing.xs - 1,
   cursor: 'pointer',
 };
 
 const iconButtonStyle: React.CSSProperties = {
-  width: '38px',
-  height: '38px',
+  width: `${components.button.icon.md.size}px`,
+  height: `${components.button.icon.md.size}px`,
   borderRadius: '50%',
-  border: '1px solid rgba(255,255,255,0.12)',
-  background: 'rgba(255,255,255,0.04)',
-  color: 'rgba(255,255,255,0.72)',
+  border: `1px solid ${colors.border.default}`,
+  background: colors.background.surface,
+  color: colors.text.secondary,
   display: 'grid',
   placeItems: 'center',
   cursor: 'pointer',
@@ -534,54 +535,55 @@ const taskCardStyle: React.CSSProperties = {
   position: 'absolute',
   width: '242px',
   minHeight: '132px',
-  border: '1px solid rgba(255,255,255,0.1)',
-  borderRadius: '12px',
-  background: 'rgba(12,12,12,0.94)',
-  boxShadow: '0 18px 46px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.05)',
-  padding: '12px',
+  border: `1px solid ${colors.border.default}`,
+  borderRadius: radius.lg,
+  background: colors.background.elevated,
+  boxShadow: shadows.card,
+  padding: spacing.md,
   cursor: 'grab',
-  transition: 'border-color 140ms ease, transform 140ms ease',
+  transition: `border-color ${transitions.default}, transform ${transitions.default}`,
 };
 
 const taskTitleStyle: React.CSSProperties = {
-  marginTop: '9px',
-  color: 'rgba(255,255,255,0.9)',
-  fontFamily: "'Plus Jakarta Sans', sans-serif",
-  fontWeight: 800,
-  fontSize: '14px',
+  marginTop: spacing.sm,
+  color: colors.text.primary,
+  fontFamily: typography.family.display,
+  fontWeight: typography.weight.bold,
+  fontSize: typography.size.md,
   lineHeight: 1.25,
 };
 
 const taskMetaStyle: React.CSSProperties = {
-  marginTop: '8px',
+  marginTop: spacing.sm,
   display: 'flex',
-  gap: '10px',
-  color: 'rgba(255,255,255,0.42)',
-  fontSize: '10px',
+  gap: spacing.md,
+  color: colors.text.secondary,
+  fontSize: typography.size.xs,
   textTransform: 'uppercase',
 };
 
 const notesStyle: React.CSSProperties = {
   width: '100%',
-  marginTop: '9px',
-  border: '1px solid rgba(255,255,255,0.08)',
-  borderRadius: '8px',
-  background: 'rgba(255,255,255,0.035)',
-  color: 'rgba(255,255,255,0.68)',
+  marginTop: spacing.sm,
+  border: `1px solid ${colors.border.default}`,
+  borderRadius: radius.md,
+  background: colors.background.surface,
+  color: colors.text.primary,
   resize: 'none',
-  padding: '8px',
+  padding: spacing.xs,
   outline: 'none',
-  fontSize: '11px',
+  fontSize: typography.size.xs,
   lineHeight: 1.4,
+  fontFamily: typography.family.base,
 };
 
 const tinyButtonStyle: React.CSSProperties = {
   width: '25px',
   height: '25px',
-  borderRadius: '7px',
-  border: '1px solid rgba(255,255,255,0.09)',
-  background: 'rgba(255,255,255,0.04)',
-  color: 'rgba(255,255,255,0.55)',
+  borderRadius: radius.md,
+  border: `1px solid ${colors.border.default}`,
+  background: colors.background.surface,
+  color: colors.text.secondary,
   display: 'grid',
   placeItems: 'center',
   cursor: 'pointer',
@@ -592,9 +594,9 @@ const connectionButtonStyle: React.CSSProperties = {
   width: '18px',
   height: '18px',
   borderRadius: '50%',
-  border: '1px solid rgba(255,255,255,0.16)',
-  background: 'rgba(8,8,8,0.92)',
-  color: 'rgba(255,255,255,0.62)',
+  border: `1px solid ${colors.border.default}`,
+  background: colors.background.base,
+  color: colors.text.secondary,
   display: 'grid',
   placeItems: 'center',
   cursor: 'pointer',
@@ -603,21 +605,21 @@ const connectionButtonStyle: React.CSSProperties = {
 const ventureMarkStyle = (color?: string, logoUrl?: string): React.CSSProperties => ({
   width: '30px',
   height: '30px',
-  borderRadius: '9px',
+  borderRadius: radius.md,
   display: 'grid',
   placeItems: 'center',
-  color: '#050505',
-  fontFamily: "'Montserrat', sans-serif",
-  fontWeight: 900,
-  background: logoUrl ? `center / cover no-repeat url(${logoUrl})` : color ? `linear-gradient(145deg, ${color}, rgba(255,255,255,0.9))` : 'rgba(255,255,255,0.88)',
+  color: colors.background.base,
+  fontFamily: typography.family.base,
+  fontWeight: typography.weight.bold,
+  background: logoUrl ? `center / cover no-repeat url(${logoUrl})` : color ? `linear-gradient(145deg, ${color}, rgba(255,255,255,0.9))` : colors.text.primary,
 });
 
 const ventureLabelStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  gap: '5px',
-  color: 'rgba(255,255,255,0.34)',
-  fontSize: '10px',
+  gap: spacing.xs - 1,
+  color: colors.text.secondary,
+  fontSize: typography.size.xs,
   maxWidth: '116px',
   overflow: 'hidden',
   whiteSpace: 'nowrap',
@@ -626,21 +628,22 @@ const ventureLabelStyle: React.CSSProperties = {
 
 const statusSelectStyle = (status: FounderTask['status']): React.CSSProperties => {
   const color: Record<FounderTask['status'], string> = {
-    todo: 'rgba(255,255,255,0.48)',
-    doing: 'rgba(149,225,211,0.85)',
-    blocked: 'rgba(255,150,135,0.82)',
-    done: 'rgba(130,255,190,0.82)',
+    todo: colors.text.secondary,
+    doing: colors.accent.teal,
+    blocked: colors.status.failed,
+    done: colors.status.active,
   };
 
   return {
     border: `1px solid ${color[status]}`,
-    borderRadius: '999px',
+    borderRadius: radius.full,
     background: 'transparent',
     color: color[status],
-    padding: '5px 9px',
-    fontSize: '10px',
+    padding: `${spacing.xs - 1}px ${spacing.xs + 1}px`,
+    fontSize: typography.size.xs,
     textTransform: 'uppercase',
     outline: 'none',
+    fontFamily: typography.family.base,
   };
 };
 
@@ -649,23 +652,23 @@ const emptyStateStyle: React.CSSProperties = {
   inset: 0,
   display: 'grid',
   placeItems: 'center',
-  color: 'rgba(255,255,255,0.28)',
-  fontSize: '13px',
-  gap: '10px',
+  color: colors.text.tertiary,
+  fontSize: typography.size.base,
+  gap: spacing.lg,
 };
 
 const linkHintStyle: React.CSSProperties = {
   position: 'absolute',
   left: '50%',
-  bottom: '18px',
+  bottom: `${spacing.lg}px`,
   transform: 'translateX(-50%)',
-  border: '1px solid rgba(255,255,255,0.12)',
-  borderRadius: '999px',
-  background: 'rgba(6,6,6,0.88)',
-  color: 'rgba(255,255,255,0.72)',
-  padding: '8px 12px',
+  border: `1px solid ${colors.border.default}`,
+  borderRadius: radius.full,
+  background: colors.background.base,
+  color: colors.text.primary,
+  padding: `${spacing.xs}px ${spacing.md}px`,
   display: 'flex',
   alignItems: 'center',
-  gap: '7px',
-  fontSize: '11px',
+  gap: spacing.xs - 1,
+  fontSize: typography.size.xs,
 };

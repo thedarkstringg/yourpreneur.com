@@ -3,6 +3,7 @@
 import { Download, Share2, X } from 'lucide-react';
 import { useMemo } from 'react';
 import { useStore } from '@/lib/useStore';
+import { colors, spacing, radius, typography, transitions } from '@/styles/tokens';
 
 export default function PatternsScreen({ onClose }: { onClose: () => void }) {
   const { ventures, events } = useStore();
@@ -145,31 +146,32 @@ const screenStyle: React.CSSProperties = {
   position: 'fixed',
   inset: 0,
   zIndex: 250,
-  background: '#111111',
-  color: '#ffffff',
+  background: colors.background.surface,
+  color: colors.text.primary,
   overflowY: 'auto',
-  fontFamily: "'Inter', sans-serif",
+  fontFamily: typography.family.base,
 };
 
 const closeStyle: React.CSSProperties = {
   position: 'fixed',
-  right: '24px',
-  top: '22px',
-  width: '36px',
-  height: '36px',
+  right: spacing.xl * 1.5,
+  top: spacing.lg + 6,
+  width: components.button.icon.sm.size,
+  height: components.button.icon.sm.size,
   borderRadius: '50%',
-  border: '1px solid rgba(255,255,255,0.12)',
-  background: 'rgba(0,0,0,0.6)',
-  color: 'rgba(255,255,255,0.72)',
+  border: `1px solid ${colors.border.default}`,
+  background: colors.background.base,
+  color: colors.text.secondary,
   display: 'grid',
   placeItems: 'center',
   cursor: 'pointer',
+  transition: transitions.default,
 };
 
 const reportStyle: React.CSSProperties = {
   width: 'min(100%, 720px)',
   margin: '0 auto',
-  padding: '48px 24px 80px',
+  padding: `${spacing['3xl']}px ${spacing.lg}px ${spacing['3xl'] + 8}px`,
 };
 
 const heroStyle: React.CSSProperties = {
@@ -179,88 +181,91 @@ const heroStyle: React.CSSProperties = {
   alignItems: 'center',
   textAlign: 'center',
   justifyContent: 'center',
-  background: 'radial-gradient(circle at 50% 38%, rgba(255,255,255,0.055), transparent 58%)',
+  background: `radial-gradient(circle at 50% 38%, ${colors.border.default}, transparent 58%)`,
 };
 
 const eyebrowStyle: React.CSSProperties = {
   fontFamily: 'Georgia, serif',
-  fontSize: '10px',
-  fontWeight: 700,
+  fontSize: typography.size.xs,
+  fontWeight: typography.weight.bold,
   textTransform: 'uppercase',
   letterSpacing: 0,
+  color: colors.text.primary,
 };
 
 const titleStyle: React.CSSProperties = {
-  margin: '8px 0 22px',
-  fontFamily: "'Plus Jakarta Sans', sans-serif",
-  fontSize: '34px',
+  margin: `${spacing.sm}px 0 ${spacing.lg + 6}px`,
+  fontFamily: typography.family.display,
+  fontSize: 34,
   lineHeight: 1.08,
-  fontWeight: 900,
+  fontWeight: typography.weight.bold,
   letterSpacing: 0,
 };
 
 const ledeStyle: React.CSSProperties = {
   maxWidth: '520px',
-  color: 'rgba(255,255,255,0.86)',
-  fontSize: '12px',
+  color: colors.text.primary,
+  fontSize: typography.size.sm,
   lineHeight: 1.55,
 };
 
 const actionRowStyle: React.CSSProperties = {
   display: 'flex',
-  gap: '10px',
-  marginTop: '28px',
+  gap: spacing.md,
+  marginTop: spacing.xl + 4,
 };
 
 const lightButtonStyle: React.CSSProperties = {
   height: '30px',
-  border: '1px solid #ffffff',
-  background: '#ffffff',
-  color: '#070707',
-  padding: '0 18px',
+  border: `1px solid ${colors.text.primary}`,
+  background: colors.text.primary,
+  color: colors.background.base,
+  padding: `0 ${spacing.lg}px`,
   textTransform: 'uppercase',
-  fontSize: '9px',
-  fontWeight: 900,
+  fontSize: typography.size.xs,
+  fontWeight: typography.weight.bold,
   letterSpacing: '0.08em',
   display: 'flex',
   alignItems: 'center',
-  gap: '8px',
+  gap: spacing.sm,
   cursor: 'pointer',
+  borderRadius: radius.sm,
+  transition: transitions.default,
 };
 
 const darkButtonStyle: React.CSSProperties = {
   ...lightButtonStyle,
   background: 'transparent',
-  color: '#ffffff',
-  border: '1px solid rgba(255,255,255,0.18)',
+  color: colors.text.primary,
+  border: `1px solid ${colors.border.strong}`,
 };
 
 const metricGridStyle: React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: '1fr 2fr 1fr',
-  gap: '6px',
+  gap: spacing.xs,
 };
 
 const metricStyle: React.CSSProperties = {
   minHeight: '94px',
-  border: '1px solid rgba(255,255,255,0.1)',
-  background: 'rgba(255,255,255,0.012)',
-  padding: '20px',
+  border: `1px solid ${colors.border.default}`,
+  background: colors.background.surface,
+  padding: spacing.lg,
 };
 
 const metricLabelStyle: React.CSSProperties = {
   fontFamily: 'Georgia, serif',
-  color: '#ffffff',
-  fontSize: '9px',
-  fontWeight: 700,
+  color: colors.text.primary,
+  fontSize: typography.size.xs,
+  fontWeight: typography.weight.bold,
   textTransform: 'uppercase',
 };
 
 const metricValueStyle: React.CSSProperties = {
   display: 'block',
-  marginTop: '5px',
-  fontFamily: "'Plus Jakarta Sans', sans-serif",
-  fontSize: '28px',
+  marginTop: spacing.xs - 1,
+  fontFamily: typography.family.display,
+  fontSize: 28,
   lineHeight: 1,
 };
 
@@ -268,24 +273,24 @@ const metricLineStyle: React.CSSProperties = {
   display: 'block',
   height: '1px',
   flex: 1,
-  background: 'linear-gradient(90deg, #ffffff 0 64%, rgba(255,255,255,0.18) 64%)',
+  background: `linear-gradient(90deg, ${colors.text.primary} 0 64%, ${colors.border.default} 64%)`,
 };
 
 const performanceStyle: React.CSSProperties = {
-  marginTop: '6px',
+  marginTop: spacing.xs,
   minHeight: '88px',
-  border: '1px solid rgba(255,255,255,0.1)',
+  border: `1px solid ${colors.border.default}`,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  gap: '24px',
-  padding: '18px 22px',
+  gap: spacing['2xl'],
+  padding: `${spacing.lg + 2}px ${spacing.lg + 6}px`,
 };
 
 const barWrapStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'flex-end',
-  gap: '5px',
+  gap: spacing.xs,
   height: '56px',
 };
 
@@ -307,53 +312,53 @@ const barMonthStyle: React.CSSProperties = {
   top: '-2px',
   left: '50%',
   transform: 'translate(-50%, -100%)',
-  fontSize: '8px',
-  fontWeight: 800,
+  fontSize: typography.size.xs - 1,
+  fontWeight: typography.weight.bold,
 };
 
 const narrativeStyle: React.CSSProperties = {
-  marginTop: '42px',
-  paddingTop: '46px',
-  borderTop: '1px solid rgba(255,255,255,0.08)',
+  marginTop: spacing.xl + 10,
+  paddingTop: spacing.xl + 14,
+  borderTop: `1px solid ${colors.border.subtle}`,
   position: 'relative',
 };
 
 const sectionTitleStyle: React.CSSProperties = {
   textAlign: 'center',
-  fontFamily: "'Plus Jakarta Sans', sans-serif",
-  fontSize: '17px',
-  margin: '0 0 24px',
+  fontFamily: typography.family.display,
+  fontSize: 17,
+  margin: `0 0 ${spacing.xl + 8}px`,
 };
 
 const narrativeColumnsStyle: React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: '1fr 1fr',
-  gap: '48px',
-  color: 'rgba(255,255,255,0.86)',
-  fontSize: '12px',
+  gap: spacing['3xl'],
+  color: colors.text.primary,
+  fontSize: typography.size.sm,
   lineHeight: 1.6,
 };
 
 const tableStyle: React.CSSProperties = {
-  marginTop: '42px',
-  borderTop: '1px solid rgba(255,255,255,0.08)',
-  paddingTop: '22px',
+  marginTop: spacing.xl + 10,
+  borderTop: `1px solid ${colors.border.subtle}`,
+  paddingTop: spacing.lg + 6,
 };
 
 const entryStyle: React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: '90px 1fr 160px',
-  gap: '18px',
+  gap: spacing.lg + 2,
   alignItems: 'center',
   minHeight: '44px',
-  borderBottom: '1px solid rgba(255,255,255,0.07)',
-  color: 'rgba(255,255,255,0.58)',
-  fontSize: '11px',
+  borderBottom: `1px solid ${colors.border.subtle}`,
+  color: colors.text.secondary,
+  fontSize: typography.size.xs + 1,
 };
 
 const emptyStyle: React.CSSProperties = {
-  border: '1px solid rgba(255,255,255,0.08)',
-  color: 'rgba(255,255,255,0.42)',
-  padding: '18px',
-  fontSize: '12px',
+  border: `1px solid ${colors.border.default}`,
+  color: colors.text.secondary,
+  padding: spacing.lg + 2,
+  fontSize: typography.size.sm,
 };

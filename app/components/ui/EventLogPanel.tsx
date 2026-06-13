@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { X, Plus, Flag, Rocket, DollarSign, Users, RefreshCw, AlertTriangle, LogOut, GitBranch, BookOpen, Heart, Circle } from 'lucide-react';
 import { useToasts } from './Toast';
 import { Venture } from '@/lib/useStore';
+import { colors, spacing, radius, typography, transitions } from '@/styles/tokens';
 
 interface EventLogPanelProps {
   isOpen: boolean;
@@ -132,12 +133,12 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
       <div
         style={{
           position: 'fixed',
-          top: '48px',
+          top: 48,
           right: 0,
-          width: '400px',
+          width: 400,
           height: 'calc(100vh - 48px)',
-          background: '#0f0f0f',
-          border: '1px solid rgba(255,255,255,0.08)',
+          background: colors.background.base,
+          border: `1px solid ${colors.border.default}`,
           display: 'flex',
           flexDirection: 'column',
           zIndex: 401,
@@ -149,18 +150,18 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '10px',
-            padding: '20px 28px',
-            borderBottom: '1px solid rgba(255,255,255,0.06)',
+            gap: spacing.sm,
+            padding: `${spacing.md}px ${spacing.lg}px`,
+            borderBottom: `1px solid ${colors.border.subtle}`,
           }}
         >
-          <Plus size={16} strokeWidth={1.5} style={{ color: 'rgba(255,255,255,0.4)' }} />
+          <Plus size={16} strokeWidth={1.5} style={{ color: colors.text.secondary }} />
           <h2
             style={{
-              fontFamily: "'Montserrat', sans-serif",
-              fontSize: '24px',
-              fontWeight: 500,
-              color: 'rgba(255,255,255,0.9)',
+              fontFamily: typography.family.display,
+              fontSize: typography.size['2xl'],
+              fontWeight: typography.weight.medium,
+              color: colors.text.primary,
               margin: 0,
               flex: 1,
             }}
@@ -173,12 +174,12 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              color: 'rgba(255,255,255,0.4)',
-              padding: '4px',
-              transition: 'color 150ms',
+              color: colors.text.secondary,
+              padding: spacing.xs,
+              transition: transitions.default,
             }}
-            onMouseOver={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.8)')}
-            onMouseOut={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}
+            onMouseOver={(e) => (e.currentTarget.style.color = colors.text.primary)}
+            onMouseOut={(e) => (e.currentTarget.style.color = colors.text.secondary)}
           >
             <X size={20} strokeWidth={1.5} />
           </button>
@@ -189,13 +190,13 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
           style={{
             flex: 1,
             overflowY: 'auto',
-            padding: '28px',
+            padding: spacing.lg,
           }}
         >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.xl }}>
             {/* Venture */}
             <div>
-              <label style={{ display: 'block', fontSize: '9px', color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: '8px' }}>
+              <label style={{ display: 'block', fontSize: typography.size.xs, color: colors.text.tertiary, textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: spacing.sm }}>
                 Venture *
               </label>
               <select
@@ -207,19 +208,19 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
                 style={{
                   width: '100%',
                   background: 'rgba(255,255,255,0.03)',
-                  border: errors.ventureId ? '1px solid rgba(255,255,255,0.4)' : '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: '6px',
-                  padding: '11px 14px',
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: '13px',
-                  color: 'rgba(255,255,255,0.8)',
+                  border: errors.ventureId ? `1px solid ${colors.text.secondary}` : `1px solid ${colors.border.default}`,
+                  borderRadius: radius.sm,
+                  padding: `${spacing.xs + 1}px ${spacing.xs + 2}px`,
+                  fontFamily: typography.family.base,
+                  fontSize: typography.size.base,
+                  color: colors.text.primary,
                   outline: 'none',
                   boxSizing: 'border-box',
                 }}
               >
                 <option value="">Select venture...</option>
                 {ventures.map((v) => (
-                  <option key={v.id} value={v.id} style={{ background: '#0f0f0f' }}>
+                  <option key={v.id} value={v.id} style={{ background: colors.background.base }}>
                     {v.name}
                   </option>
                 ))}
@@ -228,7 +229,7 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
 
             {/* Date */}
             <div>
-              <label style={{ display: 'block', fontSize: '9px', color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: '8px' }}>
+              <label style={{ display: 'block', fontSize: typography.size.xs, color: colors.text.tertiary, textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: spacing.sm }}>
                 Date *
               </label>
               <input
@@ -241,18 +242,18 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
                 style={{
                   width: '100%',
                   background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: '6px',
-                  padding: '11px 14px',
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: '13px',
-                  color: 'rgba(255,255,255,0.8)',
+                  border: `1px solid ${colors.border.default}`,
+                  borderRadius: radius.sm,
+                  padding: `${spacing.xs + 1}px ${spacing.xs + 2}px`,
+                  fontFamily: typography.family.base,
+                  fontSize: typography.size.base,
+                  color: colors.text.primary,
                   outline: 'none',
                   boxSizing: 'border-box',
                 }}
               />
               {getRelativeDate() && (
-                <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginTop: '4px' }}>
+                <div style={{ fontSize: typography.size.xs, color: colors.text.tertiary, marginTop: spacing.xs }}>
                   {getRelativeDate()}
                 </div>
               )}
@@ -260,10 +261,10 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
 
             {/* Event Type */}
             <div>
-              <label style={{ display: 'block', fontSize: '9px', color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: '8px' }}>
+              <label style={{ display: 'block', fontSize: typography.size.xs, color: colors.text.tertiary, textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: spacing.sm }}>
                 Event Type *
               </label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: spacing.sm }}>
                 {eventTypes.map((et) => {
                   const Icon = et.Icon;
                   return (
@@ -277,28 +278,28 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        gap: '4px',
-                        padding: '8px',
-                        border: eventType === et.id ? '1px solid rgba(255,255,255,0.3)' : '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '8px',
+                        gap: spacing.xs,
+                        padding: spacing.xs,
+                        border: eventType === et.id ? `1px solid ${colors.border.strong}` : `1px solid ${colors.border.default}`,
+                        borderRadius: radius.md,
                         background: eventType === et.id ? 'rgba(255,255,255,0.1)' : 'transparent',
                         cursor: 'pointer',
-                        transition: 'all 150ms',
-                        fontFamily: "'Inter', sans-serif",
+                        transition: transitions.default,
+                        fontFamily: typography.family.base,
                       }}
                       onMouseOver={(e) => {
                         if (eventType !== et.id) {
-                          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
+                          e.currentTarget.style.borderColor = colors.border.strong;
                         }
                       }}
                       onMouseOut={(e) => {
                         if (eventType !== et.id) {
-                          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                          e.currentTarget.style.borderColor = colors.border.default;
                         }
                       }}
                     >
-                      <Icon size={12} strokeWidth={1.5} style={{ color: eventType === et.id ? '#ffffff' : 'rgba(255,255,255,0.5)' }} />
-                      <span style={{ fontSize: '9px', color: eventType === et.id ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.4)' }}>
+                      <Icon size={12} strokeWidth={1.5} style={{ color: eventType === et.id ? colors.text.primary : colors.text.secondary }} />
+                      <span style={{ fontSize: typography.size.xs, color: eventType === et.id ? colors.text.primary : colors.text.secondary }}>
                         {et.label}
                       </span>
                     </button>
@@ -309,7 +310,7 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
 
             {/* Title */}
             <div>
-              <label style={{ display: 'block', fontSize: '9px', color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: '8px' }}>
+              <label style={{ display: 'block', fontSize: typography.size.xs, color: colors.text.tertiary, textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: spacing.sm }}>
                 Title * (60 chars max)
               </label>
               <input
@@ -323,24 +324,24 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
                 style={{
                   width: '100%',
                   background: 'rgba(255,255,255,0.03)',
-                  border: errors.title ? '1px solid rgba(255,255,255,0.4)' : '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: '6px',
-                  padding: '11px 14px',
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: '13px',
-                  color: 'rgba(255,255,255,0.8)',
+                  border: errors.title ? `1px solid ${colors.text.secondary}` : `1px solid ${colors.border.default}`,
+                  borderRadius: radius.sm,
+                  padding: `${spacing.xs + 1}px ${spacing.xs + 2}px`,
+                  fontFamily: typography.family.base,
+                  fontSize: typography.size.base,
+                  color: colors.text.primary,
                   outline: 'none',
                   boxSizing: 'border-box',
                 }}
               />
-              <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.2)', textAlign: 'right', marginTop: '4px' }}>
+              <div style={{ fontSize: typography.size.xs, color: colors.text.tertiary, textAlign: 'right', marginTop: spacing.xs }}>
                 {title.length}/60
               </div>
             </div>
 
             {/* Notes */}
             <div>
-              <label style={{ display: 'block', fontSize: '9px', color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: '8px' }}>
+              <label style={{ display: 'block', fontSize: typography.size.xs, color: colors.text.tertiary, textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: spacing.sm }}>
                 Notes
               </label>
               <textarea
@@ -351,12 +352,12 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
                 style={{
                   width: '100%',
                   background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: '6px',
-                  padding: '11px 14px',
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: '13px',
-                  color: 'rgba(255,255,255,0.8)',
+                  border: `1px solid ${colors.border.default}`,
+                  borderRadius: radius.sm,
+                  padding: `${spacing.xs + 1}px ${spacing.xs + 2}px`,
+                  fontFamily: typography.family.base,
+                  fontSize: typography.size.base,
+                  color: colors.text.primary,
                   outline: 'none',
                   boxSizing: 'border-box',
                   resize: 'vertical',
@@ -365,27 +366,27 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
             </div>
 
             {/* Mood & Impact */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.lg }}>
               <div>
-                <label style={{ display: 'block', fontSize: '9px', color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: '8px' }}>
+                <label style={{ display: 'block', fontSize: typography.size.xs, color: colors.text.tertiary, textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: spacing.sm }}>
                   Mood
                 </label>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.xs }}>
                   {moods.map((m) => (
                     <button
                       key={m}
                       onClick={() => setMood(mood === m ? '' : m)}
                       style={{
-                        padding: '6px 8px',
-                        border: mood === m ? '1px solid rgba(255,255,255,0.3)' : '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '6px',
+                        padding: `${spacing.xs}px`,
+                        border: mood === m ? `1px solid ${colors.border.strong}` : `1px solid ${colors.border.default}`,
+                        borderRadius: radius.sm,
                         background: mood === m ? 'rgba(255,255,255,0.1)' : 'transparent',
-                        fontFamily: "'Inter', sans-serif",
-                        fontSize: '9px',
-                        color: mood === m ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)',
+                        fontFamily: typography.family.base,
+                        fontSize: typography.size.xs,
+                        color: mood === m ? colors.text.primary : colors.text.secondary,
                         cursor: 'pointer',
                         textAlign: 'left',
-                        transition: 'all 150ms',
+                        transition: transitions.default,
                       }}
                     >
                       {m}
@@ -394,25 +395,25 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
                 </div>
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '9px', color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: '8px' }}>
+                <label style={{ display: 'block', fontSize: typography.size.xs, color: colors.text.tertiary, textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: spacing.sm }}>
                   Impact
                 </label>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.xs }}>
                   {impacts.map((imp) => (
                     <button
                       key={imp}
                       onClick={() => setImpact(impact === imp ? '' : imp)}
                       style={{
-                        padding: '6px 8px',
-                        border: impact === imp ? '1px solid rgba(255,255,255,0.3)' : '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '6px',
+                        padding: `${spacing.xs}px`,
+                        border: impact === imp ? `1px solid ${colors.border.strong}` : `1px solid ${colors.border.default}`,
+                        borderRadius: radius.sm,
                         background: impact === imp ? 'rgba(255,255,255,0.1)' : 'transparent',
-                        fontFamily: "'Inter', sans-serif",
-                        fontSize: '9px',
-                        color: impact === imp ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)',
+                        fontFamily: typography.family.base,
+                        fontSize: typography.size.xs,
+                        color: impact === imp ? colors.text.primary : colors.text.secondary,
                         cursor: 'pointer',
                         textAlign: 'left',
-                        transition: 'all 150ms',
+                        transition: transitions.default,
                       }}
                     >
                       {imp}
@@ -428,17 +429,17 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
               style={{
                 background: 'none',
                 border: 'none',
-                color: 'rgba(255,255,255,0.3)',
+                color: colors.text.tertiary,
                 cursor: 'pointer',
-                fontSize: '10px',
+                fontSize: typography.size.xs,
                 textAlign: 'left',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '4px',
-                transition: 'color 150ms',
+                gap: spacing.xs,
+                transition: transitions.default,
               }}
-              onMouseOver={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.6)')}
-              onMouseOut={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}
+              onMouseOver={(e) => (e.currentTarget.style.color = colors.text.secondary)}
+              onMouseOut={(e) => (e.currentTarget.style.color = colors.text.tertiary)}
             >
               + Add depth
             </button>
@@ -447,7 +448,7 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
             {showDepth && (
               <>
                 <div>
-                  <label style={{ display: 'block', fontSize: '9px', color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: '8px' }}>
+                  <label style={{ display: 'block', fontSize: typography.size.xs, color: colors.text.tertiary, textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: spacing.sm }}>
                     Lesson Learned
                   </label>
                   <textarea
@@ -458,12 +459,12 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
                     style={{
                       width: '100%',
                       background: 'rgba(255,255,255,0.03)',
-                      border: '1px solid rgba(255,255,255,0.08)',
-                      borderRadius: '6px',
-                      padding: '11px 14px',
-                      fontFamily: "'Inter', sans-serif",
-                      fontSize: '13px',
-                      color: 'rgba(255,255,255,0.8)',
+                      border: `1px solid ${colors.border.default}`,
+                      borderRadius: radius.sm,
+                      padding: `${spacing.xs + 1}px ${spacing.xs + 2}px`,
+                      fontFamily: typography.family.base,
+                      fontSize: typography.size.base,
+                      color: colors.text.primary,
                       outline: 'none',
                       boxSizing: 'border-box',
                       resize: 'vertical',
@@ -471,7 +472,7 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '9px', color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: '8px' }}>
+                  <label style={{ display: 'block', fontSize: typography.size.xs, color: colors.text.tertiary, textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: spacing.sm }}>
                     What You&apos;d Do Differently
                   </label>
                   <textarea
@@ -482,12 +483,12 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
                     style={{
                       width: '100%',
                       background: 'rgba(255,255,255,0.03)',
-                      border: '1px solid rgba(255,255,255,0.08)',
-                      borderRadius: '6px',
-                      padding: '11px 14px',
-                      fontFamily: "'Inter', sans-serif",
-                      fontSize: '13px',
-                      color: 'rgba(255,255,255,0.8)',
+                      border: `1px solid ${colors.border.default}`,
+                      borderRadius: radius.sm,
+                      padding: `${spacing.xs + 1}px ${spacing.xs + 2}px`,
+                      fontFamily: typography.family.base,
+                      fontSize: typography.size.base,
+                      color: colors.text.primary,
                       outline: 'none',
                       boxSizing: 'border-box',
                       resize: 'vertical',
@@ -499,7 +500,7 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
 
             {/* Link URL */}
             <div>
-              <label style={{ display: 'block', fontSize: '9px', color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: '8px' }}>
+              <label style={{ display: 'block', fontSize: typography.size.xs, color: colors.text.tertiary, textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: spacing.sm }}>
                 Link URL
               </label>
               <input
@@ -510,12 +511,12 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
                 style={{
                   width: '100%',
                   background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: '6px',
-                  padding: '11px 14px',
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: '13px',
-                  color: 'rgba(255,255,255,0.8)',
+                  border: `1px solid ${colors.border.default}`,
+                  borderRadius: radius.sm,
+                  padding: `${spacing.xs + 1}px ${spacing.xs + 2}px`,
+                  fontFamily: typography.family.base,
+                  fontSize: typography.size.base,
+                  color: colors.text.primary,
                   outline: 'none',
                   boxSizing: 'border-box',
                 }}
@@ -525,29 +526,29 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
         </div>
 
         {/* Footer */}
-        <div style={{ padding: '28px', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+        <div style={{ padding: spacing.lg, borderTop: `1px solid ${colors.border.subtle}`, display: 'flex', gap: spacing.sm, justifyContent: 'flex-end' }}>
           <button
             onClick={onClose}
             style={{
               background: 'transparent',
-              border: '1px solid rgba(255,255,255,0.12)',
-              borderRadius: '999px',
-              padding: '9px 20px',
-              fontFamily: "'Inter', sans-serif",
-              fontSize: '11px',
-              fontWeight: 500,
-              color: 'rgba(255,255,255,0.5)',
+              border: `1px solid ${colors.border.default}`,
+              borderRadius: radius.full,
+              padding: `${spacing.xs}px ${spacing.sm}px`,
+              fontFamily: typography.family.base,
+              fontSize: typography.size.xs,
+              fontWeight: typography.weight.medium,
+              color: colors.text.secondary,
               textTransform: 'uppercase',
               cursor: 'pointer',
-              transition: 'all 150ms',
+              transition: transitions.default,
             }}
             onMouseOver={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)';
-              e.currentTarget.style.color = 'rgba(255,255,255,0.8)';
+              e.currentTarget.style.borderColor = colors.border.strong;
+              e.currentTarget.style.color = colors.text.primary;
             }}
             onMouseOut={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)';
-              e.currentTarget.style.color = 'rgba(255,255,255,0.5)';
+              e.currentTarget.style.borderColor = colors.border.default;
+              e.currentTarget.style.color = colors.text.secondary;
             }}
           >
             Cancel
@@ -557,19 +558,19 @@ export default function EventLogPanel({ isOpen, onClose, onSave, ventures = [], 
             style={{
               background: 'rgba(255,255,255,0.92)',
               border: 'none',
-              borderRadius: '999px',
-              padding: '10px 24px',
-              fontFamily: "'Inter', sans-serif",
-              fontSize: '11px',
-              fontWeight: 600,
+              borderRadius: radius.full,
+              padding: `${spacing.xs + 2}px ${spacing.sm + 4}px`,
+              fontFamily: typography.family.base,
+              fontSize: typography.size.xs,
+              fontWeight: typography.weight.semibold,
               color: '#080808',
               textTransform: 'uppercase',
               letterSpacing: '0.08em',
               cursor: 'pointer',
-              transition: 'opacity 150ms',
+              transition: transitions.default,
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: spacing.xs,
             }}
             onMouseOver={(e) => (e.currentTarget.style.opacity = '0.85')}
             onMouseOut={(e) => (e.currentTarget.style.opacity = '1')}

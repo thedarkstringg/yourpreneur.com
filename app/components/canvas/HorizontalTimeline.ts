@@ -171,9 +171,14 @@ export class HorizontalTimeline extends Container {
 
       const t = Math.min(1, (elapsed - watermarkDelay) / watermarkDuration);
       const eased = easeOutCubic(t);
-      const targetAlpha = 0.035;
+      const centerX = 0; // Viewport center
+      const maxDistance = 2000; // Distance for complete fade
+
       this.yearLabels.forEach((label) => {
-        label.alpha = targetAlpha * eased;
+        // Calculate fade based on distance from center
+        const distance = Math.abs(label.x - centerX);
+        const distanceFade = Math.max(0.02, Math.min(1, 1 - distance / maxDistance));
+        label.alpha = 0.035 * eased * distanceFade;
       });
 
       if (t < 1) requestAnimationFrame(watermarkAnimate);

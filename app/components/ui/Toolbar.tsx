@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Plus, Maximize2, Grid, List, BookOpen, ClipboardList, FlipVertical, Edit3, NotepadText } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { colors, spacing, radius, layout, transitions } from '@/styles/tokens';
 
 type ActionTool = {
       id: string;
@@ -86,29 +87,33 @@ export default function Toolbar({
             top: tooltipPos.y - 60,
             left: tooltipPos.x,
             transform: 'translateX(-50%)',
-            background: 'rgba(8,6,6,0.97)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: '8px',
-            padding: '6px 12px',
+            background: `${colors.background.base}/97`,
+            border: `1px solid ${colors.border.default}`,
+            borderRadius: radius.md,
+            padding: `${spacing.xs}px ${spacing.md}px`,
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
+            gap: spacing.sm,
             pointerEvents: 'none',
             zIndex: 1000,
-            fontSize: '12px',
+            fontSize: 12,
           }}
         >
-          <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '13px', color: 'rgba(255,255,255,0.8)' }}>
+          <span style={{
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            fontSize: 13,
+            color: colors.text.secondary,
+          }}>
             {hoveredTool?.tooltip}
           </span>
           <div
             style={{
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '4px',
+              background: colors.background.surface,
+              border: `1px solid ${colors.border.default}`,
+              borderRadius: 4,
               padding: '2px 6px',
-              fontSize: '9px',
-              color: 'rgba(255,255,255,0.3)',
+              fontSize: 9,
+              color: colors.text.tertiary,
               fontFamily: "'Inter', sans-serif",
             }}
           >
@@ -136,13 +141,13 @@ export default function Toolbar({
             transform: 'translateX(-50%)',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
-            padding: '6px 10px',
+            gap: spacing.xs,
+            padding: `${spacing.xs}px ${spacing.sm}px`,
             borderRadius: '999px',
-            border: '1px solid rgba(255,255,255,0.09)',
-            background: 'rgba(6,6,6,0.72)',
-            color: 'rgba(255,255,255,0.42)',
-            fontSize: '9px',
+            border: `1px solid ${colors.border.subtle}`,
+            background: `${colors.background.base}`,
+            color: colors.text.tertiary,
+            fontSize: 9,
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
             whiteSpace: 'nowrap',
@@ -150,17 +155,17 @@ export default function Toolbar({
           }}
         >
           Canvas tools
-          <span style={{ color: 'rgba(255,255,255,0.22)' }}>hover for keys</span>
+          <span style={{ color: colors.text.disabled }}>hover for keys</span>
         </div>
         <div
           style={{
-            background: 'rgba(7,7,7,0.94)',
-            border: '1px solid rgba(255,255,255,0.13)',
-            borderRadius: '14px',
-            padding: '4px',
+            background: `${colors.background.base}`,
+            border: `1px solid ${colors.border.default}`,
+            borderRadius: radius.lg,
+            padding: 4,
             display: 'grid',
             gridTemplateColumns: 'repeat(12, auto)',
-            gap: '2px',
+            gap: spacing.xs,
             backdropFilter: 'blur(32px)',
             boxShadow: '0 12px 48px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.06)',
           }}
@@ -171,10 +176,10 @@ export default function Toolbar({
                 <div
                   key={tool.id}
                   style={{
-                    width: '1px',
-                    height: '28px',
-                    background: 'rgba(255,255,255,0.08)',
-                    margin: '0 2px',
+                    width: 1,
+                    height: 28,
+                    background: colors.border.subtle,
+                    margin: `0 ${spacing.xs}px`,
                   }}
                 />
               );
@@ -189,28 +194,30 @@ export default function Toolbar({
                 onMouseLeave={() => setHoveredButton(null)}
                 onClick={() => handleToolClick(tool)}
                 style={{
-                  width: '44px',
-                  height: '44px',
-                  borderRadius: '10px',
+                  width: 40,
+                  height: 40,
+                  borderRadius: radius.md,
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '4px',
-                  background: activeButton === tool.id ? 'rgba(255,255,255,0.1)' : 'transparent',
-                  border: activeButton === tool.id ? '1px solid rgba(255,255,255,0.15)' : 'none',
+                  gap: 3,
+                  background: activeButton === tool.id ? colors.background.elevated : 'transparent',
+                  border: activeButton === tool.id ? `1px solid ${colors.border.default}` : '1px solid transparent',
                   cursor: 'pointer',
-                  transition: 'background 150ms ease',
+                  transition: `background ${transitions.default}, border-color ${transitions.default}`,
                   fontFamily: "'Inter', sans-serif",
                 }}
                 onMouseOver={(e) => {
                   if (activeButton !== tool.id) {
-                    (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.07)';
+                    (e.currentTarget as HTMLElement).style.background = colors.background.surface;
+                    (e.currentTarget as HTMLElement).style.borderColor = colors.border.subtle;
                   }
                 }}
                 onMouseOut={(e) => {
                   if (activeButton !== tool.id) {
                     (e.currentTarget as HTMLElement).style.background = 'transparent';
+                    (e.currentTarget as HTMLElement).style.borderColor = 'transparent';
                   }
                 }}
               >
@@ -218,17 +225,17 @@ export default function Toolbar({
                   size={18}
                   strokeWidth={1.5}
                   style={{
-                    color: activeButton === tool.id ? '#ffffff' : 'rgba(255,255,255,0.5)',
-                    transition: 'color 150ms ease',
+                    color: activeButton === tool.id ? colors.text.primary : colors.text.secondary,
+                    transition: `color ${transitions.default}`,
                   }}
                 />
                 <span
                   style={{
-                    fontSize: '7px',
-                    color: activeButton === tool.id ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.3)',
+                    fontSize: 7,
+                    color: activeButton === tool.id ? colors.text.secondary : colors.text.disabled,
                     textTransform: 'uppercase',
                     fontFamily: "'Inter', sans-serif",
-                    transition: 'color 150ms ease',
+                    transition: `color ${transitions.default}`,
                   }}
                 >
                   {tool.label}

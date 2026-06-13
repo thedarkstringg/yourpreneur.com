@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { Upload, X, Check } from 'lucide-react';
 import { useStore } from '@/lib/useStore';
 import { useToasts } from './Toast';
+import { colors, spacing, radius, typography, transitions } from '@/styles/tokens';
 
 interface LogoUploadOverlayProps {
   ventureId?: string | null;
@@ -81,15 +82,15 @@ export default function LogoUploadOverlay({ ventureId, onClose }: LogoUploadOver
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        background: '#0f0f0f',
-        border: '1px solid rgba(255,255,255,0.1)',
-        borderRadius: '10px',
-        padding: '16px',
+        background: colors.background.surface,
+        border: `1px solid ${colors.border.default}`,
+        borderRadius: radius.lg,
+        padding: spacing.lg,
         width: '200px',
         boxShadow: '0 12px 40px rgba(0,0,0,0.7)',
         zIndex: 600,
         animation: 'logoUploadOpen 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: typography.family.base,
       }}
       onClick={(e) => e.stopPropagation()}
     >
@@ -104,26 +105,26 @@ export default function LogoUploadOverlay({ ventureId, onClose }: LogoUploadOver
         style={{
           width: '80px',
           height: '80px',
-          border: '1px dashed rgba(255,255,255,0.15)',
-          borderRadius: '8px',
-          background: isDragOver ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.02)',
+          border: `1px dashed ${colors.border.default}`,
+          borderRadius: radius.md,
+          background: isDragOver ? colors.background.elevated : colors.background.surface,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',
-          margin: '0 auto 12px',
-          transition: 'all 150ms',
+          margin: `0 auto ${spacing.md}px`,
+          transition: `all ${transitions.fast}`,
           flexDirection: 'column',
-          gap: '4px',
+          gap: spacing.xs,
         }}
         onClick={handleBrowse}
         onMouseOver={(e) => {
-          (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.35)';
-          (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)';
+          (e.currentTarget as HTMLElement).style.borderColor = colors.border.strong;
+          (e.currentTarget as HTMLElement).style.background = colors.background.elevated;
         }}
         onMouseOut={(e) => {
-          (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.15)';
-          (e.currentTarget as HTMLElement).style.background = isDragOver ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.02)';
+          (e.currentTarget as HTMLElement).style.borderColor = colors.border.default;
+          (e.currentTarget as HTMLElement).style.background = isDragOver ? colors.background.elevated : colors.background.surface;
         }}
       >
         {previewSrc ? (
@@ -134,13 +135,13 @@ export default function LogoUploadOverlay({ ventureId, onClose }: LogoUploadOver
               width: '100%',
               height: '100%',
               objectFit: 'cover',
-              borderRadius: '6px',
+              borderRadius: radius.sm,
             }}
           />
         ) : (
           <>
-            <Upload size={20} strokeWidth={1.5} style={{ color: 'rgba(255,255,255,0.4)' }} />
-            <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)' }}>Drop logo here</span>
+            <Upload size={20} strokeWidth={1.5} style={{ color: colors.text.secondary }} />
+            <span style={{ fontSize: typography.size.xs, color: colors.text.tertiary }}>Drop logo here</span>
           </>
         )}
       </div>
@@ -156,7 +157,7 @@ export default function LogoUploadOverlay({ ventureId, onClose }: LogoUploadOver
 
       {/* Or Text */}
       {!previewSrc && (
-        <div style={{ textAlign: 'center', margin: '8px 0', fontSize: '9px', color: 'rgba(255,255,255,0.2)' }}>
+        <div style={{ textAlign: 'center', margin: `${spacing.sm}px 0`, fontSize: typography.size.xs, color: colors.text.disabled }}>
           or
         </div>
       )}
@@ -167,24 +168,24 @@ export default function LogoUploadOverlay({ ventureId, onClose }: LogoUploadOver
           onClick={handleBrowse}
           style={{
             width: '100%',
-            padding: '6px',
+            padding: spacing.xs,
             background: 'transparent',
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: '6px',
-            color: 'rgba(255,255,255,0.4)',
+            border: `1px solid ${colors.border.default}`,
+            borderRadius: radius.sm,
+            color: colors.text.secondary,
             cursor: 'pointer',
-            fontSize: '10px',
-            fontFamily: "'Inter', sans-serif",
-            transition: 'all 150ms',
-            marginBottom: '12px',
+            fontSize: typography.size.xs,
+            fontFamily: typography.family.base,
+            transition: `all ${transitions.fast}`,
+            marginBottom: spacing.md,
           }}
           onMouseOver={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)';
-            e.currentTarget.style.color = 'rgba(255,255,255,0.8)';
+            e.currentTarget.style.borderColor = colors.border.strong;
+            e.currentTarget.style.color = colors.text.primary;
           }}
           onMouseOut={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-            e.currentTarget.style.color = 'rgba(255,255,255,0.4)';
+            e.currentTarget.style.borderColor = colors.border.default;
+            e.currentTarget.style.color = colors.text.secondary;
           }}
         >
           Browse files
@@ -193,26 +194,26 @@ export default function LogoUploadOverlay({ ventureId, onClose }: LogoUploadOver
 
       {/* Actions */}
       {previewSrc && (
-        <div style={{ display: 'flex', gap: '6px', marginTop: '12px' }}>
+        <div style={{ display: 'flex', gap: spacing.xs - 2, marginTop: spacing.md }}>
           <button
             onClick={() => setPreview(null)}
             style={{
               flex: 1,
-              padding: '6px',
+              padding: spacing.xs,
               background: 'transparent',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '6px',
-              color: 'rgba(255,255,255,0.4)',
+              border: `1px solid ${colors.border.default}`,
+              borderRadius: radius.sm,
+              color: colors.text.secondary,
               cursor: 'pointer',
-              fontSize: '10px',
-              fontFamily: "'Inter', sans-serif",
-              transition: 'all 150ms',
+              fontSize: typography.size.xs,
+              fontFamily: typography.family.base,
+              transition: `all ${transitions.fast}`,
             }}
             onMouseOver={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)';
+              e.currentTarget.style.borderColor = colors.border.strong;
             }}
             onMouseOut={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+              e.currentTarget.style.borderColor = colors.border.default;
             }}
           >
             <X size={12} style={{ margin: '0 auto' }} />
@@ -221,16 +222,16 @@ export default function LogoUploadOverlay({ ventureId, onClose }: LogoUploadOver
             onClick={handleSave}
             style={{
               flex: 1,
-              padding: '6px',
-              background: 'rgba(255,255,255,0.92)',
+              padding: spacing.xs,
+              background: colors.text.primary,
               border: 'none',
-              borderRadius: '6px',
-              color: '#080808',
+              borderRadius: radius.sm,
+              color: colors.background.base,
               cursor: 'pointer',
-              fontSize: '10px',
-              fontFamily: "'Inter', sans-serif",
-              fontWeight: 600,
-              transition: 'opacity 150ms',
+              fontSize: typography.size.xs,
+              fontFamily: typography.family.base,
+              fontWeight: typography.weight.semibold,
+              transition: `opacity ${transitions.fast}`,
             }}
             onMouseOver={(e) => (e.currentTarget.style.opacity = '0.85')}
             onMouseOut={(e) => (e.currentTarget.style.opacity = '1')}

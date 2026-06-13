@@ -1,10 +1,10 @@
+'use client';
+
 import type { Metadata } from "next";
 import "./globals.css";
+import { Providers } from "./providers";
 
-export const metadata: Metadata = {
-  title: "Yourpreneur Canvas",
-  description: "Entrepreneurial timeline and venture dashboard",
-};
+// Note: Metadata won't work with 'use client', so define it in a layout.server.tsx if needed
 
 export default function RootLayout({
   children,
@@ -14,7 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen overflow-hidden bg-black text-white" suppressHydrationWarning>
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

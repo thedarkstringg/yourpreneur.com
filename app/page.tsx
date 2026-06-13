@@ -82,7 +82,7 @@ export default function Home() {
   };
 
   return (
-    <>
+    <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100vh', overflow: 'hidden' }}>
       {/* Vignette overlay */}
       <div
         style={{
@@ -110,6 +110,7 @@ export default function Home() {
         onNavigateNext={() => {}}
       />
 
+      {/* Header - fixed at top */}
       <TopBar
         currentYear={currentYear}
         onYearChange={setCurrentYear}
@@ -120,33 +121,42 @@ export default function Home() {
         zoomLevel={zoomLevel * 100}
       />
 
-      <LeftPanel
-        userName="Founder"
-        ventures={ventures}
-        selectedVentureId={selectedVentureId}
-        onSelectVenture={(id) => useStore.setState({ selectedVentureId: id })}
-        collapsed={isLeftPanelCollapsed}
-        onToggleCollapsed={() => setIsLeftPanelCollapsed((value) => !value)}
-      />
+      {/* Main content area - flexbox row */}
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden', width: '100%' }}>
+        {/* Left Panel - fixed width */}
+        <LeftPanel
+          userName="Founder"
+          ventures={ventures}
+          selectedVentureId={selectedVentureId}
+          onSelectVenture={(id) => useStore.setState({ selectedVentureId: id })}
+          collapsed={isLeftPanelCollapsed}
+          onToggleCollapsed={() => setIsLeftPanelCollapsed((value) => !value)}
+        />
 
-      <RightPanel
-        ventures={ventures}
-        collapsed={isRightPanelCollapsed}
-        onToggleCollapsed={() => setIsRightPanelCollapsed((value) => !value)}
-      />
+        {/* Canvas - flex to fill remaining space */}
+        <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+          <PixiApp
+            onNodeDoubleClick={(ventureId) => {
+              useStore.setState({ selectedVentureId: ventureId });
+              setIsModifyPanelOpen(true);
+            }}
+            onNewVenture={() => setIsNewVentureOpen(true)}
+            onHelpToggle={() => setIsHelpOpen(!isHelpOpen)}
+            onListToggle={() => setIsLeftPanelCollapsed((value) => !value)}
+            onStatsToggle={() => setIsReviewOpen(!isReviewOpen)}
+            taskTopologyVentureId={isTaskTopologyOpen ? selectedVentureId : null}
+          />
+        </div>
 
-      <PixiApp
-        onNodeDoubleClick={(ventureId) => {
-          useStore.setState({ selectedVentureId: ventureId });
-          setIsModifyPanelOpen(true);
-        }}
-        onNewVenture={() => setIsNewVentureOpen(true)}
-        onHelpToggle={() => setIsHelpOpen(!isHelpOpen)}
-        onListToggle={() => setIsLeftPanelCollapsed((value) => !value)}
-        onStatsToggle={() => setIsReviewOpen(!isReviewOpen)}
-        taskTopologyVentureId={isTaskTopologyOpen ? selectedVentureId : null}
-      />
+        {/* Right Panel - fixed width */}
+        <RightPanel
+          ventures={ventures}
+          collapsed={isRightPanelCollapsed}
+          onToggleCollapsed={() => setIsRightPanelCollapsed((value) => !value)}
+        />
+      </div>
 
+      {/* Toolbar - floating */}
       <Toolbar
         onGenerateClick={() => setIsNewVentureOpen(true)}
         onModifyClick={() => selectedVentureId && setIsModifyPanelOpen(true)}
@@ -163,6 +173,9 @@ export default function Home() {
         onFlipSelectedClick={flipSelectedVenture}
       />
 
+      {/* Modals and overlays */}
+
+      {/* Modals and overlays */}
       <NewVentureModal
         isOpen={isNewVentureOpen}
         onClose={() => setIsNewVentureOpen(false)}
@@ -225,6 +238,6 @@ export default function Home() {
 
       <DataManager isOpen={isDataManagerOpen} onClose={() => setIsDataManagerOpen(false)} />
       <TaskCanvas isOpen={isTaskCanvasOpen} onClose={() => setIsTaskCanvasOpen(false)} ventureId={selectedVentureId} />
-    </>
+    </div>
   );
 }

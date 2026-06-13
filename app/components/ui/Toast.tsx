@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { CheckCircle, Info, XCircle } from 'lucide-react';
+import { colors, spacing, radius, typography, transitions, layout, shadows } from '@/styles/tokens';
 
 export interface Toast {
   id: string;
@@ -63,12 +64,12 @@ export default function ToastContainer() {
     <div
       style={{
         position: 'fixed',
-        top: '64px',
-        right: '16px',
+        top: `${layout.header.height}px`,
+        right: spacing.lg,
         zIndex: 2000,
         display: 'flex',
         flexDirection: 'column',
-        gap: '8px',
+        gap: spacing.sm,
         pointerEvents: 'none',
       }}
     >
@@ -78,35 +79,35 @@ export default function ToastContainer() {
           <div
             key={toast.id}
             style={{
-              background: 'rgba(14,11,11,0.96)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '8px',
-              padding: '12px 16px',
+              background: colors.background.elevated,
+              border: `1px solid ${colors.border.default}`,
+              borderRadius: radius.md,
+              padding: `${spacing.md}px ${spacing.lg}px`,
               display: 'flex',
               alignItems: 'center',
-              gap: '10px',
-              fontFamily: "'Inter', sans-serif",
-              fontSize: '10px',
-              color: 'rgba(255,255,255,0.75)',
+              gap: spacing.md,
+              fontFamily: typography.family.base,
+              fontSize: typography.size.xs,
+              color: colors.text.primary,
               backdropFilter: 'blur(16px)',
-              boxShadow: '0 4px 24px rgba(0,0,0,0.5)',
-              animation: 'slideInRight 250ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+              boxShadow: shadows.elevated,
+              animation: `slideInRight ${transitions.default}`,
               pointerEvents: 'auto',
               cursor: 'pointer',
             }}
             onClick={() => removeToast(toast.id)}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.border = '1px solid rgba(255,255,255,0.2)';
+              (e.currentTarget as HTMLElement).style.border = `1px solid ${colors.border.strong}`;
             }}
             onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.border = '1px solid rgba(255,255,255,0.1)';
+              (e.currentTarget as HTMLElement).style.border = `1px solid ${colors.border.default}`;
             }}
           >
             <Icon
               size={14}
               strokeWidth={1.5}
               style={{
-                color: toast.type === 'success' ? 'rgba(100,255,100,0.8)' : 'rgba(255,255,255,0.6)',
+                color: toast.type === 'success' ? colors.status.active : colors.text.secondary,
               }}
             />
             <span>{toast.message}</span>
@@ -117,7 +118,7 @@ export default function ToastContainer() {
       <style>{`
         @keyframes slideInRight {
           from {
-            transform: translateX(calc(100% + 16px));
+            transform: translateX(calc(100% + ${spacing.lg}px));
             opacity: 0;
           }
           to {
@@ -132,7 +133,7 @@ export default function ToastContainer() {
             opacity: 1;
           }
           to {
-            transform: translateX(calc(100% + 16px));
+            transform: translateX(calc(100% + ${spacing.lg}px));
             opacity: 0;
           }
         }

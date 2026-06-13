@@ -6,7 +6,6 @@ import { Viewport } from 'pixi-viewport';
 import { DotGrid } from './DotGrid2';
 import { HorizontalTimeline } from './HorizontalTimeline';
 import { VentureNode } from './VentureNode';
-import { BranchLine } from './BranchLine';
 import { EventDot } from './EventDot';
 import { InteractionManager } from './InteractionManager';
 import { VentureEvent, useStore } from '@/lib/useStore';
@@ -41,6 +40,7 @@ export default function PixiApp({
 } = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<Application | null>(null);
+  const viewportRef = useRef<Viewport | null>(null);
   const textObjectsRef = useRef<Text[]>([]);
   const nodeMapRef = useRef<Map<string, VentureNode>>(new Map());
   const navigationFrameRef = useRef<number | null>(null);
@@ -113,6 +113,7 @@ export default function PixiApp({
         events: app.renderer.events,
       });
 
+      viewportRef.current = viewport;
       app.stage.addChild(viewport);
       viewport.addChild(rootContainer);
 
@@ -150,37 +151,6 @@ export default function PixiApp({
       // Collect text objects from timeline for resolution updates
       timeline.children.forEach(child => {
         if (child instanceof Text) textObjectsRef.current.push(child);
-      });
-
-      // Add branch lines
-      const branchContainer = new Container();
-      rootContainer.addChild(branchContainer);
-
-      ventures.forEach((venture, branchIndex) => {
-        if (venture.parentId) {
-          const parentPos = layout.positions.get(venture.parentId);
-          const childPos = layout.positions.get(venture.id);
-          if (parentPos && childPos) {
-            const branch = new BranchLine({
-              fromX: parentPos.x,
-              fromY: parentPos.y,
-              fromWidth: 220,
-              fromHeight: 120,
-              toX: childPos.x,
-              toY: childPos.y,
-              toWidth: 220,
-              toHeight: 120,
-              label: venture.branchLabel,
-            });
-            branchContainer.addChild(branch);
-            branch.startLoadAnimation(branchIndex);
-            if (branch.children) {
-               branch.children.forEach(c => {
-                 if (c instanceof Text) textObjectsRef.current.push(c);
-               });
-            }
-          }
-        }
       });
 
       const nodeMap = new Map();
@@ -223,7 +193,7 @@ export default function PixiApp({
             const centerX = pos.x + 110;
             stem.moveTo(centerX, layout.timelineY + (pos.stemHeight < 0 ? -10 : 10));
             stem.lineTo(centerX, layout.timelineY + pos.stemHeight);
-            stem.stroke({ width: 1.8, color: 0xffffff, alpha: 0.62 });
+            stem.stroke({ width: 1.5, color: 0xffffff, alpha: 0.72 });
             stem.circle(centerX, layout.timelineY, 3);
             stem.fill({ color: venture.color ? parseInt(venture.color.slice(1), 16) : 0xffffff, alpha: 0.75 });
             stemsContainer.addChild(stem);
@@ -366,21 +336,24 @@ export default function PixiApp({
           cancelAnimationFrame(navigationFrameRef.current);
         }
 
-        const startCenter = viewport.center.clone();
-        const startScale = viewport.scale.x;
+        if (!viewportRef.current) return;
+
+        const startCenter = viewportRef.current.center.clone();
+        const startScale = viewportRef.current.scale.x;
         const targetScale = Math.max(0.72, Math.min(1.18, scale ?? startScale));
         const start = performance.now();
 
         const step = (now: number) => {
+          if (!viewportRef.current) return;
           const t = Math.min(1, (now - start) / duration);
           const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
           const nextScale = startScale + (targetScale - startScale) * eased;
           const nextX = startCenter.x + (worldX - startCenter.x) * eased;
           const nextY = startCenter.y + (worldY - startCenter.y) * eased;
-          viewport.setZoom(nextScale, true);
-          viewport.moveCenter(nextX, nextY);
+          viewportRef.current.setZoom(nextScale, true);
+          viewportRef.current.moveCenter(nextX, nextY);
           setZoom(nextScale);
-          setPan(viewport.x, viewport.y);
+          setPan(viewportRef.current.x, viewportRef.current.y);
 
           if (t < 1) {
             navigationFrameRef.current = requestAnimationFrame(step);
@@ -396,7 +369,7 @@ export default function PixiApp({
         (worldX, worldY, scale) => animateViewportTo(worldX, worldY, scale),
         (year) => {
           const yearX = layout.yearPositions.get(year) ?? (year - 2024) * 1440;
-          animateViewportTo(yearX + 360, layout.timelineY + 170, viewport.scale.x, 720);
+          animateViewportTo(yearX + 360, layout.timelineY + 170, viewportRef.current?.scale.x, 720);
           window.dispatchEvent(new CustomEvent('flash-year-watermark', { detail: { year } }));
         }
       );
@@ -404,40 +377,6 @@ export default function PixiApp({
       const events = useStore.getState().events;
       const eventContainer = new Container();
       rootContainer.addChild(eventContainer);
-
-      const revenueTopography = new Graphics();
-      ventures.forEach((venture) => {
-        const pos = layout.positions.get(venture.id);
-        const values = venture.mrrTrend;
-        if (!pos || !values?.length) return;
-        const min = Math.min(...values);
-        const max = Math.max(...values);
-        const range = Math.max(1, max - min);
-        const startX = pos.x;
-        const baseY = layout.timelineY - 78;
-        values.forEach((value, index) => {
-          const x = startX + (index / Math.max(1, values.length - 1)) * 220;
-          const y = baseY - ((value - min) / range) * 42;
-          if (index === 0) revenueTopography.moveTo(x, y);
-          else revenueTopography.lineTo(x, y);
-        });
-        revenueTopography.stroke({
-          width: 1.25,
-          color: venture.color ? parseInt(venture.color.slice(1), 16) : 0xffffff,
-          alpha: 0.34,
-        });
-      });
-      eventContainer.addChild(revenueTopography);
-
-      const topographyLabel = new Text({
-        text: 'REVENUE TOPOGRAPHY',
-        style: new TextStyle({ fontFamily: 'Inter', fontSize: 8, fill: 'rgba(255,255,255,0.28)', letterSpacing: 1.3 }),
-      });
-      topographyLabel.resolution = window.devicePixelRatio * 4;
-      topographyLabel.x = -80;
-      topographyLabel.y = layout.timelineY - 142;
-      eventContainer.addChild(topographyLabel);
-      textObjectsRef.current.push(topographyLabel);
 
       // Pivot detection visual
       ventures.forEach(v => {
@@ -499,9 +438,9 @@ export default function PixiApp({
       });
 
       const handleResize = () => {
-        if (!isMounted || !appRef.current) return;
+        if (!isMounted || !appRef.current || !viewportRef.current) return;
         appRef.current.renderer.resize(window.innerWidth, window.innerHeight);
-        viewport.resize(window.innerWidth, window.innerHeight);
+        viewportRef.current.resize(window.innerWidth, window.innerHeight);
       };
 
       let cursorEl = document.getElementById('custom-cursor');
@@ -518,11 +457,11 @@ export default function PixiApp({
       let rafId: number | null = null;
 
       const onMouseMoveClient = (e: MouseEvent) => {
-        if (!isMounted || !appRef.current?.canvas) return;
+        if (!isMounted || !appRef.current?.canvas || !viewportRef.current) return;
         mouseClientX = e.clientX;
         mouseClientY = e.clientY;
         const canvasRect = appRef.current.canvas.getBoundingClientRect();
-        const worldPos = viewport.toWorld({ x: e.clientX - canvasRect.left, y: e.clientY - canvasRect.top });
+        const worldPos = viewportRef.current.toWorld({ x: e.clientX - canvasRect.left, y: e.clientY - canvasRect.top });
         dotGrid.updateMousePosition(worldPos.x, worldPos.y);
       };
       window.addEventListener('mousemove', onMouseMoveClient);
