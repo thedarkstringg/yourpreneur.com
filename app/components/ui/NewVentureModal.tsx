@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import { X, Plus, Upload } from 'lucide-react';
 import { useToasts } from './Toast';
 import { colors, spacing, radius, typography, transitions, shadows, components } from '@/styles/tokens';
+import { validateVentureName, validateDate } from '@/lib/validation';
 
 interface NewVentureModalProps {
   isOpen: boolean;
@@ -34,8 +35,17 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
 
   const validateForm = () => {
     const newErrors: typeof errors = {};
-    if (!name.trim()) newErrors.name = 'Name is required';
-    if (!startDate) newErrors.startDate = 'Start date is required';
+
+    const nameValidation = validateVentureName(name);
+    if (!nameValidation.isValid) {
+      newErrors.name = nameValidation.error;
+    }
+
+    const dateValidation = validateDate(startDate);
+    if (!dateValidation.isValid) {
+      newErrors.startDate = dateValidation.error;
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useStore, VentureEvent } from '@/lib/useStore';
 import { colors, spacing, radius, typography, transitions } from '@/styles/tokens';
+import { validateEventTitle, validateDate } from '@/lib/validation';
 
 const MOODS = [
   { label: '⚡ Energized', value: 'energized' },
@@ -34,6 +35,7 @@ export default function EventForm({
 }) {
   const { events, setEvents } = useStore();
   const [showDepth, setShowDepth] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [formData, setFormData] = useState<Partial<VentureEvent>>({
     type: 'milestone',
     title: '',
@@ -53,8 +55,20 @@ export default function EventForm({
   };
 
   const handleAdd = () => {
-    if (!formData.title || !formData.eventDate) {
-      alert('Please fill in title and date');
+    const newErrors: { [key: string]: string } = {};
+
+    const titleValidation = validateEventTitle(formData.title || '');
+    if (!titleValidation.isValid) {
+      newErrors.title = titleValidation.error || '';
+    }
+
+    const dateValidation = validateDate(formData.eventDate || '');
+    if (!dateValidation.isValid) {
+      newErrors.eventDate = dateValidation.error || '';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
 
@@ -110,12 +124,15 @@ export default function EventForm({
           <input
             type="text"
             value={formData.title || ''}
-            onChange={(e) => handleChange('title', e.target.value)}
+            onChange={(e) => {
+              handleChange('title', e.target.value);
+              if (errors.title) setErrors({ ...errors, title: undefined });
+            }}
             placeholder="What happened?"
             style={{
               width: '100%',
               backgroundColor: 'rgba(255,255,255,0.03)',
-              border: `1px solid ${colors.border.default}`,
+              border: errors.title ? `1px solid ${colors.status.failed}` : `1px solid ${colors.border.default}`,
               borderRadius: radius.md,
               padding: `${spacing.md}px ${spacing.sm}px`,
               color: colors.text.primary,
@@ -123,8 +140,13 @@ export default function EventForm({
             }}
             className="focus:outline-none transition-all"
             onFocus={(e) => (e.currentTarget.style.borderColor = colors.border.strong)}
-            onBlur={(e) => (e.currentTarget.style.borderColor = colors.border.default)}
+            onBlur={(e) => (e.currentTarget.style.borderColor = errors.title ? colors.status.failed : colors.border.default)}
           />
+          {errors.title && (
+            <div style={{ fontSize: typography.size.xs, color: colors.status.failed, marginTop: spacing.xs }}>
+              {errors.title}
+            </div>
+          )}
         </div>
 
         {/* Type */}
