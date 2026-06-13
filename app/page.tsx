@@ -15,6 +15,7 @@ import KeyboardHelp from './components/ui/KeyboardHelp';
 import DataManager from './components/ui/DataManager';
 import PatternsScreen from './components/ui/PatternsScreen';
 import TaskCanvas from './components/ui/TaskCanvas';
+import SearchModal from './components/ui/SearchModal';
 import { useStore } from '@/lib/useStore';
 import { useEventManagement } from '@/lib/useEventManagement';
 import { calculateLayout } from '@/lib/layoutAlgorithm';
@@ -30,6 +31,7 @@ export default function Home() {
   const [isTaskTopologyOpen, setIsTaskTopologyOpen] = useState(false);
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
   const [isRightPanelCollapsed, setIsRightPanelCollapsed] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [currentYear, setCurrentYear] = useState(2024);
 
   const { selectedVentureId, ventures, addVenture, updateVenture, zoomLevel, onNavigateToTarget } = useStore();
@@ -106,6 +108,7 @@ export default function Home() {
         onHelp={() => setIsHelpOpen(true)}
         onTaskCanvas={() => setIsTaskCanvasOpen(true)}
         onFlipSelected={flipSelectedVenture}
+        onSearch={() => setIsSearchOpen(true)}
         onNavigatePrev={() => {}}
         onNavigateNext={() => {}}
       />
@@ -238,6 +241,7 @@ export default function Home() {
 
       <DataManager isOpen={isDataManagerOpen} onClose={() => setIsDataManagerOpen(false)} />
       <TaskCanvas isOpen={isTaskCanvasOpen} onClose={() => setIsTaskCanvasOpen(false)} ventureId={selectedVentureId} />
+      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} onSelectVenture={(id) => useStore.setState({ selectedVentureId: id })} />
     </div>
   );
 }

@@ -37,6 +37,8 @@ export default function TaskCanvas({
     deleteTask,
     addTaskConnection,
     deleteTaskConnection,
+    saveTaskToDb,
+    deleteTaskFromDb,
   } = useStore();
   const [draft, setDraft] = useState({
     title: '',
@@ -83,7 +85,7 @@ export default function TaskCanvas({
     const title = draft.title.trim();
     if (!title) return;
 
-    addTask({
+    const newTask: FounderTask = {
       id: `task-${tasks.length + 1}-${++idCounterRef.current}`,
       title,
       ventureId: activeDraftVentureId || undefined,
@@ -95,7 +97,11 @@ export default function TaskCanvas({
         x: selectedVenture ? 380 + (displayedTasks.length % 3) * 285 : 160 + (tasks.length % 3) * 270,
         y: selectedVenture ? 170 + Math.floor(displayedTasks.length / 3) * 165 : 150 + Math.floor(tasks.length / 3) * 150,
       },
-    });
+    };
+
+    addTask(newTask);
+    // Persist to database
+    saveTaskToDb(newTask).catch(console.error);
 
     setDraft((value) => ({ ...value, title: '', notes: '' }));
   };
@@ -333,7 +339,10 @@ export default function TaskCanvas({
                     <button onClick={() => handleLinkClick(task.id)} style={tinyButtonStyle} aria-label="Connect task">
                       <Link2 size={12} />
                     </button>
-                    <button onClick={() => deleteTask(task.id)} style={tinyButtonStyle} aria-label="Delete task">
+                    <button onClick={() => {
+                      deleteTask(task.id);
+                      deleteTaskFromDb(task.id).catch(console.error);
+                    }} style={tinyButtonStyle} aria-label="Delete task">
                       <Trash2 size={12} />
                     </button>
                   </div>

@@ -13,6 +13,7 @@ export default function KeyboardShortcuts({
   onHelp,
   onTaskCanvas,
   onFlipSelected,
+  onSearch,
   onNavigatePrev,
   onNavigateNext,
 }: {
@@ -25,6 +26,7 @@ export default function KeyboardShortcuts({
   onHelp?: () => void;
   onTaskCanvas?: () => void;
   onFlipSelected?: () => void;
+  onSearch?: () => void;
   onNavigatePrev?: () => void;
   onNavigateNext?: () => void;
 }) {
@@ -94,6 +96,12 @@ export default function KeyboardShortcuts({
         onHelp?.();
       }
 
+      // / - Open search
+      if (e.key === '/') {
+        e.preventDefault();
+        onSearch?.();
+      }
+
       if (e.key === 't' || e.key === 'T') {
         e.preventDefault();
         onTaskCanvas?.();
@@ -126,7 +134,7 @@ export default function KeyboardShortcuts({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedVentureId, ventures, onNewVenture, onLogEvent, onModify, onFocus, onList, onReview, onHelp, onTaskCanvas, onFlipSelected, onNavigatePrev, onNavigateNext]);
+  }, [selectedVentureId, ventures, onNewVenture, onLogEvent, onModify, onFocus, onList, onReview, onHelp, onTaskCanvas, onFlipSelected, onSearch, onNavigatePrev, onNavigateNext]);
 
   return null;
 }

@@ -4,12 +4,21 @@ import { Download, Share2, X } from 'lucide-react';
 import { useMemo } from 'react';
 import { useStore } from '@/lib/useStore';
 import { colors, spacing, radius, typography, transitions } from '@/styles/tokens';
+import {
+  calculateVentureMetrics,
+  calculateIndustryBreakdown,
+  calculateStatusBreakdown,
+  calculateYearlyMetrics,
+} from '@/lib/metrics';
+import { exportAsJSON, exportVenturesAsCSV } from '@/lib/export';
+import { useToasts } from './Toast';
 
 export default function PatternsScreen({ onClose }: { onClose: () => void }) {
   const { ventures, events } = useStore();
+  const { addToast } = useToasts();
 
   const report = useMemo(() => {
-    const year = 2024;
+    const year = new Date().getFullYear();
     const yearEvents = events
       .filter((event) => new Date(event.eventDate).getFullYear() === year)
       .sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
@@ -17,23 +26,65 @@ export default function PatternsScreen({ onClose }: { onClose: () => void }) {
       month,
       count: yearEvents.filter((event) => new Date(event.eventDate).getMonth() === month).length,
     }));
-    const bestMonth = monthCounts.slice().sort((a, b) => b.count - a.count)[0];
+    const bestMonth = monthCounts.slice().sort((a, b) => b.count - a.count)[0] || monthCounts[0];
     const pivots = yearEvents.filter((event) => event.type === 'pivot' || event.type === 'decision').length;
     const ventureIds = new Set(yearEvents.map((event) => event.ventureId));
     const strategicPivots = Math.max(pivots, ventures.filter((venture) => venture.status === 'pivot').length);
     const highImpact = yearEvents.filter((event) => event.impact === 'high' || event.impact === 'critical').length;
+
+    const ventureMetrics = calculateVentureMetrics(ventures);
+    const industryBreakdown = calculateIndustryBreakdown(ventures);
+    const statusBreakdown = calculateStatusBreakdown(ventures);
+    const yearlyMetrics = calculateYearlyMetrics(ventures, events, year);
 
     return {
       year,
       events: yearEvents,
       bestMonth,
       monthCounts,
-      venturesStarted: ventures.filter((venture) => new Date(venture.startedDate).getFullYear() === year).length || ventureIds.size,
-      milestones: yearEvents.length,
+      venturesStarted: yearlyMetrics.venturesStarted,
+      milestones: yearlyMetrics.eventsCount,
       strategicPivots,
       highImpact,
+      ventureMetrics,
+      industryBreakdown,
+      statusBreakdown,
+      yearlyMetrics,
     };
   }, [events, ventures]);
+
+  const handleExportPDF = () => {
+    addToast('info', 'PDF export coming soon');
+  };
+
+  const handleExportJSON = () => {
+    try {
+      exportAsJSON({
+        ventures,
+        events,
+        tasks: [],
+        metadata: {
+          exportDate: new Date().toISOString(),
+          year: report.year,
+        },
+      });
+      addToast('success', 'Report exported as JSON');
+    } catch (error) {
+      addToast('error', 'Failed to export report');
+    }
+  };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: `${report.year} Annual Review`,
+        text: `Portfolio Review: ${report.ventureMetrics.totalVentures} ventures, ${report.milestones} milestones`,
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      addToast('success', 'Report link copied to clipboard');
+    }
+  };
 
   const maxMonth = Math.max(...report.monthCounts.map((item) => item.count), 1);
   const monthLabel = new Date(report.year, report.bestMonth.month).toLocaleString('en-US', { month: 'long' });
@@ -47,19 +98,21 @@ export default function PatternsScreen({ onClose }: { onClose: () => void }) {
       <main style={reportStyle}>
         <section style={heroStyle}>
           <div style={eyebrowStyle}>Annual review</div>
-          <h1 style={titleStyle}>{report.year}: The Year of the Pivot</h1>
+          <h1 style={titleStyle}>
+            {report.year}: {report.strategicPivots > 2 ? 'The Year of the Pivot' : report.milestones > 20 ? 'The Year of Momentum' : 'Year in Review'}
+          </h1>
           <p style={ledeStyle}>
-            A definitive record of strategic shifts, foundational realignments, and calculated risks.
-            This year was defined not by linear progression, but by the courage to alter the course when the data demanded it.
+            {report.ventureMetrics.totalVentures} ventures tracked • {report.milestones} milestones recorded • {report.ventureMetrics.activeVentures} active ventures
+            {report.ventureMetrics.exitedVentures > 0 && ` • ${report.ventureMetrics.exitedVentures} successful exits`}
           </p>
           <div style={actionRowStyle}>
-            <button style={lightButtonStyle}>
+            <button onClick={handleShare} style={lightButtonStyle}>
               <Share2 size={13} />
               Share report
             </button>
-            <button style={darkButtonStyle}>
+            <button onClick={handleExportJSON} style={darkButtonStyle}>
               <Download size={13} />
-              Export PDF
+              Export JSON
             </button>
           </div>
         </section>
@@ -74,6 +127,12 @@ export default function PatternsScreen({ onClose }: { onClose: () => void }) {
             </div>
           </div>
           <Metric label="Strategic pivots" value={report.strategicPivots} />
+        </section>
+
+        <section style={metricGridStyle}>
+          <Metric label="Active ventures" value={report.ventureMetrics.activeVentures} />
+          <Metric label="Exits" value={report.ventureMetrics.exitedVentures} />
+          <Metric label="Average health" value={report.ventureMetrics.averageHealthScore} />
         </section>
 
         <section style={performanceStyle}>
