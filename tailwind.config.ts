@@ -99,7 +99,7 @@ const config: Config = {
     },
   },
   plugins: [
-    function ({ addComponents, theme }) {
+    function ({ addComponents, theme }: any) {
       addComponents({
         // Primary buttons (solid white, dark text)
         ".btn-primary": {

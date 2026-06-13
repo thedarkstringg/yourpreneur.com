@@ -14,7 +14,7 @@ export function SyncStatusIndicator() {
       case 'syncing':
         return colors.text.secondary;
       case 'synced':
-        return colors.status.success;
+        return colors.status.active;
       case 'error':
         return colors.status.failed;
       default:

@@ -366,10 +366,10 @@ export default function TopBar({
               cursor: 'pointer',
             }}
             onMouseEnter={(e) => {
-              if (!publicProfile) e.currentTarget.color = colors.text.secondary;
+              if (!publicProfile) e.currentTarget.style.color = colors.text.secondary;
             }}
             onMouseLeave={(e) => {
-              if (!publicProfile) e.currentTarget.color = colors.text.tertiary;
+              if (!publicProfile) e.currentTarget.style.color = colors.text.tertiary;
             }}
           >
             <Share2 size={12} />

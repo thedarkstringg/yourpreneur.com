@@ -3,7 +3,7 @@
 import { Download, Share2, X } from 'lucide-react';
 import { useMemo } from 'react';
 import { useStore } from '@/lib/useStore';
-import { colors, spacing, radius, typography, transitions } from '@/styles/tokens';
+import { colors, spacing, radius, typography, transitions, components } from '@/styles/tokens';
 import {
   calculateVentureMetrics,
   calculateIndustryBreakdown,
@@ -63,10 +63,6 @@ export default function PatternsScreen({ onClose }: { onClose: () => void }) {
         ventures,
         events,
         tasks: [],
-        metadata: {
-          exportDate: new Date().toISOString(),
-          year: report.year,
-        },
       });
       addToast('success', 'Report exported as JSON');
     } catch (error) {

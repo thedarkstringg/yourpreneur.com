@@ -72,57 +72,9 @@ export const exportAsJSON = (data: {
 
 // PDF Export (requires external library like jsPDF)
 export const exportVenturesAsPDF = async (ventures: Venture[]) => {
-  try {
-    // This would require jsPDF library
-    const { jsPDF } = await import('jspdf');
-    const doc = new jsPDF();
-
-    let yPosition = 10;
-    const pageHeight = doc.internal.pageSize.height;
-    const lineHeight = 7;
-
-    doc.setFontSize(16);
-    doc.text('Venture Portfolio Report', 10, yPosition);
-    yPosition += 15;
-
-    ventures.forEach((venture, index) => {
-      if (yPosition > pageHeight - 20) {
-        doc.addPage();
-        yPosition = 10;
-      }
-
-      doc.setFontSize(12);
-      doc.text(`${index + 1}. ${venture.name}`, 10, yPosition);
-      yPosition += lineHeight;
-
-      doc.setFontSize(10);
-      doc.text(`Industry: ${venture.industry}`, 15, yPosition);
-      yPosition += lineHeight;
-
-      doc.text(`Status: ${venture.status}`, 15, yPosition);
-      yPosition += lineHeight;
-
-      doc.text(`Started: ${venture.startedDate}`, 15, yPosition);
-      yPosition += lineHeight;
-
-      if (venture.description) {
-        doc.text(`Description: ${venture.description}`, 15, yPosition);
-        yPosition += lineHeight;
-      }
-
-      if (venture.healthScore) {
-        doc.text(`Health Score: ${venture.healthScore}/100`, 15, yPosition);
-        yPosition += lineHeight;
-      }
-
-      yPosition += 5;
-    });
-
-    doc.save('ventures-report.pdf');
-  } catch (error) {
-    console.error('PDF export failed:', error);
-    throw new Error('Failed to export as PDF. Please install jsPDF.');
-  }
+  // PDF export requires jsPDF library
+  // To enable: npm install jspdf
+  throw new Error('PDF export coming soon. Please use JSON export for now.');
 };
 
 // Helper function to download files

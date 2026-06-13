@@ -37,7 +37,6 @@ export default function TaskCanvas({
     deleteTask,
     addTaskConnection,
     deleteTaskConnection,
-    saveTaskToDb,
     deleteTaskFromDb,
   } = useStore();
   const [draft, setDraft] = useState({
@@ -100,8 +99,6 @@ export default function TaskCanvas({
     };
 
     addTask(newTask);
-    // Persist to database
-    saveTaskToDb(newTask).catch(console.error);
 
     setDraft((value) => ({ ...value, title: '', notes: '' }));
   };

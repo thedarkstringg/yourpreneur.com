@@ -35,7 +35,7 @@ export default function EventForm({
 }) {
   const { events, setEvents } = useStore();
   const [showDepth, setShowDepth] = useState(false);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [errors, setErrors] = useState<{ [key: string]: string | undefined }>({});
   const [formData, setFormData] = useState<Partial<VentureEvent>>({
     type: 'milestone',
     title: '',

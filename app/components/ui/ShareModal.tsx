@@ -2,8 +2,9 @@
 
 import { Copy, Share2, X } from 'lucide-react';
 import { useState } from 'react';
-import { generateShareLink } from '@/lib/sharing';
+import { createShareLink } from '@/lib/sharing';
 import { useToasts } from './Toast';
+import { useStore } from '@/lib/useStore';
 import { colors, spacing, radius, typography, transitions } from '@/styles/tokens';
 
 interface ShareModalProps {
@@ -18,15 +19,18 @@ export default function ShareModal({ isOpen, onClose, ventureId, ventureName }: 
   const [role, setRole] = useState<'viewer' | 'commenter' | 'editor'>('viewer');
   const [copied, setCopied] = useState(false);
   const { addToast } = useToasts();
+  const { user } = useStore();
 
   const handleGenerateLink = async () => {
-    if (!ventureId) {
-      addToast('error', 'No venture selected');
+    if (!ventureId || !user?.id) {
+      addToast('error', 'No venture or user selected');
       return;
     }
 
     try {
-      const link = generateShareLink(ventureId, role);
+      const actualRole = (role === 'commenter' ? 'viewer' : role) as 'viewer' | 'editor';
+      const shareResult = await createShareLink(user.id, ventureId, actualRole, { days: 30 });
+      const link = `${window.location.origin}/share/${shareResult.linkToken}`;
       setShareLink(link);
       addToast('success', 'Share link generated');
     } catch (error) {

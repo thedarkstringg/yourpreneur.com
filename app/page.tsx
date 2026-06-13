@@ -173,7 +173,6 @@ export default function Home() {
         onLogEventClick={() => setIsEventLogOpen(true)}
         onReviewClick={() => setIsReviewOpen(true)}
         onListClick={() => setIsLeftPanelCollapsed(false)}
-        onHelpClick={() => setIsHelpOpen(true)}
         onTaskCanvasClick={() => setIsTaskTopologyOpen((value) => !value)}
         onFlipSelectedClick={flipSelectedVenture}
         onShareClick={() => setIsShareOpen(true)}
