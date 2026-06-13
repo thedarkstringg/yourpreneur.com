@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Maximize2, Grid, List, BookOpen, ClipboardList, FlipVertical, Edit3, NotepadText } from 'lucide-react';
+import { Plus, Maximize2, Grid, List, BookOpen, ClipboardList, FlipVertical, Edit3, NotepadText, Share2 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { colors, spacing, radius, layout, transitions } from '@/styles/tokens';
 
@@ -32,6 +32,7 @@ export default function Toolbar({
   onListClick,
   onTaskCanvasClick,
   onFlipSelectedClick,
+  onShareClick,
 }: {
   onGenerateClick?: () => void;
   onModifyClick?: () => void;
@@ -42,6 +43,7 @@ export default function Toolbar({
   onListClick?: () => void;
   onTaskCanvasClick?: () => void;
   onFlipSelectedClick?: () => void;
+  onShareClick?: () => void;
 }) {
   const [hoveredButton, setHoveredButton] = useState<string | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
@@ -59,6 +61,7 @@ export default function Toolbar({
     { id: 'list', Icon: List, label: 'LIST', tooltip: 'Open the portfolio sidebar', shortcut: 'L', onClick: onListClick },
     { id: 'log', Icon: NotepadText, label: 'LOG', tooltip: 'Log an event for the selected venture', shortcut: 'E', onClick: onLogEventClick },
     { id: 'tasks', Icon: ClipboardList, label: 'TASKS', tooltip: 'Open selected venture task canvas', shortcut: 'T', onClick: onTaskCanvasClick },
+    { id: 'share', Icon: Share2, label: 'SHARE', tooltip: 'Share the selected venture', shortcut: 'Sh+R', onClick: onShareClick },
     { id: 'review', Icon: BookOpen, label: 'REVIEW', tooltip: 'Open annual review report', shortcut: 'R', onClick: onReviewClick },
   ];
 
