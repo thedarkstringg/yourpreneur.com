@@ -1,81 +1,41 @@
-# Yourpreneur Dashboard
+# Yourpreneur Canvas
 
-A powerful infinite canvas for visualizing your venture journey. Track ventures, milestones, and relationships in an interactive timeline.
+> Built this, validated the idea, killed it. Entrepreneurs don't need a canvas 
+> to organize their ambition — they need their ideas to actually work, and no 
+> serious founder has time to curate a dashboard. The trust infrastructure alone 
+> (who owns your data, who sees your runway numbers) would take years to earn.
+> Leaving it public in case the timeline mechanics or dashboard UI patterns are 
+> useful to someone.
 
-## Features
+**Status: Archived — no maintenance, no PRs reviewed.**
 
-### Canvas Visualization
-- **Infinite Pan & Zoom**: Navigate through your venture landscape seamlessly
-- **Venture Nodes**: Visual cards showing venture status, dates, and industry
-- **Branch Lines**: Connect parent and child ventures with labeled relationship lines
-- **Event Dots**: Colored indicators for important events and milestones
-- **Timeline Grid**: Year-based positioning with dot grid background
+---
 
-### Data Management
-- **Create Ventures**: Add new ventures with name, description, industry, and status
-- **Edit Details**: Modify venture information anytime
-- **Delete Ventures**: Remove ventures with confirmation dialog
-- **Add Events**: Track launches, funding, milestones, pivots, and more
-- **Set Relationships**: Define parent-child ventures for spinoffs and pivots
+## What It Is
 
-### Organization & Discovery
-- **Search & Filter**: Find ventures by name or filter by status
-- **Sort Options**: Organize by name, start date, or status
-- **Statistics Dashboard**: View metrics including venture counts, event distribution, and timeline
-- **Status Tracking**: Active, Pivot, Paused, Shutdown, Exited
+An infinite canvas for tracking ventures, milestones, and relationships on an 
+interactive timeline. Built with PixiJS (WebGL), React 19, Next.js, Zustand, 
+and Tailwind CSS.
 
-### Controls
-- **Keyboard Shortcuts**:
-  - `N` - Create new venture
-  - `M` - Modify selected venture
-  - `P` - Toggle preview mode
-  - `L` - Toggle ventures list
-  - `S` - Show statistics
-  - `?` - Show keyboard help
+## Tech Stack
 
-- **Toolbar Buttons**: Generate, Modify, Preview, List, Help, Data management
+| Layer | Tech |
+|-------|------|
+| Frontend | Next.js, React 19, TypeScript |
+| Canvas | PixiJS v8 (WebGL) |
+| State | Zustand |
+| Styling | Tailwind CSS |
 
-### Data Persistence
-- **Export**: Download your ventures as JSON
-- **Import**: Load previously exported data
-- **Clear Data**: Reset everything (with confirmation)
+## Running Locally
 
-## Quick Start
+```bash
+npm install
+npm run dev
+```
 
-1. **Create Your First Venture** - Press `N` or click "Generate" button
-2. **Add Events** - Double-click a venture, then click "+ ADD EVENT"
-3. **Build Relationships** - Edit a venture and set a parent venture for branches
-4. **Explore** - Use `P` for preview mode, `L` for list view, `S` for statistics
+Works best on Chrome, Firefox, Safari, Edge (WebGL required).
 
-## Event Types
-
-- **Launch** - Product or service launch
-- **Funding** - Funding round or investment
-- **Milestone** - Key achievement or milestone
-- **Team** - Team member addition or hiring
-- **Pivot** - Business pivot or direction change
-- **Setback** - Challenges or setbacks
-- **Exit** - Acquisition or exit event
-- **Other** - General events
-
-## Venture Status
-
-- **Active** - Currently running venture
-- **Pivot** - Pivoted from original direction
-- **Paused** - Temporarily paused
-- **Shutdown** - Closed down
-- **Exited** - Acquired or successfully exited
-
-## Tips
-
-- Use **preview mode** (P) to hide editing panels for clean screenshots
-- **Export regularly** to backup your data
-- Use **statistics** (S) to see your venture portfolio at a glance
-- **Double-click** ventures for quick editing
-- Use **space + drag** to pan the canvas
-- **Scroll** to zoom in and out
-
-## Keyboard Controls
+## Core Controls
 
 | Key | Action |
 |-----|--------|
@@ -84,22 +44,13 @@ A powerful infinite canvas for visualizing your venture journey. Track ventures,
 | `P` | Preview mode |
 | `L` | Ventures list |
 | `S` | Statistics |
-| `?` | Help |
 | `Space + Drag` | Pan canvas |
 | `Scroll` | Zoom |
 
-## Browser Support
+## Data
 
-Works best on modern browsers with WebGL support (Chrome, Firefox, Safari, Edge).
-
-## Tech Stack
-
-- **Frontend**: Next.js 16, React 19, TypeScript
-- **Canvas**: PixiJS v8 (WebGL rendering)
-- **State**: Zustand
-- **Styling**: Tailwind CSS
-- **UI Components**: Custom React components
+Export/import via JSON. No backend — all local.
 
 ---
 
-Made with PixiJS, React, and Next.js for entrepreneurs tracking their venture journey.
+*If you fork this and build something with it, I'd be curious to hear about it.*
