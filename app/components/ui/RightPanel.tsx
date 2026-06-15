@@ -260,7 +260,8 @@ export default function RightPanel({
                   placeItems: 'center',
                   color: colors.background.base,
                   fontWeight: 900,
-                  background: event.logoUrl ? `center / cover no-repeat url(${event.logoUrl})` : event.color ? `linear-gradient(145deg, ${event.color}, ${colors.text.primary})` : colors.text.primary,
+                  background: event.logoUrl ? `center / contain no-repeat url(${event.logoUrl})` : event.color ? `linear-gradient(145deg, ${event.color}, ${colors.text.primary})` : colors.text.primary,
+                  backgroundColor: event.logoUrl ? 'transparent' : undefined,
                   flexShrink: 0,
                 }}>{!event.logoUrl && event.ventureName.slice(0, 1).toUpperCase()}</span>
                 <span style={{ minWidth: 0 }}>
@@ -449,7 +450,7 @@ function MiniMetric({ icon: Icon, value, label }: { icon: LucideIcon; value: num
         marginTop: 7,
         color: colors.text.secondary,
         fontFamily: "'Plus Jakarta Sans', sans-serif",
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: 800,
       }}>
         {value}
@@ -476,7 +477,8 @@ const logoStyle = (color?: string, logoUrl?: string): React.CSSProperties => ({
   placeItems: 'center',
   color: colors.background.base,
   fontWeight: 900,
-  background: logoUrl ? `center / cover no-repeat url(${logoUrl})` : color ? `linear-gradient(145deg, ${color}, ${colors.text.primary})` : colors.text.primary,
+  background: logoUrl ? `center / contain no-repeat url(${logoUrl})` : color ? `linear-gradient(145deg, ${color}, ${colors.text.primary})` : colors.text.primary,
+  backgroundColor: logoUrl ? 'transparent' : undefined,
   flexShrink: 0,
 });
 

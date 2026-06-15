@@ -7,7 +7,6 @@ import { calculateLayout } from '@/lib/layoutAlgorithm';
 import { colors, spacing, radius, typography, transitions, layout } from '@/styles/tokens';
 
 export default function LeftPanel({
-  userName = 'Founder',
   ventures = [],
   selectedVentureId,
   onSelectVenture,
@@ -16,7 +15,6 @@ export default function LeftPanel({
   collapsed = false,
   onToggleCollapsed,
 }: {
-  userName?: string;
   ventures?: Venture[];
   selectedVentureId?: string | null;
   onSelectVenture?: (id: string) => void;
@@ -27,13 +25,17 @@ export default function LeftPanel({
 }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [now] = useState(() => Date.now());
-  const { events, onNavigateToTarget, setSelectedVenture } = useStore();
+  const { user, events, onNavigateToTarget, setSelectedVenture } = useStore();
 
-  const userInitials = userName
-    .split(' ')
-    .map((name) => name[0])
-    .join('')
-    .toUpperCase();
+  const userName = user?.fullName || 'Founder';
+
+  const userInitials = useMemo(() => {
+    return userName
+      .split(' ')
+      .map((name) => name[0])
+      .join('')
+      .toUpperCase();
+  }, [userName]);
 
   const activeVentures = ventures.filter((venture) => venture.status === 'active').length;
   const industries = new Set(ventures.map((venture) => venture.industry).filter(Boolean));
@@ -191,13 +193,13 @@ export default function LeftPanel({
             <div style={{ display: 'flex', alignItems: 'center', gap: spacing.md }}>
               <div
                 style={{
-                  width: 42,
-                  height: 42,
-                  borderRadius: radius.lg,
+                  width: 36,
+                  height: 36,
+                  borderRadius: radius.md,
                   border: `1px solid ${colors.border.default}`,
                   display: 'grid',
                   placeItems: 'center',
-                  fontSize: 14,
+                  fontSize: 13,
                   color: colors.background.base,
                   background: colors.text.primary,
                   fontFamily: "'Plus Jakarta Sans', sans-serif",
@@ -210,7 +212,7 @@ export default function LeftPanel({
                 <div
                   style={{
                     fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    fontSize: 17,
+                    fontSize: 15,
                     color: colors.text.primary,
                     fontWeight: 750,
                   }}
@@ -267,7 +269,7 @@ export default function LeftPanel({
                       style={{
                         marginTop: 7,
                         fontFamily: "'Plus Jakarta Sans', sans-serif",
-                        fontSize: isPrompt ? 12 : 20,
+                        fontSize: isPrompt ? 11 : 18,
                         color: isPrompt ? colors.text.secondary : colors.text.primary,
                         fontWeight: 800,
                       }}
@@ -374,11 +376,9 @@ export default function LeftPanel({
                       borderRadius: radius.lg,
                       display: 'grid',
                       placeItems: 'center',
-                      background: venture.logoUrl ? `center / cover no-repeat url(${venture.logoUrl})` : venture.color ? `linear-gradient(145deg, ${venture.color}, ${colors.text.primary})` : colors.text.primary,
-                      color: colors.background.base,
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
-                      fontWeight: 900,
-                      boxShadow: venture.color ? `0 0 22px ${venture.color}33` : 'none',
+                      background: venture.logoUrl ? `center / contain no-repeat url(${venture.logoUrl})` : venture.color ? `linear-gradient(145deg, ${venture.color}, ${colors.text.primary})` : colors.text.primary,
+                      backgroundColor: venture.logoUrl ? 'transparent' : undefined,
+                      boxShadow: !venture.logoUrl && venture.color ? `0 0 22px ${venture.color}33` : 'none',
                     }}>{!venture.logoUrl && venture.name.slice(0, 1).toUpperCase()}</span>
                     <span style={{ minWidth: 0 }}>
                       <span
@@ -508,11 +508,12 @@ const logoStyle = (color?: string, logoUrl?: string): React.CSSProperties => ({
   borderRadius: radius.lg,
   display: 'grid',
   placeItems: 'center',
-  background: logoUrl ? `center / cover no-repeat url(${logoUrl})` : color ? `linear-gradient(145deg, ${color}, ${colors.text.primary})` : colors.text.primary,
+  background: logoUrl ? `center / contain no-repeat url(${logoUrl})` : color ? `linear-gradient(145deg, ${color}, ${colors.text.primary})` : colors.text.primary,
+  backgroundColor: logoUrl ? 'transparent' : undefined,
   color: colors.background.base,
   fontFamily: "'Plus Jakarta Sans', sans-serif",
   fontWeight: 900,
-  boxShadow: color ? `0 0 22px ${color}33` : 'none',
+  boxShadow: !logoUrl && color ? `0 0 22px ${color}33` : 'none',
 });
 
 const statusStyle = (status: Venture['status']): React.CSSProperties => {

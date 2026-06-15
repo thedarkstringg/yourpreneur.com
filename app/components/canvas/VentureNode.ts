@@ -100,40 +100,70 @@ export class VentureNode extends Container {
     this.contentContainer.removeChildren();
 
     // Logo placeholder (top-right)
-    const logoSize = 36;
+    const logoSize = 32;
     const logoMargin = 12;
     const logoX = this.widthPx - logoSize - logoMargin;
     const logoY = logoMargin;
 
-    // Logo background
-    const logoBg = new Graphics();
-    logoBg.roundRect(logoX, logoY, logoSize, logoSize, 8);
-    logoBg.fill({ color: this.venture.color ? parseInt(this.venture.color.slice(1), 16) : 0xffffff, alpha: 0.9 });
-    logoBg.stroke({ width: 1, color: 0xffffff, alpha: this.isHovered ? 0.32 : 0.14 });
-    this.contentContainer.addChild(logoBg);
+    if (this.venture.logoUrl && typeof this.venture.logoUrl === 'string' && this.venture.logoUrl.length > 10) {
+      // Validate URL format - reject base64 and invalid URLs
+      const isValidUrl = !this.venture.logoUrl.startsWith('data:') &&
+                         (this.venture.logoUrl.startsWith('http') ||
+                          this.venture.logoUrl.startsWith('/') ||
+                          this.venture.logoUrl.startsWith('.'));
 
-    if (this.venture.logoUrl) {
-      const logo = new Sprite(Texture.from(this.venture.logoUrl));
-      logo.x = logoX;
-      logo.y = logoY;
-      logo.width = logoSize;
-      logo.height = logoSize;
-      logo.alpha = 0.96;
-      this.contentContainer.addChild(logo);
+      if (!isValidUrl) {
+        this.drawTextLogo(logoX, logoY, logoSize);
+      } else {
+        try {
+          const texture = Texture.from(this.venture.logoUrl);
+          if (texture) {
+          const width = texture.width;
+          const height = texture.height;
+
+          if (width > 0 && height > 0) {
+            const logo = new Sprite(texture);
+            
+            // Calculate aspect ratio to fit within logoSize without background
+            const ratio = width / height;
+            if (ratio > 1) {
+              // Landscape
+              logo.width = logoSize;
+              logo.height = logoSize / ratio;
+            } else {
+              // Portrait or Square
+              logo.height = logoSize;
+              logo.width = logoSize * ratio;
+            }
+            
+            // Center the logo in the allocated space
+            logo.x = logoX + (logoSize - logo.width) / 2;
+            logo.y = logoY + (logoSize - logo.height) / 2;
+            logo.alpha = 0.96;
+            this.contentContainer.addChild(logo);
+          } else {
+            // Texture exists but not loaded yet
+            const logo = new Sprite(texture);
+            logo.x = logoX;
+            logo.y = logoY;
+            logo.width = logoSize;
+            logo.height = logoSize;
+            logo.alpha = 0.96;
+            this.contentContainer.addChild(logo);
+            
+            // Redraw when texture is updated/loaded
+            texture.on('update', () => {
+              if (!this.destroyed) this.drawContent();
+            });
+          }
+        }
+      } catch (err) {
+        console.error('Error loading logo:', err);
+        this.drawTextLogo(logoX, logoY, logoSize);
+      }
+      }
     } else if (this.venture.name) {
-      const logoTextStyle = new TextStyle({
-        fontFamily: 'Montserrat',
-        fontSize: 16,
-        fontWeight: '800',
-        fill: 'rgba(0,0,0,0.88)',
-        align: 'center',
-      });
-      const logoText = new Text({ text: this.venture.name.charAt(0).toUpperCase(), style: logoTextStyle });
-      logoText.resolution = window.devicePixelRatio * 4;
-      logoText.anchor.set(0.5, 0.5);
-      logoText.x = logoX + logoSize / 2;
-      logoText.y = logoY + logoSize / 2;
-      this.contentContainer.addChild(logoText);
+      this.drawTextLogo(logoX, logoY, logoSize);
     }
 
     // Logo hover indicator (small icon hint on hover)
@@ -141,7 +171,7 @@ export class VentureNode extends Container {
       const hintStyle = new TextStyle({
         fontFamily: 'Montserrat',
         fontSize: 10,
-        fill: 'rgba(0,0,0,0.5)',
+        fill: this.venture.logoUrl ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)',
         align: 'center',
       });
       const hint = new Text({ text: 'O', style: hintStyle });
@@ -152,7 +182,7 @@ export class VentureNode extends Container {
       hint.alpha = 0.6;
       this.contentContainer.addChild(hint);
     }
-
+    
     // Industry tag: Inter, 9px, rgba(255,255,255,0.32), uppercase, letterSpacing: 2
     const industryStyle = new TextStyle({
       fontFamily: 'Inter',
@@ -166,10 +196,10 @@ export class VentureNode extends Container {
     industry.y = 18;
     this.contentContainer.addChild(industry);
 
-    // Venture name: Plus Jakarta Sans, 22px, font-weight 600, rgba(255,255,255,0.92)
+    // Venture name: Plus Jakarta Sans, 18px, font-weight 600, rgba(255,255,255,0.92)
     const nameStyle = new TextStyle({
       fontFamily: 'Plus Jakarta Sans',
-      fontSize: 22,
+      fontSize: 18,
       fontWeight: '600',
       fill: 'rgba(255,255,255,0.92)',
     });
@@ -279,16 +309,6 @@ export class VentureNode extends Container {
 
       const events = useStore.getState().events.filter((e) => e.ventureId === this.venture.id);
       const startY = 128;
-      const closeStyle = new TextStyle({
-        fontFamily: 'Inter',
-        fontSize: 10,
-        fill: 'rgba(255,255,255,0.48)',
-      });
-      const close = new Text({ text: 'CLOSE X', style: closeStyle });
-      close.resolution = window.devicePixelRatio * 4;
-      close.x = this.widthPx - 64;
-      close.y = 132;
-      this.contentContainer.addChild(close);
 
       const branchLine = new Graphics();
       branchLine.moveTo(34, 116);
@@ -378,6 +398,28 @@ export class VentureNode extends Container {
       add.on('pointerout', () => (add.style.fill = 'rgba(255,255,255,0.28)'));
       this.contentContainer.addChild(add);
     }
+  }
+
+  private drawTextLogo(logoX: number, logoY: number, logoSize: number) {
+    const logoBg = new Graphics();
+    logoBg.roundRect(logoX, logoY, logoSize, logoSize, 8);
+    logoBg.fill({ color: this.venture.color ? parseInt(this.venture.color.slice(1), 16) : 0xffffff, alpha: 0.9 });
+    logoBg.stroke({ width: 1, color: 0xffffff, alpha: this.isHovered ? 0.32 : 0.14 });
+    this.contentContainer.addChild(logoBg);
+
+    const logoTextStyle = new TextStyle({
+      fontFamily: 'Montserrat',
+      fontSize: 16,
+      fontWeight: '800',
+      fill: 'rgba(0,0,0,0.88)',
+      align: 'center',
+    });
+    const logoText = new Text({ text: this.venture.name.charAt(0).toUpperCase(), style: logoTextStyle });
+    logoText.resolution = window.devicePixelRatio * 4;
+    logoText.anchor.set(0.5, 0.5);
+    logoText.x = logoX + logoSize / 2;
+    logoText.y = logoY + logoSize / 2;
+    this.contentContainer.addChild(logoText);
   }
 
   private drawSparkline() {
@@ -606,11 +648,6 @@ export class VentureNode extends Container {
   public handlePointerAction(globalX: number, globalY: number): boolean {
     const localX = globalX - this.x;
     const localY = globalY - this.y;
-
-    if (this.isSelected && localX >= this.widthPx - 70 && localX <= this.widthPx - 14 && localY >= 126 && localY <= 150) {
-      window.dispatchEvent(new CustomEvent('venture-node-close'));
-      return true;
-    }
 
     if (this.isSelected && localX >= 42 && localX <= 116 && localY >= this.currentHeight - 36 && localY <= this.currentHeight - 8) {
       window.dispatchEvent(new CustomEvent('open-event-log', { detail: { ventureId: this.venture.id } }));

@@ -85,7 +85,7 @@ export default function TaskCanvas({
     if (!title) return;
 
     const newTask: FounderTask = {
-      id: `task-${tasks.length + 1}-${++idCounterRef.current}`,
+      id: crypto.randomUUID(),
       title,
       ventureId: activeDraftVentureId || undefined,
       role: draft.role,
@@ -99,6 +99,7 @@ export default function TaskCanvas({
     };
 
     addTask(newTask);
+    useStore.getState().saveTask(newTask).catch(console.error);
 
     setDraft((value) => ({ ...value, title: '', notes: '' }));
   };
@@ -118,18 +119,23 @@ export default function TaskCanvas({
     event.currentTarget.setPointerCapture(event.pointerId);
 
     const onMove = (moveEvent: PointerEvent) => {
-      updateTask(taskId, {
-        position: {
-          x: Math.max(18, Math.min(rect.width / zoom - 250, origin.x + moveEvent.clientX / zoom - startX)),
-          y: Math.max(18, Math.min(rect.height / zoom - 140, origin.y + moveEvent.clientY / zoom - startY)),
-        },
-      });
+      const newPos = {
+        x: Math.max(18, Math.min(rect.width / zoom - 250, origin.x + moveEvent.clientX / zoom - startX)),
+        y: Math.max(18, Math.min(rect.height / zoom - 140, origin.y + moveEvent.clientY / zoom - startY)),
+      };
+      updateTask(taskId, { position: newPos });
     };
 
-    const onUp = () => {
+    const onUp = (moveEvent: PointerEvent) => {
       setDraggingId(null);
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
+
+      // Persist final position
+      const finalTask = taskMap.get(taskId);
+      if (finalTask) {
+        useStore.getState().saveTask(finalTask).catch(console.error);
+      }
     };
 
     window.addEventListener('pointermove', onMove);
@@ -148,11 +154,13 @@ export default function TaskCanvas({
           connection.fromTaskId === linkStartId && connection.toTaskId === taskId
       );
       if (!exists) {
-        addTaskConnection({
-          id: `task-link-${taskConnections.length + 1}-${++idCounterRef.current}`,
+        const newConnection = {
+          id: crypto.randomUUID(),
           fromTaskId: linkStartId,
           toTaskId: taskId,
-        });
+        };
+        addTaskConnection(newConnection);
+        // DB sync for connections not implemented yet in useStore, but good for local
       }
     }
     setLinkStartId(null);
@@ -352,6 +360,7 @@ export default function TaskCanvas({
                 <textarea
                   value={task.notes}
                   onChange={(event) => updateTask(task.id, { notes: event.target.value })}
+                  onBlur={() => useStore.getState().saveTask(task).catch(console.error)}
                   placeholder="Notes"
                   rows={2}
                   style={notesStyle}
@@ -359,7 +368,11 @@ export default function TaskCanvas({
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
                   <select
                     value={task.status}
-                    onChange={(event) => updateTask(task.id, { status: event.target.value as FounderTask['status'] })}
+                    onChange={(event) => {
+                      const newStatus = event.target.value as FounderTask['status'];
+                      updateTask(task.id, { status: newStatus });
+                      useStore.getState().saveTask({ ...task, status: newStatus }).catch(console.error);
+                    }}
                     style={statusSelectStyle(task.status)}
                   >
                     {STATUS_OPTIONS.map((status) => (
@@ -617,7 +630,8 @@ const ventureMarkStyle = (color?: string, logoUrl?: string): React.CSSProperties
   color: colors.background.base,
   fontFamily: typography.family.base,
   fontWeight: typography.weight.bold,
-  background: logoUrl ? `center / cover no-repeat url(${logoUrl})` : color ? `linear-gradient(145deg, ${color}, rgba(255,255,255,0.9))` : colors.text.primary,
+  background: logoUrl ? `center / contain no-repeat url(${logoUrl})` : color ? `linear-gradient(145deg, ${color}, rgba(255,255,255,0.9))` : colors.text.primary,
+  backgroundColor: logoUrl ? 'transparent' : undefined,
 });
 
 const ventureLabelStyle: React.CSSProperties = {

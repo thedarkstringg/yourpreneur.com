@@ -60,13 +60,13 @@ export const colors = {
 // 4px base unit: xs:4, sm:8, md:12, lg:16, xl:24, 2xl:32, 3xl:48
 
 export const spacing = {
-  xs: 4,
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 24,
-  '2xl': 32,
-  '3xl': 48,
+  xs: 3,
+  sm: 6,
+  md: 10,
+  lg: 14,
+  xl: 20,
+  '2xl': 28,
+  '3xl': 40,
 } as const;
 
 // Common computed spacing values
@@ -102,14 +102,14 @@ export const typography = {
   },
 
   size: {
-    xs: 11,    // Extra small (65% of base 16px)
-    sm: 12,    // Small (75% of base)
-    base: 13,  // Base/body (81.25% of base 16px = readable)
-    md: 14,    // Medium (87.5%)
-    lg: 16,    // Large (100%)
-    xl: 20,    // Extra large (125%)
-    '2xl': 24, // 2x large (150%)
-    '3xl': 32, // 3x large (200%)
+    xs: 10,    // Extra small
+    sm: 11,    // Small
+    base: 12,  // Base/body
+    md: 13,    // Medium
+    lg: 14,    // Large
+    xl: 18,    // Extra large
+    '2xl': 22, // 2x large
+    '3xl': 28, // 3x large
   },
 
   weight: {
@@ -191,21 +191,21 @@ export const transitions = {
 
 export const layout = {
   header: {
-    height: 48,
+    height: 40,
     zIndex: 100,
   },
   sidebar: {
-    width: 280,
-    collapsedWidth: 56,
+    width: 240,
+    collapsedWidth: 48,
     zIndex: 50,
   },
   rightPanel: {
-    width: 320,
+    width: 260,
     zIndex: 50,
   },
   toolbar: {
-    height: 64,
-    bottom: 24,
+    height: 56,
+    bottom: 20,
     zIndex: 60,
   },
   canvas: {
@@ -220,35 +220,35 @@ export const layout = {
 export const components = {
   button: {
     primary: {
-      height: 44,
-      heightSmall: 36,
-      heightTiny: 32,
+      height: 36,
+      heightSmall: 32,
+      heightTiny: 28,
       borderRadius: radius.md,
-      paddingX: 16,
-      paddingY: 10,
+      paddingX: 12,
+      paddingY: 8,
       fontSize: typography.size.sm,
       fontWeight: typography.weight.semibold,
     },
     icon: {
       sm: {
-        size: 36,
-        iconSize: 16,
+        size: 30,
+        iconSize: 14,
         borderRadius: radius.md,
       },
       md: {
-        size: 40,
-        iconSize: 18,
+        size: 34,
+        iconSize: 16,
         borderRadius: radius.md,
       },
     },
   },
 
   input: {
-    height: 44,
-    heightSmall: 36,
+    height: 36,
+    heightSmall: 32,
     borderRadius: radius.md,
-    paddingX: 16,
-    paddingY: 10,
+    paddingX: 12,
+    paddingY: 8,
     fontSize: typography.size.base,
     borderColor: colors.border.default,
   },
@@ -261,22 +261,22 @@ export const components = {
 
   modal: {
     borderRadius: radius.lg,
-    maxWidth: 520,
-    padding: spacing.lg * 2.5, // 40px
+    maxWidth: 460,
+    padding: spacing.lg * 2, // 28px
   },
 
   ventureNode: {
-    width: 220,
-    minHeight: 120,
+    width: 200,
+    minHeight: 110,
     borderRadius: radius.lg,
     topEdgeHeight: 2,
   },
 
   avatar: {
-    lg: 48,
-    md: 40,
-    sm: 32,
-    xs: 28,
+    lg: 40,
+    md: 32,
+    sm: 28,
+    xs: 24,
   },
 } as const;
 

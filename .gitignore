@@ -1,6 +1,48 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# ─────────────────────────────────────────────────────────────────────────────
+# Environment Variables & Credentials
+# ─────────────────────────────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+.env.development
+.env.development.local
+.env.production
+.env.production.local
+.env.test
+.env.test.local
+.env.staging
+.env.staging.local
 
-# dependencies
+# ─────────────────────────────────────────────────────────────────────────────
+# SSL/TLS Certificates & Keys
+# ─────────────────────────────────────────────────────────────────────────────
+*.pem
+*.key
+*.cert
+*.cer
+*.crt
+*.pfx
+*.p12
+*.jks
+*.keystore
+*.p8
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Service Account & Cloud Config Files
+# ─────────────────────────────────────────────────────────────────────────────
+*-service-account.json
+*-service-account.key
+firebase-*.json
+google-*.json
+firebase.json
+serviceAccount.json
+credentials.json
+secrets.json
+config/secrets.json
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Node.js Dependencies & Build Artifacts
+# ─────────────────────────────────────────────────────────────────────────────
 /node_modules
 /.pnp
 .pnp.*
@@ -9,33 +51,207 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
-
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
+.npm
+pnpm-debug.log*
+pnpm-error.log*
+*.tsbuildinfo
 
-# env files (can opt-in for committing if needed)
-.env*
+# ─────────────────────────────────────────────────────────────────────────────
+# Next.js Build Artifacts
+# ─────────────────────────────────────────────────────────────────────────────
+/.next/
+/out/
+/build/
+/dist/
+.vercel
+.vercel/
 
-# vercel
+# ─────────────────────────────────────────────────────────────────────────────
+# General Build & Cache
+# ─────────────────────────────────────────────────────────────────────────────
+.cache/
+.next/cache/
+.eslintcache
+.babel-cache/
+.turbo/
+.parcel-cache/
+.swc/
+.tsc-cache/
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Test & Coverage
+# ─────────────────────────────────────────────────────────────────────────────
+/coverage
+.coverage
+.nyc_output/
+junit.xml
+test-results/
+*.lcov
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Python & Virtual Environments
+# ─────────────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+develop-eggs/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.venv
+pipenv.lock
+
+# ─────────────────────────────────────────────────────────────────────────────
+# OS-Specific Files
+# ─────────────────────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+.directory
+.Spotlight-V100
+.Trashes
+
+# ─────────────────────────────────────────────────────────────────────────────
+# IDE & Editor Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+.vscode/
+.vscode/settings.json
+.vscode/extensions.json
+.idea/
+.idea_modules/
+*.iml
+*.iws
+*.ipr
+*.sublime-workspace
+*.sublime-project
+.project
+.classpath
+.c9/
+*.launch
+.tern-port
+.vscode-test
+.history/
+*.swp
+*.swo
+*~
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Logs
+# ─────────────────────────────────────────────────────────────────────────────
+logs/
+*.log
+pip-log.txt
+pip-delete-this-directory.txt
+.venv
+env.bak/
+venv.bak/
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Temporary Files
+# ─────────────────────────────────────────────────────────────────────────────
+tmp/
+temp/
+.temp/
+*.tmp
+*.temp
+.cache
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Database Files
+# ─────────────────────────────────────────────────────────────────────────────
+*.sqlite
+*.sqlite3
+*.db
+*.mdb
+*.sql
+*.sql.bak
+*.dump
+*.sql.gz
+database.json
+.db/
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Docker & Docker Compose
+# ─────────────────────────────────────────────────────────────────────────────
+.docker/
+.docker/config.json
+docker-compose.override.yml
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Cloud Platform Local Config
+# ─────────────────────────────────────────────────────────────────────────────
+# Vercel
 .vercel
 
-# typescript
-*.tsbuildinfo
+# Netlify
+.netlify
+.netlify/functions
+
+# AWS
+.aws/
+aws-exports.js
+awsconfiguration.json
+amplifyconfiguration.json
+amplifyconfiguration.dart
+amplify-build-config.json
+amplify.*.graphql
+
+# Firebase
+.firebase/
+firebase-debug.log
+.firebaserc
+
+# Google Cloud
+.gcloud/
+.gcp-key.json
+google-cloud-*.json
+
+# Azure
+.azure/
+
+# Supabase
+.supabase/
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TypeScript
+# ─────────────────────────────────────────────────────────────────────────────
 next-env.d.ts
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Miscellaneous
+# ─────────────────────────────────────────────────────────────────────────────
+.rvmrc
+.ruby-version
+.ruby-gemset
+Gemfile.lock
+.vendor/
+vendor/
+.bundle/
+bundle/
+.solargraph.yml

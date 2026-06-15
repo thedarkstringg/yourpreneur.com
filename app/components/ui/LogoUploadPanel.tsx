@@ -120,7 +120,7 @@ export default function LogoUploadPanel({ onSave, onCancel, currentLogo }: LogoU
             style={{
               width: '100%',
               height: '100%',
-              objectFit: 'cover',
+              objectFit: 'contain',
               borderRadius: radius.sm,
             }}
           />

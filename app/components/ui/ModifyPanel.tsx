@@ -39,7 +39,9 @@ export default function ModifyPanel({
       window.alert('Add the hardest lesson learned before moving this venture into the graveyard.');
       return;
     }
+    const updatedVenture = { ...venture, ...formData };
     updateVenture(venture.id, formData);
+    useStore.getState().saveVenture(updatedVenture).catch(console.error);
     handleCloseAnimated();
   };
 
@@ -53,6 +55,7 @@ export default function ModifyPanel({
   const handleDelete = () => {
     if (window.confirm('Are you sure you want to delete this venture?')) {
       deleteVenture(venture.id);
+      useStore.getState().deleteVentureFromDb(venture.id).catch(console.error);
       handleCloseAnimated();
     }
   };
@@ -62,7 +65,7 @@ export default function ModifyPanel({
       <div
         className="modify-panel"
         style={{
-          width: '430px',
+          width: '360px',
           zIndex: 210,
           animation: isClosing ? 'panelSlideOut 250ms cubic-bezier(0.4, 0, 0.2, 1)' : 'panelSlideIn 300ms cubic-bezier(0.4, 0, 0.2, 1)',
         }}
@@ -356,12 +359,11 @@ const logoButtonStyle: React.CSSProperties = {
   justifyContent: 'center',
   gap: spacing.sm,
 };
-
 const logoPreviewStyle: React.CSSProperties = {
-  width: 34,
-  height: 34,
-  borderRadius: radius.sm,
-  backgroundSize: 'cover',
+  width: 32,
+  height: 32,
+  borderRadius: 6,
+  backgroundSize: 'contain',
   backgroundPosition: 'center',
-  border: `1px solid ${colors.border.default}`,
+  backgroundRepeat: 'no-repeat',
 };

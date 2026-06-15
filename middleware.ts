@@ -10,15 +10,15 @@ export async function middleware(request: NextRequest) {
   // Get session token from cookies
   const token = request.cookies.get('sb-access-token')?.value;
 
-  // If user is authenticated and tries to access auth routes, redirect to canvas
+  // If user is authenticated and tries to access auth routes, redirect to root
   if (token && isAuthRoute) {
-    return NextResponse.redirect(new URL('/canvas', request.url));
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   // If user is not authenticated and tries to access protected routes, redirect to signin
-  if (!token && !isAuthRoute && pathname !== '/' && pathname.startsWith('/')) {
-    // Allow public routes like '/' but protect '/canvas' and other app routes
-    if (pathname.startsWith('/canvas') || pathname.startsWith('/billing')) {
+  if (!token && !isAuthRoute && pathname !== '/') {
+    // Protect app routes
+    if (pathname.startsWith('/billing') || pathname.startsWith('/settings') || pathname.startsWith('/profile')) {
       return NextResponse.redirect(new URL('/auth/signin', request.url));
     }
   }

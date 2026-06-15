@@ -20,6 +20,7 @@ import ShareModal from './components/ui/ShareModal';
 import { useStore } from '@/lib/useStore';
 import { useEventManagement } from '@/lib/useEventManagement';
 import { calculateLayout } from '@/lib/layoutAlgorithm';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const [isModifyPanelOpen, setIsModifyPanelOpen] = useState(false);
@@ -36,8 +37,33 @@ export default function Home() {
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [currentYear, setCurrentYear] = useState(2024);
 
-  const { selectedVentureId, ventures, addVenture, updateVenture, zoomLevel, onNavigateToTarget } = useStore();
+  const { 
+    user, 
+    authLoading,
+    selectedVentureId, 
+    ventures, 
+    addVenture, 
+    updateVenture, 
+    zoomLevel, 
+    onNavigateToTarget,
+    fetchVentures,
+    fetchTasks
+  } = useStore();
   const { addEvent } = useEventManagement();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/auth/signin');
+    }
+  }, [user, authLoading, router]);
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchVentures(user.id);
+      fetchTasks(user.id);
+    }
+  }, [user?.id, fetchVentures, fetchTasks]);
 
   useEffect(() => {
     const openEventLog = (event: Event) => {
@@ -130,7 +156,6 @@ export default function Home() {
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden', width: '100%' }}>
         {/* Left Panel - fixed width */}
         <LeftPanel
-          userName="Founder"
           ventures={ventures}
           selectedVentureId={selectedVentureId}
           onSelectVenture={(id) => useStore.setState({ selectedVentureId: id })}
@@ -185,8 +210,8 @@ export default function Home() {
         isOpen={isNewVentureOpen}
         onClose={() => setIsNewVentureOpen(false)}
         onSave={(venture) => {
-          addVenture({
-            id: Math.random().toString(36).slice(2),
+          const newVenture = {
+            id: crypto.randomUUID(),
             name: venture.name,
             description: venture.description || '',
             industry: venture.industry || '',
@@ -199,8 +224,10 @@ export default function Home() {
             healthScore: 55,
             mrrTrend: [1, 2, 3, 4, 5, 6, 7],
             lastSyncedAt: new Date().toISOString(),
-            source: 'manual',
-          });
+            source: 'manual' as const,
+          };
+          addVenture(newVenture);
+          useStore.getState().saveVenture(newVenture).catch(console.error);
           setIsNewVentureOpen(false);
         }}
       />

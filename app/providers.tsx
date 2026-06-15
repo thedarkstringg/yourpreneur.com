@@ -6,21 +6,12 @@ import { useStore } from '@/lib/useStore';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const { checkSession } = useAuth();
-  const { setUser } = useStore();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const result = await checkSession();
-        if (result.authenticated && result.user) {
-          setUser({
-            id: result.user.id,
-            email: result.user.email || '',
-            fullName: result.user.user_metadata?.full_name || 'Founder',
-            tier: 'free',
-          });
-        }
+        await checkSession();
       } catch (error) {
         console.error('Auth init error:', error);
       } finally {
@@ -29,7 +20,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     };
 
     initAuth();
-  }, [checkSession, setUser]);
+  }, []);
 
   if (isLoading) {
     return (

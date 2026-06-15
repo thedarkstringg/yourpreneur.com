@@ -126,7 +126,7 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
           border: `1px solid ${colors.border.default}`,
           borderRadius: radius.lg,
           padding: spacing['2xl'],
-          width: 440,
+          width: 400,
           maxHeight: '90vh',
           overflowY: 'auto',
           boxShadow: shadows.elevated,
@@ -148,7 +148,7 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
           <h2
             style={{
               fontFamily: typography.family.display,
-              fontSize: typography.size['2xl'],
+              fontSize: typography.size.xl,
               fontWeight: typography.weight.medium,
               color: colors.text.primary,
               margin: 0,
@@ -215,17 +215,18 @@ export default function NewVentureModal({ isOpen, onClose, onSave }: NewVentureM
               }}
             >
               {logoUrl ? (
-                <span
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: radius.sm,
-                    backgroundImage: `url(${logoUrl})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                  }}
-                />
-              ) : (
+                              <span
+                                style={{
+                                  width: 48,
+                                  height: 48,
+                                  borderRadius: radius.md,
+                                  backgroundImage: `url(${logoUrl})`,
+                                  backgroundSize: 'contain',
+                                  backgroundPosition: 'center',
+                                  backgroundRepeat: 'no-repeat',
+                                }}
+                              />
+                            ) : (
                 <Upload size={15} />
               )}
               {logoUrl ? 'Logo ready' : 'Upload logo'}

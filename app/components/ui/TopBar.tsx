@@ -1,33 +1,26 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Bell,
   ChevronLeft,
   ChevronRight,
   Clock,
-  ClipboardList,
-  Command,
-  CreditCard,
-  History,
   LogOut,
-  Plus,
   RotateCcw,
   Search,
-  Settings,
   Share2,
   User,
-  Zap,
 } from 'lucide-react';
 import { useStore } from '@/lib/useStore';
+import { useAuth } from '@/lib/useAuth';
 import { calculateLayout } from '@/lib/layoutAlgorithm';
 import { colors, spacing, layout, transitions } from '@/styles/tokens';
 
 export default function TopBar({
   onYearChange,
   onNewVenture,
-  onTaskCanvas,
-  onHelpClick,
   onFitClick,
   currentYear = 2024,
   zoomLevel = 100,
@@ -44,21 +37,26 @@ export default function TopBar({
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isSyncHistoryOpen, setIsSyncHistoryOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const [notice, setNotice] = useState('Synced 2m ago');
   const [publicProfile, setPublicProfile] = useState(false);
-  const { ventures, events, setSelectedVenture, onNavigateToTarget, onNavigateToYear, setZoom } = useStore();
+  
+  const { 
+    user, 
+    ventures, 
+    events, 
+    setSelectedVenture, 
+    onNavigateToTarget, 
+    onNavigateToYear, 
+    setZoom,
+    syncStatus 
+  } = useStore();
+  const { logOut } = useAuth();
+  const router = useRouter();
 
-  const searchResults = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    if (!normalized) return [];
-    return ventures
-      .filter((venture) =>
-        [venture.name, venture.industry, venture.description, venture.status]
-          .filter(Boolean)
-          .some((value) => String(value).toLowerCase().includes(normalized))
-      )
-      .slice(0, 5);
-  }, [query, ventures]);
+  const notice = useMemo(() => {
+    if (syncStatus === 'syncing') return 'Syncing...';
+    if (syncStatus === 'error') return 'Sync error';
+    return 'Synced to Cloud';
+  }, [syncStatus]);
 
   const unreadCount = useMemo(() => {
     const twentyFourHoursAgo = new Date();
@@ -89,16 +87,6 @@ export default function TopBar({
     };
   }, []);
 
-  const focusVenture = (ventureId: string) => {
-    const layout = calculateLayout(ventures);
-    const position = layout.positions.get(ventureId);
-    setSelectedVenture(ventureId);
-    setQuery('');
-    if (position) {
-      onNavigateToTarget?.(position.x + 110, position.y + 60, 1);
-    }
-  };
-
   const handleYearClick = (year: number) => {
     onYearChange?.(year);
     onNavigateToYear?.(year);
@@ -115,6 +103,18 @@ export default function TopBar({
     setZoom(1);
     onFitClick?.();
   };
+
+  const handleSignOut = async () => {
+    await logOut();
+    router.push('/auth/signin');
+  };
+
+  const accountMenuItems = [
+    { label: 'Profile', onClick: () => router.push('/profile') },
+    { label: 'Settings', onClick: () => router.push('/settings') },
+    { label: 'Billing', onClick: () => router.push('/billing') },
+    { label: 'Sign Out', onClick: handleSignOut, danger: true },
+  ];
 
   return (
     <div style={{
@@ -137,9 +137,9 @@ export default function TopBar({
       <div className="flex items-center gap-4 min-w-0">
         <div style={{
           flexShrink: 0,
-          width: 36,
-          height: 36,
-          borderRadius: 12,
+          width: 32,
+          height: 32,
+          borderRadius: 10,
           background: colors.text.primary,
           color: colors.background.base,
           display: 'flex',
@@ -147,7 +147,7 @@ export default function TopBar({
           justifyContent: 'center',
           fontFamily: "'Plus Jakarta Sans', sans-serif",
           fontWeight: 900,
-          fontSize: 18,
+          fontSize: 16,
           boxShadow: `0 0 20px ${colors.accent.teal}26`,
         }}>
           Y
@@ -322,21 +322,18 @@ export default function TopBar({
                    paddingTop: 4,
                    paddingBottom: 4,
                    marginBottom: 4,
-                 }}>Last 5 Syncs</div>
-                 {['GitHub (2m ago)', 'Notion (1h ago)', 'Linear (4h ago)', 'Stripe (12h ago)', 'Manual (1d ago)'].map(s => (
-                   <div key={s} style={{
-                     paddingLeft: 8,
-                     paddingRight: 8,
-                     paddingTop: 6,
-                     paddingBottom: 6,
-                     fontSize: 11,
-                     color: colors.text.secondary,
-                     borderRadius: 8,
-                     cursor: 'default',
-                   }}>
-                     {s}
-                   </div>
-                 ))}
+                 }}>Sync Status</div>
+                 <div style={{
+                   paddingLeft: 8,
+                   paddingRight: 8,
+                   paddingTop: 6,
+                   paddingBottom: 6,
+                   fontSize: 11,
+                   color: colors.text.secondary,
+                   borderRadius: 8,
+                 }}>
+                   {notice}
+                 </div>
               </div>
             )}
           </div>
@@ -344,7 +341,6 @@ export default function TopBar({
           <button
             onClick={() => {
               setPublicProfile(!publicProfile);
-              setNotice(publicProfile ? 'Profile private' : 'Profile: /founder-92');
             }}
             style={{
               display: 'flex',
@@ -427,28 +423,35 @@ export default function TopBar({
                       fontSize: 11,
                       fontWeight: 700,
                       color: colors.text.primary,
-                    }}>Founder</div>
+                    }}>{user?.fullName || 'Founder'}</div>
                     <div style={{
                       fontSize: 9,
                       color: colors.text.tertiary,
-                    }}>Founder Tier Plan</div>
+                      textTransform: 'capitalize',
+                    }}>{user?.tier || 'Free'} Tier Plan</div>
                  </div>
-                 {['Profile', 'Settings', 'Billing', 'Sign Out'].map(item => (
-                   <button key={item} style={{
-                     width: '100%',
-                     textAlign: 'left',
-                     paddingLeft: 8,
-                     paddingRight: 8,
-                     paddingTop: 6,
-                     paddingBottom: 6,
-                     fontSize: 11,
-                     color: colors.text.secondary,
-                     borderRadius: 8,
-                     background: 'transparent',
-                     border: 'none',
-                     cursor: 'pointer',
-                   }}>
-                     {item}
+                 {accountMenuItems.map(item => (
+                   <button 
+                     key={item.label} 
+                     onClick={() => {
+                       item.onClick();
+                       setIsAccountOpen(false);
+                     }}
+                     style={{
+                       width: '100%',
+                       textAlign: 'left',
+                       paddingLeft: 8,
+                       paddingRight: 8,
+                       paddingTop: 6,
+                       paddingBottom: 6,
+                       fontSize: 11,
+                       color: item.danger ? colors.status.failed : colors.text.secondary,
+                       borderRadius: 8,
+                       background: 'transparent',
+                       border: 'none',
+                       cursor: 'pointer',
+                     }}>
+                     {item.label}
                    </button>
                  ))}
               </div>
