@@ -1,4 +1,4 @@
-# Yourpreneur Canvas
+# yourpreneur.com
 
 > Built this, validated the idea, killed it. Entrepreneurs don't need a canvas 
 > to organize their ambition — they need their ideas to actually work, and no 
