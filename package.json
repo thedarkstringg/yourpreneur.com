@@ -2,6 +2,13 @@
   "name": "yourpreneur.com",
   "version": "0.1.0",
   "private": true,
+  "description": "An infinite canvas for tracking ventures, milestones, and relationships on an interactive timeline.",
+  "author": "Ziyad Muradov",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thedarkstringg/yourpreneur.com.git"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
